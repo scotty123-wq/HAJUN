@@ -70,14 +70,92 @@ const HEAD = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#24713C">
+<meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="하준이 포켓몬">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
 <title>하준아 포켓몬 잡으러 가자!</title>
 </head>
 <body>
 `;
-fs.writeFileSync(INDEX, HEAD + html + '\n</body>\n</html>\n', 'utf8');
+/* 인터넷이 끊겨도 돌아가게 하는 부분 — 주소로 열었을 때만 켜집니다 */
+const FOOT = `
+<script>
+if('serviceWorker' in navigator && location.protocol === 'https:'){
+  addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+</script>
+</body>
+</html>
+`;
+fs.writeFileSync(INDEX, HEAD + html + FOOT, 'utf8');
+
+/* ---- 3-2. 앱 아이콘 ---- */
+
+const ICONS = [192,512,180].map(s => `icon-${s}.png`);
+if(ICONS.some(f => !fs.existsSync(path.join(DIR, f)))){
+  console.log('  앱 아이콘을 만드는 중...');
+  require('./make-icons.js');
+}
+
+/* ---- 3-3. 홈 화면 추가 정보 ---- */
+
+fs.writeFileSync(path.join(DIR,'manifest.webmanifest'), JSON.stringify({
+  name: '하준아 포켓몬 잡으러 가자!',
+  short_name: '하준이 포켓몬',
+  lang: 'ko',
+  start_url: './',
+  scope: './',
+  display: 'standalone',
+  orientation: 'portrait',
+  background_color: '#24713C',
+  theme_color: '#24713C',
+  icons: [
+    {src:'icon-192.png', sizes:'192x192', type:'image/png', purpose:'any'},
+    {src:'icon-512.png', sizes:'512x512', type:'image/png', purpose:'any'},
+    {src:'icon-512.png', sizes:'512x512', type:'image/png', purpose:'maskable'}
+  ]
+}, null, 2), 'utf8');
+
+/* ---- 3-4. 오프라인 캐시 (게임이 바뀌면 자동으로 새 버전을 받습니다) ---- */
+
+const stamp = require('crypto').createHash('sha1')
+  .update(fs.readFileSync(INDEX)).digest('hex').slice(0,10);
+
+fs.writeFileSync(path.join(DIR,'sw.js'),
+`/* 자동 생성 파일 — 직접 고치지 마세요. build.js 가 다시 만듭니다. */
+const CACHE = 'hajun-pokemon-${stamp}';
+const ASSETS = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-180.png'];
+
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys()
+    .then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    .then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  if(e.request.method !== 'GET') return;
+  e.respondWith(
+    fetch(e.request)
+      .then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+        return res;
+      })
+      .catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
+  );
+});
+`, 'utf8');
+
+/* ---- 3-5. 검색엔진 차단 ---- */
+
+fs.writeFileSync(path.join(DIR,'robots.txt'), 'User-agent: *\nDisallow: /\n', 'utf8');
 
 /* ---- 4. 결과 알려주기 ---- */
 
