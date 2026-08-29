@@ -86,7 +86,37 @@ const HEAD = `<!doctype html>
 const FOOT = `
 <script>
 if('serviceWorker' in navigator && location.protocol === 'https:'){
-  addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      var pending = false;
+
+      /* 새 버전을 다 받아두면 표시만 해둡니다 */
+      reg.addEventListener('updatefound', function(){
+        var nw = reg.installing;
+        if(!nw) return;
+        nw.addEventListener('statechange', function(){
+          if(nw.state === 'installed' && navigator.serviceWorker.controller){
+            pending = true;
+            apply();
+          }
+        });
+      });
+
+      /* 게임 중에 갑자기 새로고침되면 아이가 놀라니,
+         화면을 안 보고 있을 때만 조용히 갈아끼웁니다 */
+      function apply(){
+        if(pending && document.visibilityState === 'hidden') location.reload();
+      }
+
+      document.addEventListener('visibilitychange', function(){
+        if(document.visibilityState === 'hidden') apply();
+        else reg.update();          /* 앱을 열 때마다 새 버전이 있는지 확인 */
+      });
+
+      reg.update();
+      setInterval(function(){ reg.update(); }, 30 * 60 * 1000);
+    }).catch(function(){});
+  });
 }
 </script>
 </body>

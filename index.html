@@ -617,6 +617,44 @@ body{
 .chain .step.dim{opacity:.32;}
 .chain .arrow{font-weight:900;color:var(--ink-soft);}
 
+/* 7차: 갈래가 있는 계보(이브이 8갈래 · 코스모움 2갈래)는 단계마다 줄을 바꿉니다.
+   갈래가 없는 계보는 예전 그대로 가로 한 줄입니다 */
+.chain-tree{flex-direction:column;gap:2px;width:100%;}
+.chain-row{display:flex;align-items:flex-start;justify-content:center;gap:4px;flex-wrap:wrap;}
+.chain-row.many .artbox{width:42px;height:42px;}
+.chain-row.many .step{width:46px;}
+.chain-row.many .cn{font-size:9px;letter-spacing:-.07em;}
+.chain-dn{font-weight:900;font-size:13px;line-height:1;color:var(--ink-soft);text-align:center;}
+/* 창이 길어져도 잘리지 않게 (창 안에서만 스크롤됩니다 — 화면은 안 늘어납니다) */
+.sheet{max-height:100%;overflow-y:auto;}
+/* 갈래 계보가 붙은 창은 조금씩 줄여서 360×640 에서도 닫기 버튼까지 다 보이게 합니다.
+   갈래가 없는 보통 창은 예전 크기 그대로입니다 */
+.sheet.tree{gap:6px;}
+.sheet.tree > .artbox{width:96px;height:96px;}
+.sheet.tree .nm{font-size:25px;}
+.sheet.tree .chain .artbox{width:46px;height:46px;}
+.sheet.tree .chain .step{width:50px;}
+/* 갈래가 넷을 넘으면(이브이 여덟) 한 줄에 넷씩 두 줄로 가지런히 */
+.sheet.tree .chain-row.many{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;justify-items:center;}
+.sheet.tree .chain-row.many .artbox{width:34px;height:34px;}
+.sheet.tree .chain-row.many .step{width:100%;}
+
+/* 7차: 갈래 진화 고르기 창 */
+.evopicks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;}
+.evopicks.few{grid-template-columns:repeat(2,1fr);gap:9px;}
+.evopick{
+  display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;
+  background:#fff;border:3px solid var(--edge);border-radius:14px;
+  box-shadow:var(--shadow-sm);cursor:pointer;min-height:76px;
+  -webkit-tap-highlight-color:transparent;
+}
+.evopick:active{transform:scale(.93);}
+.evopick .artbox{width:100%;height:auto;aspect-ratio:1/1;}
+.evopick .nm{font-weight:900;font-size:11px;letter-spacing:-.07em;text-align:center;line-height:1.08;}
+.evopick .ty{font-weight:800;font-size:9px;color:var(--ink-soft);white-space:nowrap;}
+.evopicks.few .evopick .nm{font-size:15px;letter-spacing:-.04em;}
+.evopicks.few .evopick .ty{font-size:12px;}
+
 /* ---------- 진화 연출 ---------- */
 
 #evo{
@@ -938,7 +976,9 @@ const MONS = [
  {n:'메타몽',t:'노말',hp:12,
   art:{form:'blob',c1:'#D98FD1',c2:'#EFC6EB',eyes:'dot',mouth:'flat'}},
  /* 이브이 가족 */
- {n:'이브이',t:'노말',hp:15,
+ /* 7차: 이브이는 여덟 갈래로 진화합니다 (배열 자리는 그대로 — 번호가 밀리면 안 됩니다) */
+ {n:'이브이',t:'노말',hp:15,evoLv:8,
+  evos:['샤미드','쥬피썬더','부스터','에브이','블래키','리피아','글레이시아','님피아'],
   art:{form:'biped',c1:'#C58F52',c2:'#F6EBD2',ears:'longRabbit',tail:'bushy',marks:['ruff'],eyes:'round'}},
  {n:'샤미드',t:'물',hp:19,
   art:{form:'biped',c1:'#9FD8EE',c2:'#E9F6FB',ears:'fin',tail:'fintail',marks:['ruff'],eyes:'round'}},
@@ -975,7 +1015,122 @@ const MONS = [
     페어리 타입이 이 게임에는 없어서 전기로 넣었습니다(4차 전기충격/백만볼트를 그대로 씁니다) */
  {n:'데덴네',t:'전기',hp:13,
   art:{form:'round',c1:'#FFD83D',c2:'#F0A03C',ears:'pointy',tail:'boltThin',
-       marks:['cheeks'],eyes:'big',mouth:'flat'}}
+       marks:['cheeks'],eyes:'big',mouth:'flat'}},
+
+ /* =======================================================================
+    7차: 새 친구 42마리.
+    ⚠️ 반드시 배열 맨 뒤에만 붙입니다. 앞에 끼워 넣으면 번호가 밀려서
+       하준이가 이미 모아 둔 도감이 엉뚱한 포켓몬을 가리키게 됩니다.
+    이름 철자는 sprites\ 파일명과 한 글자도 다르면 안 됩니다
+    (다르면 진짜 그림 대신 SVG 대체 그림이 나옵니다).
+    evos:[...] 는 갈래가 여럿인 진화입니다 (이브이 8갈래 · 코스모움 2갈래).
+    ======================================================================= */
+
+ /* 이브이 8갈래 — 기존 샤미드·쥬피썬더·부스터에 다섯 친구가 더 붙습니다 */
+ {n:'에브이',t:'초',hp:20,
+  art:{form:'biped',c1:'#F2C3D8',c2:'#FBE7F0',ears:'longRabbit',tail:'thin',marks:['ruff'],eyes:'big'}},
+ {n:'블래키',t:'악',hp:20,
+  art:{form:'biped',c1:'#2E2A44',c2:'#F5D64C',ears:'longRabbit',tail:'thin',marks:['gem'],eyes:'fierce'}},
+ {n:'리피아',t:'풀',hp:20,
+  art:{form:'biped',c1:'#EFEAC8',c2:'#7FBF5A',ears:'pointy',tail:'bushy',marks:['bud','ruff'],eyes:'round'}},
+ {n:'글레이시아',t:'얼음',hp:20,
+  art:{form:'biped',c1:'#BFE6F5',c2:'#6FA8D8',ears:'longRabbit',tail:'thin',marks:['ruff'],eyes:'round'}},
+ {n:'님피아',t:'페어리',hp:20,
+  art:{form:'biped',c1:'#FFD3E4',c2:'#FF9FC8',ears:'longRabbit',tail:'fintail',marks:['ruff'],eyes:'big'}},
+
+ /* 루리리 → 마릴 → 마릴리 */
+ {n:'루리리',t:'노말',hp:11,evo:'마릴',evoLv:4,
+  art:{form:'round',c1:'#BFE4F5',c2:'#FBE3EA',ears:'roundSmall',tail:'thin',eyes:'big'}},
+ {n:'마릴',t:'물',hp:14,evo:'마릴리',evoLv:9,
+  art:{form:'round',c1:'#5FB6E8',c2:'#F5EBD4',ears:'roundSmall',tail:'thin',marks:['belly'],eyes:'big'}},
+ {n:'마릴리',t:'물',hp:20,
+  art:{form:'biped',c1:'#4FA0DC',c2:'#F5EBD4',ears:'roundSmall',tail:'thin',marks:['belly'],eyes:'round',big:1}},
+
+ /* 단독 */
+ {n:'파치리스',t:'전기',hp:14,
+  art:{form:'biped',c1:'#EFF4F8',c2:'#7FC4E8',ears:'pointy',tail:'bushy',marks:['cheeks'],eyes:'big'}},
+
+ /* 리오르 → 루카리오 (→ 메가루카리오) */
+ {n:'리오르',t:'격투',hp:14,evo:'루카리오',evoLv:8,
+  art:{form:'biped',c1:'#5C7FC4',c2:'#2E2A44',ears:'pointy',tail:'bushy',eyes:'round'}},
+ {n:'루카리오',t:'격투',hp:22,mega:{n:'메가루카리오',art:{c1:'#3E5FB0',marks:['arms4','spikes']}},
+  art:{form:'biped',c1:'#4E70BE',c2:'#F0D6B8',ears:'pointy',tail:'bushy',marks:['arms4'],eyes:'fierce',big:1}},
+
+ /* 개구마르 → 개굴반장 → 개굴닌자 */
+ {n:'개구마르',t:'물',hp:13,evo:'개굴반장',evoLv:5,
+  art:{form:'biped',c1:'#7FC4E8',c2:'#EFF4F8',eyes:'big',mouth:'flat'}},
+ {n:'개굴반장',t:'물',hp:17,evo:'개굴닌자',evoLv:10,
+  art:{form:'biped',c1:'#5FA8DC',c2:'#EFF4F8',marks:['ruff'],eyes:'round',mouth:'flat'}},
+ {n:'개굴닌자',t:'물',hp:22,
+  art:{form:'biped',c1:'#4E86C4',c2:'#F2679B',marks:['ruff'],eyes:'fierce',mouth:'flat',big:1}},
+
+ /* 나오하 → 나로테 → 마스카나 */
+ {n:'나오하',t:'풀',hp:13,evo:'나로테',evoLv:5,
+  art:{form:'quad',c1:'#9CD86E',c2:'#EFF7DC',ears:'pointy',tail:'long',eyes:'big'}},
+ {n:'나로테',t:'풀',hp:17,evo:'마스카나',evoLv:10,
+  art:{form:'biped',c1:'#8CCC5E',c2:'#EFF7DC',ears:'pointy',tail:'long',marks:['bud'],eyes:'round'}},
+ {n:'마스카나',t:'풀',hp:22,
+  art:{form:'biped',c1:'#7FBF4E',c2:'#F5D64C',ears:'pointy',tail:'long',marks:['vine'],eyes:'fierce',big:1}},
+
+ /* 뜨아거 → 악뜨거 → 라우드본 */
+ {n:'뜨아거',t:'불',hp:13,evo:'악뜨거',evoLv:5,
+  art:{form:'round',c1:'#F05B4A',c2:'#F5D96B',eyes:'big',mouth:'open'}},
+ {n:'악뜨거',t:'불',hp:17,evo:'라우드본',evoLv:10,
+  art:{form:'biped',c1:'#E8503F',c2:'#F5D96B',tail:'long',eyes:'round',mouth:'fang'}},
+ {n:'라우드본',t:'불',hp:22,
+  art:{form:'biped',c1:'#D8443A',c2:'#F5D96B',tail:'flame',ears:'crest',eyes:'fierce',mouth:'fang',big:1}},
+
+ /* 꾸왁스 → 아꾸왁 → 웨이니발 */
+ {n:'꾸왁스',t:'물',hp:13,evo:'아꾸왁',evoLv:5,
+  art:{form:'bird',c1:'#EFF4F8',c2:'#5FA8DC',mouth:'beak',ears:'crest',eyes:'big'}},
+ {n:'아꾸왁',t:'물',hp:17,evo:'웨이니발',evoLv:10,
+  art:{form:'bird',c1:'#E4EEF5',c2:'#4E86C4',mouth:'beak',ears:'crest2',tail:'feather',eyes:'round'}},
+ {n:'웨이니발',t:'물',hp:22,
+  art:{form:'biped',c1:'#DCE8F2',c2:'#3E6FB0',mouth:'beak',ears:'crest2',tail:'feather',eyes:'fierce',big:1}},
+
+ /* 코스모그 → 코스모움 → 솔가레오 / 루나아라 (갈래)
+    ⚠️ 코스모그·코스모움은 전설(rare:2)로 두지 않습니다.
+       rare:2 로 두면 거의 안 나와서 솔가레오·루나아라로 진화시킬 수가 없습니다 */
+ {n:'코스모그',t:'초',hp:11,evo:'코스모움',evoLv:6,
+  art:{form:'ghost',c1:'#5C6BC4',c2:'#BFC8F5',eyes:'big',mouth:'flat'}},
+ {n:'코스모움',t:'초',hp:14,evos:['솔가레오','루나아라'],evoLv:12,
+  art:{form:'cocoon',c1:'#4E5CB0',c2:'#DCE2FB',eyes:'closed'}},
+ {n:'솔가레오',t:'초',hp:26,rare:2,
+  art:{form:'quad',c1:'#EFF2F8',c2:'#F5D64C',ears:'crest3',tail:'bushy',marks:['mane'],eyes:'fierce',big:1}},
+ {n:'루나아라',t:'고스트',hp:26,rare:2,
+  art:{form:'bird',c1:'#DCE2FB',c2:'#5C4BA0',wings:'bat',ears:'crest3',tail:'feather',eyes:'fierce',big:1}},
+
+ /* 전설 — 진화 없음 */
+ {n:'가이오가',t:'물',hp:26,rare:2,
+  art:{form:'fish',c1:'#3E6FB0',c2:'#E8503F',eyes:'fierce',big:1}},
+ {n:'그란돈',t:'땅',hp:26,rare:2,
+  art:{form:'biped',c1:'#D8543A',c2:'#5C6B4E',ears:'horn2',tail:'long',marks:['spikes'],eyes:'fierce',big:1}},
+ {n:'레쿠쟈',t:'드래곤',hp:26,rare:2,mega:{n:'메가레쿠쟈',art:{c1:'#1E4A2E',c2:'#F5D64C',marks:['spikes','spikes2']}},
+  art:{form:'serpent',c1:'#2E7A4E',c2:'#F5D64C',marks:['whisker'],ears:'horn2',eyes:'fierce',mouth:'fang',big:1}},
+ {n:'디아루가',t:'드래곤',hp:26,rare:2,
+  art:{form:'quad',c1:'#7F8FC4',c2:'#5FC4E8',ears:'horn2',tail:'long',marks:['gem'],eyes:'fierce',big:1}},
+ {n:'펄기아',t:'드래곤',hp:26,rare:2,
+  art:{form:'biped',c1:'#EFEAF5',c2:'#B48FD8',ears:'horn2',tail:'long',marks:['gem'],eyes:'fierce',big:1}},
+ {n:'기라티나',t:'고스트',hp:26,rare:2,
+  art:{form:'ghost',c1:'#3E3A5C',c2:'#D8543A',wings:'spiky',ears:'horn3',eyes:'fierce',mouth:'fang',big:1}},
+ {n:'아르세우스',t:'노말',hp:26,rare:2,
+  art:{form:'quad',c1:'#F5F2E8',c2:'#F5D64C',ears:'horn2',tail:'long',marks:['gem','ruff'],eyes:'fierce',big:1}},
+ {n:'레시라무',t:'불',hp:26,rare:2,
+  art:{form:'biped',c1:'#F7F5EF',c2:'#5FC4E8',wings:'dragon',tail:'flameTail',ears:'crest3',eyes:'fierce',big:1}},
+ {n:'제크로무',t:'전기',hp:26,rare:2,
+  art:{form:'biped',c1:'#2E2A3C',c2:'#5FC4E8',wings:'dragon',tail:'boltTail',ears:'horn2',eyes:'fierce',big:1}},
+ {n:'제르네아스',t:'페어리',hp:26,rare:2,
+  art:{form:'quad',c1:'#3E6FB0',c2:'#F5D64C',ears:'horn3',tail:'long',marks:['gem'],eyes:'round',big:1}},
+ {n:'이벨타르',t:'비행',hp:26,rare:2,
+  art:{form:'bird',c1:'#2E2A3C',c2:'#D8443A',wings:'bat',ears:'crestSpike',tail:'feather',eyes:'fierce',big:1}},
+ {n:'자시안',t:'페어리',hp:26,rare:2,
+  art:{form:'quad',c1:'#5C7FC4',c2:'#F5D64C',ears:'crest3',tail:'bushy',marks:['mane'],eyes:'fierce',big:1}},
+ {n:'자마젠타',t:'격투',hp:26,rare:2,
+  art:{form:'quad',c1:'#C4407A',c2:'#5FC4E8',ears:'crest3',tail:'bushy',marks:['mane'],eyes:'fierce',big:1}},
+ {n:'코라이돈',t:'드래곤',hp:26,rare:2,
+  art:{form:'biped',c1:'#D8443A',c2:'#EFEAF5',ears:'crestSpike',tail:'long',marks:['spikes'],eyes:'fierce',big:1}},
+ {n:'미라이돈',t:'전기',hp:26,rare:2,
+  art:{form:'biped',c1:'#5C4BA0',c2:'#5FC4E8',ears:'crestSpike',tail:'boltTail',marks:['spikes'],eyes:'fierce',big:1}}
 ];
 
 /* 이름 → 인덱스 */
@@ -985,7 +1140,9 @@ const STARTERS = [IDX['꼬부기'], IDX['파이리'], IDX['피카츄'], IDX['이
 const MEGA_LV = 15;
 
 const TYPE_EMOJI = {'전기':'⚡','물':'💧','불':'🔥','풀':'🌿','노말':'⭐','벌레':'🐛','비행':'🪶',
-                    '초':'✨','독':'☠️','격투':'🥊','고스트':'👻','땅':'⛰️','얼음':'❄️','드래곤':'🐉'};
+                    '초':'✨','독':'☠️','격투':'🥊','고스트':'👻','땅':'⛰️','얼음':'❄️','드래곤':'🐉',
+                    /* 7차: 새 타입 두 가지 */
+                    '페어리':'🧚','악':'🌑'};
 
 /* 타입별 기술 — e:날아가는 그림, c:빛나는 색, m:기술 목록
    기술 하나 = {n:이름, p:위력, s:별 개수, k:이펙트 종류}
@@ -1007,7 +1164,11 @@ const MOVES = {
   '땅':   {e:'🪨', c:'#C89B6A', m:[{n:'모래뿌리기',p:5,s:2,k:'frag'},{n:'땅가르기',p:7,s:3,k:'rock'}]},
   '얼음': {e:'❄️', c:'#A8E0F2', m:[{n:'얼음뭉치',p:5,s:2,k:'rock'},  {n:'눈보라',  p:7,s:3,k:'frag'}]},
   '드래곤':{e:'🌀', c:'#F2C46A', m:[{n:'용의숨결',p:5,s:2,k:'spin'},  {n:'드래곤클로',p:7,s:3,k:'claw'}]},
-  '초':   {e:'✨', c:'#F2679B', m:[{n:'반짝파워',p:5,s:2,k:'spark'}, {n:'신비한힘',p:7,s:3,k:'orb'}]}
+  '초':   {e:'✨', c:'#F2679B', m:[{n:'반짝파워',p:5,s:2,k:'spark'}, {n:'신비한힘',p:7,s:3,k:'orb'}]},
+  /* 7차: 새 타입 두 가지 — 색과 모양이 확실히 다른 전용 이펙트를 씁니다
+     페어리 = 분홍 하트·별 반짝임 / 악 = 어두운 보라 이빨·밤구슬 */
+  '페어리':{e:'🧚', c:'#FF7FC4', m:[{n:'요정의바람',p:5,s:2,k:'fairy'},{n:'매지컬샤인',p:7,s:3,k:'shine'}]},
+  '악':   {e:'🌑', c:'#7A3FB0', m:[{n:'깨물어부수기',p:5,s:2,k:'bite'}, {n:'나이트버스트',p:7,s:3,k:'dark'}]}
 };
 const MOVE_DEFAULT = {e:'⭐', c:'#FFC93C', m:[{n:'몸통박치기',p:5,s:2,k:'dash'},{n:'할퀴기',p:7,s:3,k:'claw'}]};
 /* 누구나 쓸 수 있는 세 번째 기술 — 약하지만 언제나 맞습니다 */
@@ -1016,17 +1177,52 @@ const MOVE_BASIC  = {n:'몸통박치기', p:3, s:1, k:'dash',  e:'⭐', c:'#FFC9
 const MOVE_BASIC2 = {n:'구르기',    p:3, s:1, k:'spin',  e:'💨', c:'#FFE08A'};
 function moveSet(t){ return MOVES[t] || MOVE_DEFAULT; }
 
-/* 진화 라인 계산 */
-const PREV = {};
-MONS.forEach((m,i)=>{ if(m.evo != null && IDX[m.evo] != null) PREV[IDX[m.evo]] = i; });
-function chainOf(i){
-  let head = i;
-  while(PREV[head] != null) head = PREV[head];
-  const out = [head];
-  let cur = head;
-  while(MONS[cur].evo != null && IDX[MONS[cur].evo] != null){ cur = IDX[MONS[cur].evo]; out.push(cur); }
+/* 진화 라인 계산
+   7차: 갈래 진화가 생겼습니다 (이브이 8갈래 · 코스모움 2갈래).
+        evo(한 갈래) 와 evos(여러 갈래) 를 이름 배열 하나로 합쳐서 봅니다 */
+function evoNames(m){
+  if(!m) return [];
+  if(Array.isArray(m.evos)) return m.evos;
+  return m.evo != null ? [m.evo] : [];
+}
+/* i 번 포켓몬이 진화할 수 있는 번호들 (없으면 빈 배열) */
+function nextOf(i){
+  const out = [];
+  evoNames(MONS[i]).forEach(n=>{ const j = IDX[n]; if(j != null && out.indexOf(j) < 0) out.push(j); });
   return out;
 }
+const PREV = {};
+MONS.forEach((m,i)=>{
+  evoNames(m).forEach(n=>{ const j = IDX[n]; if(j != null && PREV[j] == null) PREV[j] = i; });
+});
+/* 계보의 맨 처음 (무한 고리가 생겨도 멈추게 횟수를 제한합니다) */
+function headOf(i){ let h = i, g = 0; while(PREV[h] != null && g++ < 20) h = PREV[h]; return h; }
+/* 진화 단계 — 0 이 1단계. 갈래가 있어도 정확합니다
+   (예전에는 chainOf(i).indexOf(i) 로 셌는데 갈래에서는 그게 틀립니다) */
+function stageOf(i){ let n = 0, h = i, g = 0; while(PREV[h] != null && g++ < 20){ h = PREV[h]; n++; } return n; }
+/* 계보에 속한 번호 전부 — 뿌리부터 단계 순서로 */
+function chainOf(i){
+  const out = [headOf(i)];
+  for(let k = 0; k < out.length && out.length < 32; k++){
+    nextOf(out[k]).forEach(c=>{ if(out.indexOf(c) < 0) out.push(c); });
+  }
+  return out;
+}
+/* 계보를 단계별 줄로 나눠 줍니다 — 도감 진화 화면이 이걸로 그립니다
+   [[이브이],[샤미드,쥬피썬더,부스터,에브이,블래키,리피아,글레이시아,님피아]] 처럼 */
+function chainLevels(i){
+  const rows = [[headOf(i)]];
+  const seen = {}; seen[rows[0][0]] = 1;
+  while(rows.length < 8){
+    const nx = [];
+    rows[rows.length-1].forEach(p=>nextOf(p).forEach(c=>{ if(!seen[c]){ seen[c] = 1; nx.push(c); } }));
+    if(!nx.length) break;
+    rows.push(nx);
+  }
+  return rows;
+}
+/* 갈래가 하나라도 있는 계보인가 (있으면 도감에서 세로로 그립니다) */
+function chainBranches(i){ return chainLevels(i).some(r=>r.length > 1); }
 function megaForm(m){
   if(!m.mega) return null;
   return { n:m.mega.n, t:m.t, hp:m.hp + 8,
@@ -1559,6 +1755,7 @@ const S = {
   wild:null, quiz:null, msg:'',
   megaOn:false,
   detail:null,
+  evoPick:false,         // 7차: 갈래 진화에서 "누구로 진화할까" 고르는 창이 열려 있나 (저장 안 함)
   /* 퀴즈 출제 기록 — 저장하지 않습니다 (예전 저장 파일과 그대로 호환)
      qRecent: 최근 3문제 {id,kind} (최신이 앞) / qHist: 최근 3문제의 틀린 횟수 */
   qRecent:[], qHist:[],
@@ -1639,12 +1836,14 @@ function canMega(){
 const STAR_COST = 15;                 /* 별 15개를 모으면 레벨과 상관없이 진화 */
 const STAR_MAX  = 999;
 
-/* 파트너의 다음 진화체 인덱스 — 없으면 null */
+/* 파트너가 진화할 수 있는 후보 번호들 — 갈래면 여러 개입니다 */
+function evoOptions(){
+  return (S.partner == null || !MONS[S.partner]) ? [] : nextOf(S.partner);
+}
+/* 파트너의 다음 진화체 인덱스 — 없으면 null (갈래면 첫 번째) */
 function evoNext(){
-  const m = pMon();
-  if(!m || m.evo == null) return null;
-  const ni = IDX[m.evo];
-  return ni == null ? null : ni;
+  const list = evoOptions();
+  return list.length ? list[0] : null;
 }
 /* 지금 진화할 수 있나 — 'lv' 레벨로 / 'star' 별로 / null 아직
    레벨 조건이 되면 언제나 'lv' 이라서 별을 쓰지 않습니다 */
@@ -1716,7 +1915,7 @@ function powClass(mine,theirs){
 function foeTough(mi){
   const m = MONS[mi];
   if(!m) return 0;
-  const stage = Math.max(0, chainOf(mi).indexOf(mi));
+  const stage = stageOf(mi);
   const t = (m.hp - 10)/3 + stage + (m.rare === 2 ? 4 : 0) + (m.mega ? 0.5 : 0);
   return Math.max(0, Math.min(8, t));
 }
@@ -1909,10 +2108,13 @@ function viewField(){
 function evoBtnHtml(){
   const why = evoReason();
   if(!why) return '';
-  const to = MONS[evoNext()].n;
+  const opts = evoOptions();
+  const many = opts.length > 1;                 /* 7차: 갈래 진화 (이브이 · 코스모움) */
+  const to = MONS[opts[0]].n;
   const tag = why === 'lv' ? '레벨' : `⭐${STAR_COST}`;
+  const label = many ? `진화할 친구 ${opts.length}명 중에 고르기` : `${to}${josaRo(to)} 진화하기`;
   return `<button class="btn btn-yellow evoready" data-act="evolve"
-    aria-label="${to}로 진화하기">✨ 진화할 수 있어! (${tag})</button>`;
+    aria-label="${label}">✨ 진화할 수 있어!${many ? ' 골라 봐' : ''} (${tag})</button>`;
 }
 function evoSlotHtml(){
   const ni = evoNext();
@@ -2083,22 +2285,57 @@ function viewDex(){
     : `<button class="btn btn-big btn-green" data-act="back">🌿 계속 탐험하기</button>`}`;
 }
 
+/* 진화 계보 그림 — 갈래가 없으면 예전처럼 가로 한 줄,
+   갈래가 있으면(이브이 8갈래 · 코스모움 2갈래) 단계마다 줄을 바꿔서 그립니다.
+   여덟 갈래도 넘치지 않게 줄 안에서 알아서 접힙니다 */
+function chainHtmlOf(i){
+  const step = ci=>{
+    const cm = MONS[ci], seen = S.dex.indexOf(ci) >= 0;
+    return `<div class="step ${seen?'':'dim'}">${artBox(cm,0,'')}<div class="cn">${seen?cm.n:'???'}</div></div>`;
+  };
+  if(!chainBranches(i)){
+    return `<div class="chain">${chainOf(i).map((ci,k)=>(k?`<span class="arrow">▸</span>`:'') + step(ci)).join('')}</div>`;
+  }
+  const rows = chainLevels(i).map((row,k)=>
+    (k ? `<div class="chain-dn" aria-hidden="true">▾</div>` : '') +
+    `<div class="chain-row${row.length > 3 ? ' many' : ''}">${row.map(step).join('')}</div>`
+  ).join('');
+  return `<div class="chain chain-tree">${rows}</div>`;
+}
+
 function renderModal(){
+  /* 7차: 갈래 진화 고르기 창 */
+  if(S.evoPick){
+    const opts = evoOptions();
+    if(!opts.length || S.partner == null){ S.evoPick = false; modalEl.className=''; modalEl.innerHTML=''; return; }
+    const me = pMon();
+    const cards = opts.map(ci=>{
+      const cm = MONS[ci];
+      return `<div class="evopick" data-act="evopick:${ci}" role="button" tabindex="0">
+        ${artBox(cm,0,'')}<div class="nm">${cm.n}</div>
+        <div class="ty">${TYPE_EMOJI[cm.t]||'⭐'} ${cm.t}</div></div>`;
+    }).join('');
+    modalEl.className = 'on';
+    modalEl.innerHTML = `<div class="sheet">
+      <div class="nm">✨ ${me.n}${josa(me.n,['은','는'])} 누구로?</div>
+      <div class="meta">그림을 누르면 그 친구로 진화해요</div>
+      <div class="evopicks${opts.length <= 4 ? ' few' : ''}">${cards}</div>
+      <button class="btn btn-white" data-act="evopickcancel" style="min-height:52px;width:100%;font-size:17px;">↩️ 나중에 할래</button>
+    </div>`;
+    return;
+  }
   if(S.detail == null){ modalEl.className = ''; modalEl.innerHTML = ''; return; }
   const i = S.detail, m = MONS[i];
   const owned = S.mons[i];
   const chain = chainOf(i);
-  const chainHtml = chain.map((ci,k)=>{
-    const cm = MONS[ci], seen = S.dex.indexOf(ci) >= 0;
-    return (k ? `<span class="arrow">▸</span>` : '') +
-      `<div class="step ${seen?'':'dim'}">${artBox(cm,0,'')}<div class="cn">${seen?cm.n:'???'}</div></div>`;
-  }).join('');
+  const chainHtml = chainHtmlOf(i);
   modalEl.className = 'on';
-  modalEl.innerHTML = `<div class="sheet">
-    ${artBox(m,150)}
+  const tree = chain.length > 1 && chainBranches(i);   /* 갈래 계보면 창을 조금 작게 */
+  modalEl.innerHTML = `<div class="sheet${tree ? ' tree' : ''}">
+    ${tree ? artBox(m,0,'') : artBox(m,150)}
     <div class="nm">${m.n}</div>
     <div class="meta">${TYPE_EMOJI[m.t]||'⭐'} ${m.t} 타입 ${owned ? `· Lv.${owned.lv}` : ''}${isKo(i) ? ' · 😵 쓰러짐' : ''}</div>
-    ${chain.length > 1 ? `<div class="chain">${chainHtml}</div>` : ''}
+    ${chain.length > 1 ? chainHtml : ''}
     ${i === S.partner && evoBtnHtml() ? `<div class="evorow" style="width:100%">${evoBtnHtml()}</div>` : ''}
     <div class="row">
       <button class="btn btn-yellow" data-act="sayname:${i}" style="min-height:56px;font-size:17px;">🔊 이름 듣기</button>
@@ -2149,7 +2386,9 @@ function startBattle(){
   /* 6차: 파트너가 쓰러진 채로는 새 배틀이 시작되지 않습니다 */
   if(partnerKo()){ S.screen = 'ko'; render(); return; }
   const weights = MONS.map((m,i)=>{
-    let w = m.rare === 2 ? 1 : (m.evo == null && PREV[i] != null ? 3 : 10);
+    /* 7차: evos(갈래 진화) 도 '아직 더 클 수 있음' 으로 봅니다.
+       코스모움이 최종형으로 잘못 세어져 잘 안 나오면 솔가레오·루나아라를 못 만듭니다 */
+    let w = m.rare === 2 ? 1 : (nextOf(i).length === 0 && PREV[i] != null ? 3 : 10);
     if(S.dex.indexOf(i) < 0) w *= 3;         /* 아직 못 본 애를 더 자주 */
     return w;
   });
@@ -2484,6 +2723,113 @@ function fireMove(fromSel,toSel,mv,big){
            </svg>`, 640);
       }, Math.max(0, dur - 230));
       fxRing(b.x, b.y, Math.round(100*g), c, dur - 40);
+      break;
+    }
+
+    /* ---- 7차 페어리 약: 요정의바람 — 분홍 하트와 별이 줄지어 날아갑니다 ---- */
+    case 'fairy': {
+      const n = big ? 12 : 8;
+      const s = Math.round(26*g);
+      for(let i=0;i<n;i++){
+        const jx = Math.round((Math.random()*2-1) * 52);
+        const jy = Math.round((Math.random()*2-1) * 46);
+        const rot = Math.round(120 + Math.random()*420) * (Math.random()<.5?-1:1);
+        const heart = (i % 2 === 0);
+        const el = fxNode('fx-frag', a.x, a.y, s, s,
+          `--d:${dur}ms;--dx:${dx+jx}px;--dy:${dy+jy}px;--r:${rot}deg;` + fxCen(s,s)
+          + `filter:drop-shadow(0 0 ${Math.round(8*g)}px ${c}) drop-shadow(0 0 ${Math.round(14*g)}px #FFD9F0);`,
+          heart
+            ? `<svg viewBox="0 0 20 20">
+                 <path d="M10 18 C2 12 1 7 4 4 C6.5 1.6 9 3 10 5 C11 3 13.5 1.6 16 4 C19 7 18 12 10 18 Z" fill="${c}"/>
+                 <path d="M6.6 5.4 C5.6 6.2 5.5 7.4 6.2 8.3" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>
+               </svg>`
+            : `<svg viewBox="0 0 20 20">
+                 <path d="M10 0 L12.2 7.2 L19.6 7.4 L13.6 11.8 L15.9 19 L10 14.5 L4.1 19 L6.4 11.8 L0.4 7.4 L7.8 7.2 Z" fill="#FFC7E8"/>
+                 <path d="M10 5 L11 8.6 L14.6 8.8 L11.7 11 L12.8 14.5 L10 12.3 L7.2 14.5 L8.3 11 L5.4 8.8 L9 8.6 Z" fill="#fff" opacity=".9"/>
+               </svg>`, life + 140);
+        if(el) el.style.animationDelay = (i*24) + 'ms';
+      }
+      fxRing(b.x, b.y, Math.round(84*g), c, dur - 40);
+      fxRing(b.x, b.y, Math.round(58*g), '#FFD9F0', dur + 20);
+      break;
+    }
+
+    /* ---- 7차 페어리 강: 매지컬샤인 — 분홍 별빛이 상대 위에서 크게 터집니다 ---- */
+    case 'shine': {
+      const s = Math.round(122*g);
+      let petals = '';
+      for(let i=0;i<6;i++){
+        const th = i*60;
+        petals += `<ellipse cx="50" cy="18" rx="9" ry="20" fill="${c}" opacity=".75" transform="rotate(${th} 50 50)"/>`;
+      }
+      let twinkle = '';
+      for(let i=0;i<5;i++){
+        const th = (i*72 + 26)*Math.PI/180, rr = 34;
+        const px = (50 + rr*Math.cos(th)).toFixed(1), py = (50 + rr*Math.sin(th)).toFixed(1);
+        twinkle += `<path d="M${px} ${(+py-8).toFixed(1)} L${(+px+2.6).toFixed(1)} ${py} L${(+px+8).toFixed(1)} ${py} L${(+px+2.6).toFixed(1)} ${(+py+2.6).toFixed(1)} L${px} ${(+py+8).toFixed(1)} L${(+px-2.6).toFixed(1)} ${(+py+2.6).toFixed(1)} L${(+px-8).toFixed(1)} ${py} L${(+px-2.6).toFixed(1)} ${py} Z" fill="#fff"/>`;
+      }
+      setTimeout(()=>{
+        const t = centerOf(toSel); if(!t) return;
+        fxNode('fx-spark', t.x, t.y, s, s, fxCen(s,s)
+          + `filter:drop-shadow(0 0 ${Math.round(12*g)}px ${c}) drop-shadow(0 0 ${Math.round(20*g)}px #FFD9F0);`,
+          `<svg viewBox="0 0 100 100">
+             <g>${petals}</g>
+             <circle cx="50" cy="50" r="22" fill="#fff" opacity=".95"/>
+             <path d="M50 24 L56 44 L76 50 L56 56 L50 76 L44 56 L24 50 L44 44 Z" fill="${c}"/>
+             <g opacity=".95">${twinkle}</g>
+           </svg>`, 680);
+      }, Math.max(0, dur - 210));
+      fxRing(b.x, b.y, Math.round(104*g), c, dur - 120);
+      fxRing(b.x, b.y, Math.round(72*g), '#FFD9F0', dur - 40);
+      break;
+    }
+
+    /* ---- 7차 악 약: 깨물어부수기 — 어두운 보라 이빨이 콱 물었다 놓습니다 ---- */
+    case 'bite': {
+      const s = Math.round(104*g);
+      setTimeout(()=>{
+        const t = centerOf(toSel); if(!t) return;
+        fxNode('fx-claw', t.x, t.y, s, s,
+          fxCen(s,s) + `--tilt:${dx>0?-10:10}deg;`
+          + `filter:drop-shadow(0 0 ${Math.round(9*g)}px ${c}) drop-shadow(0 0 ${Math.round(16*g)}px #2A1140);`,
+          `<svg viewBox="0 0 100 100">
+             <path d="M6 16 Q50 -2 94 16 L94 26 Q50 12 6 26 Z" fill="${c}" opacity=".92"/>
+             <path d="M6 84 Q50 102 94 84 L94 74 Q50 88 6 74 Z" fill="${c}" opacity=".92"/>
+             <g fill="#fff">
+               <path d="M16 24 L24 48 L32 25 Z"/><path d="M38 26 L48 54 L58 26 Z"/><path d="M64 25 L73 48 L81 24 Z"/>
+               <path d="M16 76 L24 52 L32 75 Z"/><path d="M38 74 L48 46 L58 74 Z"/><path d="M64 75 L73 52 L81 76 Z"/>
+             </g>
+           </svg>`, 620);
+      }, Math.max(0, dur - 200));
+      fxRing(b.x, b.y, Math.round(86*g), c, dur - 60);
+      break;
+    }
+
+    /* ---- 7차 악 강: 나이트버스트 — 밤빛 구슬이 날아가 어둠으로 퍼집니다 ---- */
+    case 'dark': {
+      const s = Math.round(70*g);
+      fxNode('fx-orb', a.x, a.y, s, s, V + fxCen(s,s)
+        + `filter:drop-shadow(0 0 ${Math.round(14*g)}px ${c}) drop-shadow(0 0 ${Math.round(22*g)}px #1E0B33);`,
+        `<svg viewBox="0 0 100 100">
+           <circle cx="50" cy="50" r="47" fill="none" stroke="${c}" stroke-width="6" opacity=".7"/>
+           <circle cx="50" cy="50" r="36" fill="#1E0B33" opacity=".95"/>
+           <circle cx="50" cy="50" r="22" fill="${c}" opacity=".9"/>
+           <circle cx="50" cy="50" r="9" fill="#E6C8FF"/>
+           <g fill="#C79BF0" opacity=".9">
+             <path d="M50 6 L54 18 L46 18 Z"/><path d="M50 94 L54 82 L46 82 Z"/>
+             <path d="M6 50 L18 46 L18 54 Z"/><path d="M94 50 L82 46 L82 54 Z"/>
+           </g>
+         </svg>`, life);
+      /* 뒤따르는 어둠 자락 세 개 */
+      for(let i=1;i<=3;i++){
+        const s2 = Math.round(s*(0.7 - i*0.12));
+        const el = fxNode('fx-orb', a.x, a.y, s2, s2,
+          `--d:${dur}ms;--dx:${dx}px;--dy:${dy}px;` + fxCen(s2,s2) + `opacity:.55;`,
+          `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#2A1140"/></svg>`, life);
+        if(el) el.style.animationDelay = (i*55) + 'ms';
+      }
+      fxRing(b.x, b.y, Math.round(110*g), c, dur - 30);
+      fxRing(b.x, b.y, Math.round(74*g), '#1E0B33', dur + 40);
       break;
     }
 
@@ -3218,8 +3564,10 @@ function checkEvolve(){
   const why = evoReason();
   if(why && why !== S.evoWas){
     SFX.evoReady();
-    const to = MONS[evoNext()].n;
-    S.msg = `✨ 진화할 수 있어! 버튼을 눌러 봐 (${to})`;
+    const opts = evoOptions();
+    S.msg = opts.length > 1
+      ? `✨ 진화할 수 있어! 버튼을 누르면 ${opts.length}명 중에 고를 수 있어`
+      : `✨ 진화할 수 있어! 버튼을 눌러 봐 (${MONS[opts[0]].n})`;
     render();
     say('진화할 수 있어! 버튼을 눌러 봐!');
   }
@@ -3227,13 +3575,24 @@ function checkEvolve(){
 }
 
 /* 버튼을 눌렀을 때 — 진짜로 진화합니다 */
-function doEvolve(){
+function doEvolve(pick){
   if(S.evoing || S.catching) return;
   const why = evoReason();
   if(!why) return;
-  const ni = evoNext(), cur = pMon(), next = MONS[ni];
+  const opts = evoOptions();
+  if(!opts.length) return;
+  /* 7차: 갈래 진화(이브이 8갈래 · 코스모움 2갈래) — 아직 안 골랐으면 고르는 창부터 */
+  if(opts.length > 1 && (pick == null || opts.indexOf(pick) < 0)){
+    S.evoPick = true; S.detail = null;
+    SFX.open(); renderModal();
+    say('누구로 진화할지 골라 봐!');
+    return;
+  }
+  const ni = (pick != null && opts.indexOf(pick) >= 0) ? pick : opts[0];
+  const cur = pMon(), next = MONS[ni];
   const lv = pLv();
 
+  S.evoPick = false;
   S.evoing = true;
   lock(4200);                     /* 연출이 끝날 때까지 두 번 눌러도 한 번만 */
   /* 별로 진화할 때만 별을 씁니다. 레벨 조건이면 별은 그대로입니다 */
@@ -3338,7 +3697,7 @@ function lock(ms){ BUSY_UNTIL = Date.now() + ms; }
 function busy(){ return Date.now() < BUSY_UNTIL; }
 
 /* 연출 중 막을 버튼들 — 소리 다시 듣기·도감 보기는 언제나 눌러도 됩니다 */
-const LOCKED_WHILE_BUSY = ['mv','atk','heal','ball','run','mega','ans','ord','pick','buddy','evolve'];
+const LOCKED_WHILE_BUSY = ['mv','atk','heal','ball','run','mega','ans','ord','pick','buddy','evolve','evopick'];
 
 /* 어른 확인 — 6살이 실수로 눌러도 잡은 포켓몬이 사라지지 않게 */
 function adultGate(){
@@ -3380,6 +3739,9 @@ function act(a){
     case 'run':    run(); break;
     case 'mega':   doMega(); break;
     case 'evolve': doEvolve(); break;
+    /* 7차: 갈래 진화 — 고른 친구로 진화 / 나중에 하기 (안 골라도 아무 손해 없습니다) */
+    case 'evopick': doEvolve(+arg); break;
+    case 'evopickcancel': S.evoPick = false; SFX.open(); renderModal(); break;
     case 'hear':   hearQuiz(); break;
     case 'ans':    answerPick(+arg); break;
     case 'ord':    answerPick(+arg); break;   /* 예전 화면이 남아 있어도 같이 처리 */
@@ -3428,7 +3790,7 @@ function hook(el){
 }
 hook(document.getElementById('app'));
 hook(modalEl);
-modalEl.addEventListener('click', e=>{ if(e.target === modalEl){ S.detail = null; renderModal(); } });
+modalEl.addEventListener('click', e=>{ if(e.target === modalEl){ S.detail = null; S.evoPick = false; renderModal(); } });
 
 const KEYMAP = {ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r',w:'u',s:'d',a:'l',d:'r'};
 window.addEventListener('keydown', e=>{
@@ -3461,7 +3823,37 @@ render();
 
 <script>
 if('serviceWorker' in navigator && location.protocol === 'https:'){
-  addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').then(function(reg){
+      var pending = false;
+
+      /* 새 버전을 다 받아두면 표시만 해둡니다 */
+      reg.addEventListener('updatefound', function(){
+        var nw = reg.installing;
+        if(!nw) return;
+        nw.addEventListener('statechange', function(){
+          if(nw.state === 'installed' && navigator.serviceWorker.controller){
+            pending = true;
+            apply();
+          }
+        });
+      });
+
+      /* 게임 중에 갑자기 새로고침되면 아이가 놀라니,
+         화면을 안 보고 있을 때만 조용히 갈아끼웁니다 */
+      function apply(){
+        if(pending && document.visibilityState === 'hidden') location.reload();
+      }
+
+      document.addEventListener('visibilitychange', function(){
+        if(document.visibilityState === 'hidden') apply();
+        else reg.update();          /* 앱을 열 때마다 새 버전이 있는지 확인 */
+      });
+
+      reg.update();
+      setInterval(function(){ reg.update(); }, 30 * 60 * 1000);
+    }).catch(function(){});
+  });
 }
 </script>
 </body>
