@@ -351,8 +351,60 @@ body{
   box-shadow:0 3px 0 var(--edge);
 }
 .nameplate.m{background:linear-gradient(100deg,#E5C6F7,#C9C2F7);}
-.hearts{display:flex;gap:2px;justify-content:center;font-size:14px;line-height:1;}
-.hearts .empty{opacity:.26;filter:grayscale(1);}
+/* 12차: 체력 막대 — 하트 다섯 칸으로는 일반기술(5)과 필살기(13)의 차이가 안 보였습니다.
+   아빠 요청: "약간 막대그래프? 100% 느낌으로". 막대 + 숫자 + 깎인 양 띄우기 */
+.hpbar{display:flex;align-items:center;gap:5px;min-width:0;width:100%;}
+/* 배틀은 하늘·풀 위라서 막대 뒤에 어두운 판을 깔아야 초록 막대가 풀에 묻히지 않습니다.
+   전투력(⚔️) 은 아랫줄로 내려서 막대가 슬롯 너비를 다 쓰게 합니다 —
+   막대가 길어야 일반기술과 필살기의 깎임 차이가 눈에 들어옵니다 */
+.slot .hpbar{background:rgba(18,26,18,.32);border-radius:999px;padding:3px 7px;flex:1 0 100%;}
+.slot .statline{flex-wrap:wrap;gap:3px 6px;}
+.hpwrap{position:relative;flex:1 1 auto;min-width:40px;display:block;}
+.hptrack{
+  display:block;position:relative;width:100%;height:15px;
+  background:#fff;border:3px solid var(--edge);border-radius:999px;
+  box-shadow:0 2px 0 var(--edge);overflow:hidden;
+}
+.hptrack > i{
+  display:block;height:100%;width:0;border-radius:999px;
+  background:linear-gradient(180deg,#8BE28E,#3FA84B);
+  transition:width .42s cubic-bezier(.25,1,.4,1), background .3s linear;
+}
+.hpbar.mid .hptrack > i{background:linear-gradient(180deg,#FFE07A,#F2B21C);}
+.hpbar.lo  .hptrack > i{background:linear-gradient(180deg,#FFA98F,#E8412F);}
+.hpbar.lo  .hptrack{animation:hpLow .9s ease-in-out infinite;}
+@keyframes hpLow{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+/* 몬스터볼이 열리는 자리(절반) — 여기까지 깎으면 볼을 던질 수 있습니다.
+   막대(.hptrack) 는 overflow:hidden 이라 표시는 바깥 상자(.hpwrap)에 그립니다 */
+.hpmark{position:absolute;left:50%;top:1px;bottom:1px;width:3px;margin-left:-1.5px;
+  background:var(--edge);opacity:.55;border-radius:2px;}
+.hpball{position:absolute;left:50%;top:50%;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;
+  border-radius:50%;border:2px solid var(--edge);box-shadow:0 1px 0 rgba(0,0,0,.25);
+  background:linear-gradient(180deg,#E8412F 50%,#fff 50%);}
+.hpnum{
+  font-weight:900;font-size:11px;line-height:1;white-space:nowrap;flex:0 0 auto;
+  font-variant-numeric:tabular-nums;color:var(--ink);
+}
+/* 배틀은 하늘·풀 위라서 흰 글씨에 테두리를 둘러야 잘 보입니다 */
+.slot .hpnum{color:#fff;-webkit-text-stroke:3px var(--edge);paint-order:stroke fill;}
+.hpnum small{font-size:.84em;opacity:.9;}
+/* 밭에서는 이름 칸이 넓으니 막대 길이를 고정해서 이름을 밀지 않게 */
+.buddy .hpbar{flex:0 0 auto;width:auto;}
+.buddy .hpwrap{flex:0 0 78px;}
+/* 맞은 만큼을 그 자리에 크게 띄웁니다 — 필살기가 세다는 걸 눈으로 배웁니다 */
+.dmgpop{
+  position:absolute;font-weight:900;font-size:27px;line-height:1;white-space:nowrap;
+  color:#fff;-webkit-text-stroke:6px var(--edge);paint-order:stroke fill;
+  animation:dmgPop 1s cubic-bezier(.2,1.5,.4,1) forwards;
+}
+.dmgpop.big{font-size:41px;color:#FFD83D;-webkit-text-stroke-width:7px;}
+.dmgpop.heal{color:#8BE28E;}
+@keyframes dmgPop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.4);}
+  20%{opacity:1;transform:translate(-50%,-78%) scale(1.16);}
+  55%{opacity:1;transform:translate(-50%,-98%) scale(1);}
+  100%{opacity:0;transform:translate(-50%,-142%) scale(.9);}
+}
 
 .hurt{animation:hurt .34s ease;}
 @keyframes hurt{0%,100%{transform:translateX(0);}20%{transform:translateX(-9px) rotate(-4deg);}45%{transform:translateX(8px) rotate(4deg);}70%{transform:translateX(-5px);}}
@@ -401,7 +453,7 @@ body{
 @keyframes turnBob{0%,100%{transform:scale(1);}50%{transform:scale(1.09);}}
 
 /* ---- 전투력 ---- */
-.statline{display:flex;align-items:center;justify-content:center;gap:6px;}
+.statline{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;}
 .pw{
   font-weight:900;font-size:12px;line-height:1;padding:3px 7px;border-radius:999px;
   border:2px solid var(--edge);background:#fff;white-space:nowrap;
@@ -914,6 +966,43 @@ body{
 .qfoe .artbox{width:100%;height:100%;}
 .qsubj.wide .qfoe{right:-26px;bottom:-12px;}
 
+/* 12차: 세는 문제 전용 머리 — "이 상자 안에 있는 것만 센다"
+   아빠 지적: 낱말 이모지(나무🌳)가 세는 줄 바로 옆에 붙어서 같이 세게 됩니다.
+   그래서 세는 줄은 점선 상자 안에 혼자 두고,
+   낱말 이모지·야생 포켓몬은 상자 바깥 위쪽에 작게 떼어 놓습니다 */
+.qcount{display:flex;flex-direction:column;align-items:center;gap:13px;max-width:100%;}
+.qdeco{display:flex;align-items:center;justify-content:center;gap:9px;}
+.qdeco-emo,.qdeco-mon{
+  width:44px;height:44px;background:var(--cream);
+  border:3px solid var(--edge);box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;justify-content:center;flex:0 0 44px;
+}
+.qdeco-emo{border-radius:13px;font-size:25px;line-height:1;}
+.qdeco-mon{border-radius:50%;padding:3px;}
+.qdeco-mon .artbox{width:100%;height:100%;}
+.countbox{
+  display:flex;align-items:center;justify-content:center;max-width:100%;
+  background:#FFFCEA;border:6px dashed var(--edge);border-radius:24px;
+  box-shadow:var(--shadow);padding:12px 16px;min-height:88px;
+}
+.countbox .num{
+  font-weight:900;font-size:clamp(30px,9.5vw,48px);line-height:1.1;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.countbox .op{color:var(--ink-soft);}
+.countbox .emorow{font-size:clamp(23px,7.4vw,36px);letter-spacing:2px;white-space:nowrap;line-height:1.15;}
+/* 12차(⑤): 나눠 담기 — 구슬을 두 접시에 나눠 담은 그림 */
+.splitwrap{display:flex;flex-direction:column;align-items:center;gap:5px;max-width:100%;}
+.splitall{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:100%;}
+.splitdown{font-size:15px;line-height:1;color:var(--ink-soft);}
+.splitrow{display:flex;align-items:center;justify-content:center;gap:9px;max-width:100%;}
+.plate{
+  display:flex;gap:4px;align-items:center;justify-content:center;flex-wrap:wrap;
+  min-width:50px;min-height:36px;padding:5px 7px;
+  background:#fff;border:3px solid var(--edge);border-radius:14px;box-shadow:0 3px 0 var(--edge);
+}
+.plate.q{background:var(--sun);font-size:23px;font-weight:900;line-height:1;}
+
 .opts{
   display:grid;gap:var(--gap);justify-content:center;
   grid-template-columns:repeat(var(--cols,3), minmax(0, var(--tile)));
@@ -1201,6 +1290,20 @@ body.qk{overflow:hidden;}
   .quiz-expr .qemoji{font-size:clamp(26px,8vw,38px);}
   .qfoe{width:40px;height:40px;right:-6px;bottom:-6px;border-width:2px;padding:2px;}
   .qsubj.wide .qfoe{right:-22px;bottom:-10px;}
+  /* 12차: 세는 상자도 짧은 폰에서 같이 줄입니다 */
+  .qcount{gap:9px;}
+  .qdeco{gap:7px;}
+  .qdeco-emo,.qdeco-mon{width:36px;height:36px;flex-basis:36px;border-width:2px;}
+  .qdeco-emo{font-size:20px;border-radius:11px;}
+  .qdeco-mon{padding:2px;}
+  .countbox{min-height:68px;padding:9px 12px;border-width:5px;border-radius:20px;}
+  .countbox .num{font-size:clamp(26px,8vw,38px);}
+  .countbox .emorow{font-size:clamp(20px,6.4vw,29px);letter-spacing:1px;}
+  .splitwrap{gap:4px;}
+  .splitall{gap:4px;}
+  .splitrow{gap:7px;}
+  .plate{min-width:42px;min-height:30px;padding:4px 6px;gap:3px;border-width:2px;border-radius:11px;}
+  .plate.q{font-size:19px;}
   .acts .btn{min-height:50px;font-size:13px;padding:6px 3px;}
   .acts .btn .em{font-size:20px;}
   /* 10차: 짧은 폰에서 네 칸 · 그냥 싸울래 버튼도 같이 줄입니다 */
@@ -1216,6 +1319,17 @@ body.qk{overflow:hidden;}
   .turnbar{font-size:13px;padding:3px 9px;left:6px;top:6px;border-width:2px;}
   .pw{font-size:11px;padding:2px 6px;}
   .statline{gap:5px;}
+  /* 12차: 짧은 폰에서 체력 막대도 같이 줄입니다 */
+  .hpbar{gap:4px;}
+  .hptrack{height:12px;border-width:2px;}
+  .hpwrap{min-width:34px;}
+  .slot .hpbar{padding:2px 5px;}
+  .hpnum{font-size:10px;}
+  .slot .hpnum{-webkit-text-stroke-width:2.5px;}
+  .hpball{width:11px;height:11px;margin:-5.5px 0 0 -5.5px;}
+  .buddy .hpwrap{flex-basis:64px;}
+  .dmgpop{font-size:23px;-webkit-text-stroke-width:5px;}
+  .dmgpop.big{font-size:34px;-webkit-text-stroke-width:6px;}
   .shot{width:32px;height:32px;margin:-16px 0 0 -16px;font-size:25px;}
   .boom{width:74px;height:74px;margin:-37px 0 0 -37px;font-size:36px;}
   .say{min-height:44px;font-size:15px;padding:7px 11px;}
@@ -2116,6 +2230,9 @@ const SINO = ['영','일','이','삼','사','오','육','칠','팔','구','십',
 function sino(n){ return SINO[n] != null ? SINO[n] : String(n); }
 /* 개수는 고유어로 — "하나, 둘, 셋" */
 const NATIVE = ['','하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉','열'];
+/* 12차(⑤): 개수를 셀 때 붙는 관형사 — "세 개" 가 맞고 "셋 개" · "삼 개" 는 틀립니다 */
+const NATIVE_UNIT = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
+function nativeUnit(n){ return NATIVE_UNIT[n] != null ? NATIVE_UNIT[n] : sino(n); }
 function nativeCount(n){
   const a = [];
   for(let i=1;i<=n && i<NATIVE.length;i++) a.push(NATIVE[i]);
@@ -2420,7 +2537,7 @@ function camAt(p){ return Math.max(0, Math.min(REG_W - VIEW, p - ((VIEW-1)>>1)))
    (기운 차리기는 6차의 퀴즈로 언제나 됩니다)
    ========================================================= */
 const ITEMS = [
-  {k:'potion', n:'회복약',      e:'💊', d:'체력이 가득 차요'},
+  {k:'potion', n:'회복약',      e:'💊', d:'체력이 많이 차요'},
   {k:'candy',  n:'이상한 사탕', e:'🍬', d:'같이 가는 친구가 레벨 +1'},
   {k:'ball',   n:'좋은 볼',     e:'⭐', d:'퀴즈에서 아닌 보기를 지워요'},
   {k:'revive', n:'기운의 조각', e:'❤️', d:'쓰러진 친구가 바로 일어나요'}
@@ -2535,9 +2652,12 @@ function load(){
      체력이 이상하게 저장돼 있어도 아이가 갇히지 않게 여기서 바로잡습니다 */
   S.swapping = false; S.reviveTarget = null; S.reviveGot = 0;
   if(S.partner != null && MONS[S.partner]){
-    if(!(S.maxHp > 0)) S.maxHp = pMaxHp();
+    /* 12차: 최대 체력은 언제나 지금 파트너·레벨로 다시 셉니다.
+       옛 저장의 maxHp 로 자르면 "5/40 으로 시작" 같은 억울한 일이 생깁니다 */
+    S.maxHp = pMaxHp();
     if(partnerKo()) S.hp = 0;
     else if(!(S.hp > 0)) S.hp = S.maxHp;
+    else S.hp = Math.min(S.hp, S.maxHp);
   }
   return S.partner != null && MONS[S.partner] != null;
 }
@@ -2676,22 +2796,24 @@ function useItem(k){
   if(!canUseItem(k)) return;
   if(k === 'potion'){
     if(!useUpItem('potion')) return;
-    S.hp = S.maxHp;
+    /* 12차: 체력이 전투 사이에 이어지므로 회복약은 "가득" 이 아니라 큰 폭(60%) 으로 찹니다 */
+    const before = S.hp;
+    S.hp = Math.min(S.maxHp, S.hp + healAmount());
+    const got = S.hp - before;
     S.bag = false;
     const n = pMon().n;
-    S.msg = `💊 회복약! ${n}${josa(n,['이','가'])} 힘이 가득! 💚`;
+    S.msg = `💊 회복약! ${n}${josa(n,['이','가'])} 힘이 났다! 💚 +${got}`;
     SFX.useItem(); save(); render();
     popAt('.buddy .artbox','💚','#63C266');
-    say('회복약! 힘이 가득 찼어!');
+    healPop('.buddy .artbox', got);
+    say('회복약! 힘이 났어!');
     return;
   }
   if(k === 'candy'){
     if(!useUpItem('candy')) return;
     if(!S.mons[S.partner]) S.mons[S.partner] = {lv:1};
     S.mons[S.partner].lv++;
-    const before = S.maxHp;
-    S.maxHp = pMaxHp();
-    S.hp = Math.min(S.maxHp, Math.max(1, S.hp) + Math.max(0, S.maxHp - before));
+    growMaxHp();                 /* 12차: 커진 만큼만 더해 줍니다 (계산은 한 군데로 모았습니다) */
     S.bag = false;
     S.msg = `🍬 이상한 사탕! ${pMon().n}${josaRo(pMon().n)} Lv.${pLv()} 이 됐어! 🎉`;
     SFX.useItem(); confetti(); save(); render();
@@ -2868,7 +2990,10 @@ function wildMaxHp(mi){
    세 턴 싸우면 하트가 눈에 띄게 줄어듭니다 */
 function foeDamage(){
   if(!S.wild) return 1;
-  const base = Math.max(2, Math.round(pMaxHp() * (0.20 + foeTough(S.wild.mi) * 0.009)));
+  /* 12차: 체력이 전투 사이에 이어지게 되면서(②) 예전 20~27% 는 너무 가혹해졌습니다.
+     11~15% 로 낮춰서 "한 배틀에 대략 3분의 1이 닳는다" 로 맞춥니다.
+     그래도 세 번 싸우면 회복약이 꼭 필요할 만큼은 닳습니다 */
+  const base = Math.max(2, Math.round(pMaxHp() * (0.115 + foeTough(S.wild.mi) * 0.0045)));
   let d = base + Math.floor(Math.random() * (Math.round(base * 0.4) + 1));
   /* 메가진화 중에는 훨씬 덜 아픕니다 — 메가는 확실히 세야 합니다 */
   if(S.megaOn) d = Math.round(d * 0.55);
@@ -2877,9 +3002,28 @@ function foeDamage(){
   return Math.max(1, d);
 }
 
-/* 회복량 — 예전에는 7 고정이라 크고 나면 있으나 마나였습니다.
-   이제 최대 체력의 40% 라서 한 방 맞은 것보다 확실히 많이 찹니다 */
-function healAmount(){ return Math.max(8, Math.round(pMaxHp() * 0.40)); }
+/* 12차: 체력이 전투 사이에 이어집니다 (아빠 요청 — "물약의 효용성이 올라가지 않을까?").
+   그래서 회복 수단을 다시 정리했습니다.
+     💊 회복약 (가방·전투 둘 다)  최대 체력의 60% — 확실히 이득이 보이게
+     😮‍💨 숨 고르기 (회복약이 없을 때) 최대 체력의 22% — 언제나 쓸 수 있어서 절대 막히지 않습니다
+     🎉 포켓몬을 잡으면            최대 체력의 30% (레벨이 오른 만큼은 따로 더해 줍니다)
+   회복약이 없어도 숨 고르기로 계속 버틸 수 있으니 6살이 갇히는 일은 없습니다 */
+function healAmount(){ return Math.max(14, Math.round(pMaxHp() * 0.60)); }
+function restAmount(){ return Math.max(7,  Math.round(pMaxHp() * 0.22)); }
+function catchHeal(){ return Math.max(6,  Math.round(pMaxHp() * 0.30)); }
+/* 레벨이 올라 최대 체력이 커지면 커진 만큼 그대로 더해 줍니다 (지금 체력은 절대 안 깎입니다) */
+function growMaxHp(){
+  const before = S.maxHp;
+  S.maxHp = pMaxHp();
+  S.hp = Math.min(S.maxHp, Math.max(0, S.hp) + Math.max(0, S.maxHp - before));
+}
+/* 파트너를 바꿀 때 — 지친 정도는 이어지되, 새 친구가 바로 쓰러지지 않게 절반은 채워 줍니다 */
+function swapHp(){
+  const before = S.maxHp;
+  S.maxHp = pMaxHp();
+  const keep = (before > 0) ? Math.round(Math.max(0, S.hp) / before * S.maxHp) : S.maxHp;
+  S.hp = Math.max(Math.round(S.maxHp * 0.5), Math.min(S.maxHp, keep));
+}
 
 /* 하준이가 지금까지 얼마나 컸나 — 여기까지만 어려워집니다 */
 function skillCap(){
@@ -3041,11 +3185,44 @@ function pickQuizType(wm,mi){
 /* 난이도 별표 — 겁주지 않고 "해 보자" 로만 말합니다 */
 const WANT_LABEL = ['', '⭐ 가볍게!', '⭐⭐ 좋아!', '⭐⭐⭐ 잘한다!', '⭐⭐⭐⭐ 도전!', '⭐⭐⭐⭐⭐ 최고 도전!'];
 function wantLabel(w){ return WANT_LABEL[Math.max(1,Math.min(5,w||1))]; }
-function hearts(hp,max){
-  const filled = Math.max(0, Math.ceil(hp / (max/5)));
-  let s='';
-  for(let i=0;i<5;i++) s += `<span class="${i<filled?'':'empty'}">❤️</span>`;
-  return `<div class="hearts">${s}</div>`;
+/* 12차: 체력 막대 — 아빠 요청 "하트 한두 개씩으로는 기술별 차이가 안 보인다".
+   막대(남은 비율) + 숫자(24 / 48) 로 바꿉니다.
+   who: 'me' 내 쪽 · 'foe' 상대 쪽. 상대 막대에는 몬스터볼이 열리는 절반 자리를 그려 줍니다.
+   화면을 다시 그려도 줄어드는 모습이 보이게, 직전 비율에서 출발해 새 비율로 미끄러집니다 */
+const HP_LAST = {me:null, foe:null};
+function hpReset(who){
+  if(who) HP_LAST[who] = null;
+  else { HP_LAST.me = null; HP_LAST.foe = null; }
+}
+function hpBar(hp,max,who){
+  who = (who === 'foe') ? 'foe' : 'me';
+  max = Math.max(1, Math.round(max || 1));
+  hp  = Math.max(0, Math.min(max, Math.round(hp || 0)));
+  const pct  = hp / max * 100;
+  const prev = HP_LAST[who];
+  const from = (prev == null) ? pct : prev;
+  HP_LAST[who] = pct;
+  const tone = pct <= 25 ? 'lo' : (pct <= 55 ? 'mid' : 'hi');
+  /* 상대 막대에만 몬스터볼이 열리는 절반 자리를 표시합니다 */
+  const mark = who === 'foe'
+    ? `<b class="hpmark" aria-hidden="true"></b><b class="hpball" aria-hidden="true"></b>` : '';
+  return `<div class="hpbar ${tone}" aria-label="체력 ${hp} / ${max}">
+    <span class="hpwrap"><span class="hptrack"><i style="width:${from.toFixed(1)}%" data-hpw="${pct.toFixed(1)}"></i></span>${mark}</span>
+    <span class="hpnum">${hp}<small>/${max}</small></span>
+  </div>`;
+}
+/* 다시 그린 직후에 새 길이로 미끄러지게 합니다 (그 전에는 직전 길이 그대로) */
+function hpAnim(){
+  const list = document.querySelectorAll('.hptrack > i[data-hpw]');
+  for(let k=0;k<list.length;k++){
+    const el = list[k];
+    const w = el.getAttribute('data-hpw');
+    el.removeAttribute('data-hpw');
+    /* 지금(직전) 길이를 브라우저에 한 번 확정시킨 다음 새 길이를 주면 transition 이 돕니다.
+       requestAnimationFrame 은 화면이 가려져 있을 때 안 불릴 수 있어서 쓰지 않습니다 */
+    void el.offsetWidth;
+    el.style.width = w + '%';
+  }
 }
 
 /* =========================================================
@@ -3085,6 +3262,7 @@ function render(){
   screenEl.innerHTML = V[1]();
   if(S.screen === 'field') placePlayer();
   renderModal();
+  hpAnim();          /* 12차: 체력 막대가 새 길이로 미끄러지게 */
 }
 
 function viewTitle(){
@@ -3135,7 +3313,7 @@ function viewField(){
   <div class="buddy">
     ${artBox(pActive(),52)}
     <div class="grow"><div class="bn">${pActive().n}</div><div class="bl">Lv.${pLv()} · ${next}</div></div>
-    ${hearts(S.hp, S.maxHp)}
+    ${hpBar(S.hp, S.maxHp, 'me')}
   </div>
   <div class="regbar">
     <button class="btn regbtn" data-act="travel" aria-label="지역 옮기기">${reg.emoji} ${reg.name} 🗺️</button>
@@ -3215,13 +3393,13 @@ function viewBattle(){
     <div class="turnbar ${foeTurnNow?'foe':'me'}">${foeTurnNow?'👾 상대 차례':'😀 내 차례'}</div>
     <div class="slot foe">
       <div class="nameplate">${wm.n} ${TYPE_EMOJI[wm.t]||''}</div>
-      <div class="statline">${hearts(w.hp,w.max)}<span class="pw">⚔️${theirs}</span></div>
+      <div class="statline">${hpBar(w.hp,w.max,'foe')}<span class="pw">⚔️${theirs}</span></div>
       ${artBox(wm,0,'')}
     </div>
     <div class="slot me${S.megaOn?' mega':''}">
       ${artBox(me,0,'')}
       <div class="nameplate${S.megaOn?' m':''}">${me.n} Lv.${pLv()}</div>
-      <div class="statline">${hearts(S.hp,S.maxHp)}<span class="pw ${powClass(mine,theirs)}">⚔️${mine}</span></div>
+      <div class="statline">${hpBar(S.hp,S.maxHp,'me')}<span class="pw ${powClass(mine,theirs)}">⚔️${mine}</span></div>
     </div>
     ${S.megaOn ? `<div class="megatag">✨ 메가 파워!</div>` : ''}
   </div>
@@ -3234,7 +3412,11 @@ function viewBattle(){
     <button class="btn ${canUlt()?'btn-ult ready':'btn-white'}" data-act="ult" ${(canUlt() && !off)?'':'disabled'}>
       <span class="em">${canUlt()?'💥':'⏳'}</span> ${ultLabel()}
     </button>
-    <button class="btn btn-green" data-act="heal"${D}><span class="em">💚</span> 회복</button>
+    ${/* 12차: 회복약이 있으면 회복약을 씁니다(크게 찹니다). 없으면 숨 고르기 — 언제나 누를 수 있습니다 */''}
+    <button class="btn btn-green" data-act="heal"${D}>
+      <span class="em">${itemCount('potion') > 0 ? '💊' : '😮‍💨'}</span>
+      ${itemCount('potion') > 0 ? `회복약 ${itemCount('potion')}` : '숨 고르기'}
+    </button>
     <button class="btn ${ready?'btn-yellow ready':'btn-white'}" data-act="ball" ${(ready && !off)?'':'disabled'}>
       <span class="em">${ready?'⚪':'🔒'}</span> ${ready?(w.solved?'다시 던져!':'몬스터볼!'):'몬스터볼'}
     </button>
@@ -3258,10 +3440,61 @@ function isRight(q,v){
    9차: 소재가 낱말이면 포켓몬 그림 자리에 이모지를 크게 놓습니다.
         대신 야생 포켓몬을 오른쪽 아래에 작게 붙여서
         "이걸 잡으려고 푸는 거야" 라는 마음이 끊기지 않게 합니다 */
+/* 12차: 세거나 순서를 묻는 유형 — 이 다섯 개는 "세는 줄" 안에
+   세는 대상 말고는 아무것도 들어가면 안 됩니다 (아빠가 나무🌳 때문에 헷갈렸던 그 문제) */
+const COUNT_IDS = ['N_NTH','N_COUNT','N_PAT','N_DIFF','N_SEQ'];
+/* 12차(④): "나무만 빼기" 같은 땜질이 아니라 구조로 막습니다.
+   숫자 유형에서 무언가를 보여 주는 머리(식·볼·점·시계)는 전부 이 상자 안에 혼자 들어갑니다.
+   장식(낱말 이모지·야생 포켓몬)은 상자 바깥 위 줄(.qdeco)에만 놓입니다.
+   그래서 어떤 낱말이 걸려도 세는 줄 안에는 세는 대상 말고는 아무것도 못 들어옵니다 */
+const NUM_BOX_HEADS = ['expr','balls','dots','clock','split'];
+function numBoxed(q){
+  return (q.kind === 'num' && NUM_BOX_HEADS.indexOf(q.head) >= 0)
+      || COUNT_IDS.indexOf(q.id) >= 0;
+}
+/* 상자 안에 들어갈 내용만 만듭니다 — 낱말 이모지도 포켓몬 그림도 여기 들어오지 않습니다 */
+function countRow(q){
+  switch(q.head){
+    case 'balls': {
+      let b = '';
+      for(let i=0;i<q.headData;i++) b += ballSvg();
+      return `<div class="quiz-balls">${b}</div>`;
+    }
+    case 'dots': {
+      let r1 = '', r2 = '';
+      for(let i=0;i<q.headData.a;i++) r1 += '<i class="dot a"></i>';
+      for(let i=0;i<q.headData.b;i++) r2 += '<i class="dot b"></i>';
+      return `<div class="dotrows"><div class="dotrow">${r1}</div><div class="dotrow">${r2}</div></div>`;
+    }
+    case 'clock':
+      return clockSvg(q.headData);
+    /* 12차(⑤): 나눠 담기 — 전체 구슬 → 두 접시 */
+    case 'split': {
+      let all = '', one = '';
+      for(let i=0;i<q.headData.t;i++) all += '<i class="dot a"></i>';
+      for(let i=0;i<q.headData.a;i++) one += '<i class="dot a"></i>';
+      return `<div class="splitwrap">
+        <div class="splitall">${all}</div>
+        <div class="splitdown" aria-hidden="true">▼</div>
+        <div class="splitrow"><span class="plate">${one}</span><span class="plate q">❓</span></div>
+      </div>`;
+    }
+    default:
+      return `<div class="num">${q.headData}</div>`;
+  }
+}
 function quizHead(q,wm){
   const s = q.subj;
   const word = !!(s && s.isMon === false);
   const emo = word ? `<div class="qemoji" aria-hidden="true">${s.emoji}</div>` : '';
+  /* 12차(④): 숫자 유형은 장식(낱말 이모지·야생 포켓몬)을 상자 바깥 위쪽에 작게 두고,
+     상자 안에는 문제로 보여 줄 것(세는 대상·식·시계)만 남깁니다 */
+  if(numBoxed(q)){
+    const deco = `<div class="qdeco" aria-hidden="true">`
+      + (word ? `<span class="qdeco-emo">${s.emoji}</span>` : '')
+      + `<span class="qdeco-mon">${artBox(wm,0,'')}</span></div>`;
+    return `<div class="qcount">${deco}<div class="countbox">${countRow(q)}</div></div>`;
+  }
   let inner;
   switch(q.head){
     case 'hidden':
@@ -3645,6 +3878,7 @@ function startBattle(){
   /* 6차: 야생 체력이 내 레벨과 함께 큽니다. escapes 는 볼에서 나온 횟수 */
   const wmax = wildMaxHp(mi);
   S.wild = {mi, hp:wmax, max:wmax, escapes:0};
+  hpReset('foe');                 /* 12차: 새 상대의 막대는 가득 찬 채로 시작합니다 */
   S.megaOn = false;
   /* 10차: 배틀마다 새로 — 필살기 2번, 문제는 4개까지 */
   S.actQ = 0; S.ultUsed = 0; S.ultCool = 0;
@@ -3710,6 +3944,19 @@ function boom(sel,mv,emo){
 /* 7차: 아이템을 줍거나 쓸 때 그 자리에서 이모지가 펑 하고 뜹니다 */
 function popAt(sel,emo,color){
   boom(sel, {c: color || '#FFC93C'}, emo || '✨');
+}
+/* 12차: 깎인 양(-22) 을 맞은 자리에 크게 띄웁니다.
+   필살기는 숫자가 더 크고 노랗게 떠서 "이게 훨씬 세구나" 를 눈으로 배웁니다 */
+function dmgPop(sel,n,big){
+  const p = centerOf(sel);
+  if(!p) return;
+  fxAt(p.x, p.y - 26, 'dmgpop' + (big ? ' big' : ''), '-' + Math.max(0, Math.round(n)), 1050);
+}
+/* 회복한 양(+18) — 회복약이 얼마나 찼는지 바로 보이게 */
+function healPop(sel,n){
+  const p = centerOf(sel);
+  if(!p) return;
+  fxAt(p.x, p.y - 26, 'dmgpop heal', '+' + Math.max(0, Math.round(n)), 1050);
 }
 
 /* =========================================================
@@ -5513,8 +5760,10 @@ function attack(pick, forced){
 
   setTimeout(()=>{
     if(!S.wild || S.screen !== 'battle' || S.catching){ S.acting = false; lock(0); return; }
+    const wBefore = w.hp;
     w.hp = Math.max(0, w.hp - dmg);
     boom('.slot.foe .artbox', mv);
+    dmgPop('.slot.foe .artbox', wBefore - w.hp, !!mv.ult);   /* 12차: 깎인 양을 눈으로 */
     SFX.hit();
     const weak = w.hp <= w.max/2;
     if(w.hp === 0){
@@ -5560,8 +5809,10 @@ function foeTurn(){
 
   setTimeout(()=>{
     if(!S.wild || S.screen !== 'battle' || S.catching){ endTurn(); return; }
+    const myBefore = S.hp;
     S.hp = Math.max(0, S.hp - dmg);
     boom('.slot.me .artbox', mv);
+    dmgPop('.slot.me .artbox', myBefore - S.hp, false);      /* 12차: 깎인 양을 눈으로 */
     SFX.hit();
     if(S.hp === 0){
       /* 6차: 여기서 쓰러집니다. 게임 오버는 여전히 없습니다 —
@@ -5580,12 +5831,25 @@ function foeTurn(){
 
 function heal(){
   if(!S.wild || S.catching || S.acting || S.turn !== 'me') return;
+  /* 12차: 이미 가득이면 차례를 그냥 버리지 않습니다 — 아이가 손해 보면 안 됩니다 */
+  if(S.hp >= S.maxHp){
+    S.msg = '이미 힘이 가득해! 💚';
+    render(); say('이미 힘이 가득해!');
+    return;
+  }
   lock(HEAL_MS);
-  S.hp = Math.min(S.maxHp, S.hp + healAmount());   /* 6차: 최대 체력에 비례해서 찹니다 */
-  S.msg = '힘이 났다! 💚';
+  /* 12차: 💊회복약이 있으면 크게(60%), 없으면 숨 고르기(22%).
+     회복약이 하나도 없어도 언제나 쉴 수 있어서 절대 막히지 않습니다 */
+  const usePotion = itemCount('potion') > 0;
+  if(usePotion) useUpItem('potion');
+  const before = S.hp;
+  S.hp = Math.min(S.maxHp, S.hp + (usePotion ? healAmount() : restAmount()));
+  const got = S.hp - before;
+  S.msg = usePotion ? `💊 회복약! 힘이 확 났다! 💚 +${got}` : `😮‍💨 숨을 골랐다! 💚 +${got}`;
   S.acting = true;
-  SFX.heal(); save(); render(); say('힘이 났다!');
+  SFX.heal(); save(); render(); say(usePotion ? '회복약! 힘이 확 났어!' : '숨을 골랐어!');
   boom('.slot.me .artbox', {c:'#63C266'}, '💚');
+  healPop('.slot.me .artbox', got);
   /* 회복도 한 턴을 씁니다 — 그 다음은 상대 차례 */
   setTimeout(()=>{ S.acting = false; foeTurn(); }, 480);
 }
@@ -5634,7 +5898,7 @@ function doSwap(i){
   if(!S.mons[i] || isKo(i)) return;
   S.swapping = false; S.detail = null;
   S.partner = i;
-  S.maxHp = pMaxHp(); S.hp = S.maxHp;
+  swapHp();                       /* 12차: 지친 정도는 이어지되 절반은 채워 줍니다 */
   S.megaOn = false; S.evoWas = null;
   S.reviveGot = 0;
   S.turn = 'me'; S.acting = false;
@@ -5922,7 +6186,9 @@ function doMega(){
 
   setTimeout(()=>{
     S.megaOn = true;
-    S.hp = S.maxHp;
+    /* 12차: 메가진화도 가득 채우면 회복약이 필요 없어집니다 — 절반만 채워 줍니다
+       (메가 상태는 받는 피해가 45% 줄어드니 이것만으로도 충분히 강력합니다) */
+    S.hp = Math.min(S.maxHp, S.hp + Math.round(S.maxHp * 0.5));
     if(S.screen !== 'battle' || !S.wild){
       S.acting = false; S.turn = 'me'; lock(0); render(); return;
     }
@@ -6192,7 +6458,7 @@ const QUIZ_TYPES = [
   ok:s=>s.n.length >= 2 && s.n.length <= 4,
   build(s){
     const cs = s.n.split('');
-    return { head:'art', ask:s.isMon ? '이름을 순서대로 눌러 봐!' : '순서대로 눌러 봐!',
+    return { head:'art', ask:s.isMon ? '이름을 순서대로 눌러 봐!' : '글자를 순서대로 눌러 봐!',
       cols:cs.length, render:'text',
       options:shuffle(cs), answer:cs, judge:'seq', placed:[], used:[],
       speak(){ say(s.n,{rate:0.85}); setTimeout(()=>sayLetters(s.n), 900); } };
@@ -6228,9 +6494,9 @@ const QUIZ_TYPES = [
     const a = (dg.length && Math.random() < 0.7) ? pick(dg) : pick(withJ);
     const snd = jongSound(a);
     return { head:'art', snd:snd,
-      ask:`끝소리가 &ldquo;${snd}&rdquo; 소리로 나는 글자는?`, cols:3, render:'text',
+      ask:`끝에서 &ldquo;${snd}&rdquo; 소리가 나는 글자는?`, cols:3, render:'text',
       options:shuffle([a].concat(distJong(a,2))), answer:a, judge:'jongSnd',
-      speak(){ say(`끝소리가 ${JONG_SND_SAY[snd] || snd} 소리로 나는 글자를 찾아 봐`,{rate:0.65}); } };
+      speak(){ say(`끝에서 ${JONG_SND_SAY[snd] || snd} 소리가 나는 글자를 찾아 봐`,{rate:0.65}); } };
   } },
 
 /* ---------- 숫자 7종 ---------- */
@@ -6241,7 +6507,7 @@ const QUIZ_TYPES = [
     const c = rint(2, Math.max(5, numCap()+1));
     return { head:'balls', headData:c, ask:'몬스터볼이 몇 개일까?', cols:3, render:'num',
       options:shuffle([c].concat(numDistract(c,2,10))), answer:c, judge:'equalNum',
-      speak(){ say(`${nativeCount(c)}. 모두 몇 개일까?`,{rate:0.55}); } };
+      speak(){ say(`${nativeCount(c)}. 몬스터볼은 모두 몇 개일까?`,{rate:0.55}); } };
   } },
 
 /* 어느 쪽이 더 커? */
@@ -6251,9 +6517,9 @@ const QUIZ_TYPES = [
     const a = rint(1,hi);
     let b = rint(1,hi);
     while(b === a) b = rint(1,hi);
-    return { head:'art', ask:'어느 쪽이 더 커?', cols:2, render:'num',
+    return { head:'art', ask:'더 큰 수는 어느 것일까?', cols:2, render:'num',
       options:shuffle([a,b]), answer:Math.max(a,b), judge:'equalNum',
-      speak(){ say(`${sino(a)}하고 ${sino(b)}, 어느 쪽이 더 클까?`,{rate:0.7}); } };
+      speak(){ say(`${sino(a)}${josa(sino(a),['과','와'])} ${sino(b)} 중에서 더 큰 수는?`,{rate:0.7}); } };
   } },
 
 /* 한 자리 덧셈 — 합은 9까지 */
@@ -6261,10 +6527,10 @@ const QUIZ_TYPES = [
   build(){
     const hi = numCap();
     const a = rint(1,hi-1), b = rint(1, hi-a), ans = a+b;
-    return { head:'expr', headData:`${a} <span class="op">+</span> ${b} <span class="op">=</span> ?`,
+    return { head:'expr', headData:`${a} <span class="op">+</span> ${b} <span class="op">=</span> <span class="op">❓</span>`,
       ask:'더하면 몇일까?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,9))), answer:ans, judge:'equalNum',
-      speak(){ say(`${sino(a)} 더하기 ${sino(b)}는?`,{rate:0.75}); } };
+      speak(){ say(`${sino(a)} 더하기 ${sino(b)}${josa(sino(b),['은','는'])} 몇일까?`,{rate:0.75}); } };
   } },
 
 /* 레벨 올리기 — 덧셈을 이야기로 */
@@ -6273,7 +6539,7 @@ const QUIZ_TYPES = [
     const hi = numCap();
     const a = rint(1,hi-2), b = rint(1, Math.min(3, hi-a)), ans = a+b;
     return { head:'expr', headData:`Lv.${a} <span class="op">+</span>${b}`,
-      ask:`레벨이 ${a}이야. ${b} 올라가면?`, cols:3, render:'num',
+      ask:`레벨 ${a}에서 ${b} 올라가면 몇 레벨일까?`, cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,9))), answer:ans, judge:'equalNum',
       speak(){ say(`레벨 ${sino(a)}에서 ${sino(b)} 올라가면 몇 레벨일까?`,{rate:0.75}); } };
   } },
@@ -6282,10 +6548,10 @@ const QUIZ_TYPES = [
 { id:'N_SUB', kind:'num', diff:3, ns:4, ok:()=>true,
   build(){
     const a = rint(2,numCap()), b = rint(1,a), ans = a-b;
-    return { head:'expr', headData:`${a} <span class="op">-</span> ${b} <span class="op">=</span> ?`,
+    return { head:'expr', headData:`${a} <span class="op">-</span> ${b} <span class="op">=</span> <span class="op">❓</span>`,
       ask:'빼면 몇일까?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,9))), answer:ans, judge:'equalNum',
-      speak(){ say(`${sino(a)} 빼기 ${sino(b)}는?`,{rate:0.75}); } };
+      speak(){ say(`${sino(a)} 빼기 ${sino(b)}${josa(sino(b),['은','는'])} 몇일까?`,{rate:0.75}); } };
   } },
 
 /* 빠진 수 찾기 — 3 + ? = 7 */
@@ -6293,20 +6559,20 @@ const QUIZ_TYPES = [
   build(){
     const hi = numCap();
     const a = rint(1,hi-1), ans = rint(1, hi-a), total = a+ans;
-    return { head:'expr', headData:`${a} <span class="op">+</span> ? <span class="op">=</span> ${total}`,
-      ask:'? 에 들어갈 수는?', cols:3, render:'num',
+    return { head:'expr', headData:`${a} <span class="op">+</span> <span class="op">❓</span> <span class="op">=</span> ${total}`,
+      ask:'❓ 에 들어갈 수는?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,9))), answer:ans, judge:'equalNum',
-      speak(){ say(`${sino(a)} 더하기 몇은 ${sino(total)}일까?`,{rate:0.75}); } };
+      speak(){ say(`${sino(a)}에 몇을 더하면 ${sino(total)}${josa(sino(total),['이','가'])} 될까?`,{rate:0.75}); } };
   } },
 
 /* 열이 넘는 덧셈 */
 { id:'N_ADD10', kind:'num', diff:5, ns:6, ok:()=>true,
   build(){
     const a = rint(3,9), b = rint(Math.max(1,10-a), 9), ans = a+b;
-    return { head:'expr', headData:`${a} <span class="op">+</span> ${b} <span class="op">=</span> ?`,
+    return { head:'expr', headData:`${a} <span class="op">+</span> ${b} <span class="op">=</span> <span class="op">❓</span>`,
       ask:'더하면 몇일까?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,18))), answer:ans, judge:'equalNum',
-      speak(){ say(`${sino(a)} 더하기 ${sino(b)}는?`,{rate:0.75}); } };
+      speak(){ say(`${sino(a)} 더하기 ${sino(b)}${josa(sino(b),['은','는'])} 몇일까?`,{rate:0.75}); } };
   } },
 
 /* ---------- 10차: 숫자 9종 더 ----------
@@ -6321,9 +6587,9 @@ const QUIZ_TYPES = [
     const a = rint(1,hi);
     let b = rint(1,hi);
     while(b === a) b = rint(1,hi);
-    return { head:'art', ask:'어느 쪽이 더 작아?', cols:2, render:'num',
+    return { head:'art', ask:'더 작은 수는 어느 것일까?', cols:2, render:'num',
       options:shuffle([a,b]), answer:Math.min(a,b), judge:'equalNum',
-      speak(){ say(`${sino(a)}하고 ${sino(b)}, 어느 쪽이 더 작을까?`,{rate:0.7}); } };
+      speak(){ say(`${sino(a)}${josa(sino(a),['과','와'])} ${sino(b)} 중에서 더 작은 수는?`,{rate:0.7}); } };
   } },
 
 /* ② 모양 — 색을 전부 빨강으로 맞춰서 "모양" 만 보게 합니다 */
@@ -6331,9 +6597,9 @@ const QUIZ_TYPES = [
   build(){
     const SHAPES = [['동그라미','🔴'],['세모','🔺'],['네모','🟥']];
     const s = pick(SHAPES);
-    return { head:'art', ask:`${s[0]}는 어느 것일까?`, cols:3, render:'text',
+    return { head:'art', ask:`${s[0]}${josa(s[0],['은','는'])} 어느 것일까?`, cols:3, render:'text',
       options:shuffle(SHAPES.map(x=>x[1])), answer:s[1], judge:'equal',
-      speak(){ say(`${s[0]}를 찾아 봐`,{rate:0.7}); } };
+      speak(){ say(`${s[0]}${josa(s[0],['을','를'])} 찾아 봐`,{rate:0.7}); } };
   } },
 
 /* ③ 수 순서 — 3 4 ❓ 6. 빠진 자리는 가운데 두 칸 중 하나입니다 */
@@ -6347,7 +6613,7 @@ const QUIZ_TYPES = [
     const txt = row.map((v,i)=> i === hole ? '<span class="op">❓</span>' : v).join(' ');
     return { head:'expr', headData:txt, ask:'❓ 에 들어갈 수는?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,row[3]+2))), answer:ans, judge:'equalNum',
-      speak(){ say(`${row.map((v,i)=> i===hole ? '몇' : sino(v)).join(', ')}. 몇일까?`,{rate:0.7}); } };
+      speak(){ say(`${row.map((v,i)=> i===hole ? '음' : sino(v)).join(', ')}. 빠진 수는 몇일까?`,{rate:0.7}); } };
   } },
 
 /* ④ 몇 번째 — 왼쪽부터 셉니다 */
@@ -6378,32 +6644,36 @@ const QUIZ_TYPES = [
     const wrong = two ? b : a;
     const third = (other[0] !== a && other[0] !== b) ? other[0] : other[1];
     return { head:'expr', headData:`<span class="emorow">${seq.join('')}<span class="op">❓</span></span>`,
-      ask:'다음에 올 것은?', cols:3, render:'text',
+      ask:'다음에 올 것은 무엇일까?', cols:3, render:'text',
       options:shuffle([ans, wrong, third]), answer:ans, judge:'equal',
-      speak(){ say('규칙을 찾아 봐! 다음에 올 것은?',{rate:0.7}); } };
+      speak(){ say('규칙을 찾아 봐! 다음에 올 것은 무엇일까?',{rate:0.7}); } };
   } },
 
-/* ⑥ 가르기 — 5는 2하고 몇? (답은 언제나 1 이상) */
+/* ⑥ 나눠 담기 (가르기) — 12차(⑤) 에서 다시 만들었습니다.
+   예전에는 `5 → 4 하고 ?` 를 놓고 "5는 4하고 몇일까?" 라고 물었습니다.
+   교과서 말투이긴 하지만 아빠도 "5빼기 4인가?" 로 읽었을 만큼 애매했고,
+   글자만 보면 N_SUB(5 - 4 = ?) · N_MISS(4 + ? = 5) 와 구별이 안 됐습니다.
+   그래서 아예 **눈으로 보는 문제**로 바꿉니다 — 구슬을 두 접시에 나눠 담고
+   빈 접시의 개수를 셉니다. 숫자식이 하나도 안 나오니 다른 유형과 확실히 다릅니다 */
 { id:'N_SPLIT', kind:'num', diff:3, ns:3, ok:()=>true,
   build(){
     const t = rint(3, Math.max(4, numCap()));
     const a = rint(1, t-1), ans = t - a;
-    /* 조사는 숫자를 읽은 소리로 정합니다 — 6은(육은) · 5는(오는) */
-    const eun = josa(sino(t), ['은','는']);
-    return { head:'expr', headData:`${t} <span class="op">→</span> ${a} <span class="op">하고</span> ?`,
-      ask:`${t}${eun} ${a}하고 몇일까?`, cols:3, render:'num',
+    return { head:'split', headData:{t:t, a:a},
+      ask:'나눠 담았어! 빈 접시에는 몇 개일까?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,t))), answer:ans, judge:'equalNum',
-      speak(){ say(`${sino(t)}${eun} ${sino(a)}하고 몇일까?`,{rate:0.72}); } };
+      speak(){ say(`구슬 ${nativeUnit(t)} 개를 두 접시에 나눠 담았어. `
+        + `한 접시에 ${nativeUnit(a)} 개면, 남은 접시에는 몇 개일까?`,{rate:0.66}); } };
   } },
 
 /* ⑦ 10 만들기 — 3 + ? = 10 (답은 1~9) */
 { id:'N_TEN', kind:'num', diff:4, ns:4, ok:()=>true,
   build(){
     const a = rint(1,9), ans = 10 - a;
-    return { head:'expr', headData:`${a} <span class="op">+</span> ? <span class="op">=</span> 10`,
-      ask:'10을 만들려면 얼마가 더 필요할까?', cols:3, render:'num',
+    return { head:'expr', headData:`${a} <span class="op">+</span> <span class="op">❓</span> <span class="op">=</span> 10`,
+      ask:'10을 만들려면 몇이 더 있어야 할까?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,10))), answer:ans, judge:'equalNum',
-      speak(){ say(`${sino(a)} 더하기 몇은 십일까?`,{rate:0.72}); } };
+      speak(){ say(`${sino(a)}에 몇을 더하면 십이 될까?`,{rate:0.72}); } };
   } },
 
 /* ⑧ 정시 시계 — 짧은바늘이 가리키는 수를 읽습니다 */
@@ -6421,9 +6691,9 @@ const QUIZ_TYPES = [
     const a = rint(3, Math.min(8, Math.max(4, numCap())));
     const b = rint(1, a-1), ans = a - b;
     return { head:'dots', headData:{a:a, b:b},
-      ask:'주황이 파랑보다 몇 개 더 많을까?', cols:3, render:'num',
+      ask:'🟠 주황이 🔵 파랑보다 몇 개 더 많을까?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,a))), answer:ans, judge:'equalNum',
-      speak(){ say(`주황은 ${sino(a)} 개, 파랑은 ${sino(b)} 개. 몇 개 더 많을까?`,{rate:0.68}); } };
+      speak(){ say(`주황은 ${nativeUnit(a)} 개, 파랑은 ${nativeUnit(b)} 개. 주황이 몇 개 더 많을까?`,{rate:0.68}); } };
   } }
 ];
 
@@ -6628,7 +6898,10 @@ function doCatch(){
 
     /* 파트너가 한 뼘 자랍니다 */
     S.mons[S.partner].lv++;
-    S.maxHp = pMaxHp(); S.hp = S.maxHp;
+    /* 12차: 여기서 체력을 가득 채우면 회복약을 쓸 이유가 사라집니다 (아빠 지적 ②).
+       레벨이 올라 커진 만큼 + 축하 회복 30% 만 주고, 나머지는 다음 배틀로 이어집니다 */
+    growMaxHp();
+    S.hp = Math.min(S.maxHp, S.hp + catchHeal());
     S.megaOn = false;
     S.wild = null;
     S.catching = false;
@@ -6875,7 +7148,7 @@ function act(a){
       if(isKo(i)){ S.detail = null; openRevive(i); break; }
       if(!S.mons[i]) S.mons[i] = {lv:1};
       S.partner = i;
-      S.maxHp = pMaxHp(); S.hp = S.maxHp;
+      swapHp();                   /* 12차: 도감에서 친구를 바꿔도 체력이 공짜로 가득 차지 않습니다 */
       S.megaOn = false; S.detail = null; S.evoWas = null;
       /* 바꾼 친구를 바로 볼 수 있게 풀숲으로 */
       S.screen = 'field';
@@ -6943,7 +7216,9 @@ document.addEventListener('gesturestart', e=>e.preventDefault());
 
 if(!S.learn) S.learn = freshLearn();      /* 11차: 저장이 없어도 커리큘럼은 언제나 준비돼 있습니다 */
 if(load()){
-  S.maxHp = pMaxHp(); if(!(S.hp > 0)) S.hp = S.maxHp;
+  S.maxHp = pMaxHp();
+  /* 12차: 체력이 이어지므로 이어서 시작할 때도 그대로 씁니다. 최대치만 넘지 않게 다듬습니다 */
+  if(!(S.hp > 0)) S.hp = S.maxHp; else S.hp = Math.min(S.hp, S.maxHp);
   /* 7차: 이어서 시작할 때도 지금 지역 바닥에 주울 것이 있게 */
   fillDrops(S.reg);
 }
