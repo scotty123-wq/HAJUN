@@ -998,6 +998,14 @@ body{
   cursor:pointer;transition:transform .08s, box-shadow .08s;
 }
 .opt.num{font-variant-numeric:tabular-nums;}
+/* 14차: 보기가 낱말·포켓몬 이름일 때 — 긴 이름(거다이 이상해꽃 · 메가이상해꽃)도
+   상자 안에서 두 줄로 접혀서 360×640 에서 넘치지 않습니다.
+   --wfs 는 보기 중 가장 긴 글자 수에 따라 viewQuiz 가 정해서 넣어 줍니다 */
+.opt.word{
+  font-size:min(34px, calc(var(--tile) * var(--wfs, .28)));
+  line-height:1.06;padding:4px;text-align:center;
+  word-break:keep-all;overflow-wrap:anywhere;hyphens:none;letter-spacing:-.05em;
+}
 .opt .artbox{width:86%;height:86%;}
 .opt:active{transform:translateY(5px);box-shadow:0 1px 0 var(--edge);}
 .opt.wrong{animation:hurt .4s ease;background:#F3E3E1;}
@@ -1082,6 +1090,20 @@ body{
 .sheet.tree .chain-row.many{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;justify-items:center;}
 .sheet.tree .chain-row.many .artbox{width:34px;height:34px;}
 .sheet.tree .chain-row.many .step{width:100%;}
+
+/* 14차: 같은 포켓몬의 "다른 모습" 줄 (거다이맥스·리전폼·코스튬).
+   진화 계보와 헷갈리지 않게 화살표 없이 상자로 묶어서 보여 줍니다 */
+.formwrap{
+  width:100%;background:#fff;border:3px solid var(--edge);border-radius:16px;
+  padding:6px 5px 7px;display:flex;flex-direction:column;gap:4px;
+}
+.formttl{font-weight:900;font-size:12px;color:var(--ink-soft);text-align:center;letter-spacing:-.03em;}
+.formrow{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;justify-items:center;width:100%;}
+.formrow .artbox{width:40px;height:40px;}
+.formrow .step{width:100%;}
+.formrow .cn{font-size:9px;letter-spacing:-.07em;line-height:1.1;}
+.formrow .step.now{background:var(--sun);border-radius:10px;}
+.formrow .step.dim{opacity:.3;}
 
 /* 7차: 갈래 진화 고르기 창 */
 .evopicks{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%;}
@@ -1632,7 +1654,123 @@ const MONS = [
  {n:'코라이돈',t:'드래곤',hp:26,rare:2,
   art:{form:'biped',c1:'#D8443A',c2:'#EFEAF5',ears:'crestSpike',tail:'long',marks:['spikes'],eyes:'fierce',big:1}},
  {n:'미라이돈',t:'전기',hp:26,rare:2,
-  art:{form:'biped',c1:'#5C4BA0',c2:'#5FC4E8',ears:'crestSpike',tail:'boltTail',marks:['spikes'],eyes:'fierce',big:1}}
+  art:{form:'biped',c1:'#5C4BA0',c2:'#5FC4E8',ears:'crestSpike',tail:'boltTail',marks:['spikes'],eyes:'fierce',big:1}},
+
+ /* ========== 14차 신규 108마리 — 반드시 배열 맨 뒤에만 붙입니다.
+    앞쪽 103마리의 번호가 하나라도 밀리면 하준이가 모은 도감이 엉뚱한 포켓몬을 가리킵니다 ==========
+    (1) 일반 60마리 — 이름은 sprites\ 파일명과 한 글자까지 같아야 그림이 뜹니다 */
+ {n:'가디',t:'불',hp:13,evo:'윈디',evoLv:8},
+ {n:'윈디',t:'불',hp:22},
+ {n:'아라리',t:'풀',hp:13,evo:'나시',evoLv:8},
+ {n:'나시',t:'풀',hp:22},
+ {n:'또가스',t:'독',hp:13,evo:'또도가스',evoLv:8},
+ {n:'또도가스',t:'독',hp:22},
+ {n:'포니타',t:'불',hp:13,evo:'날쌩마',evoLv:8},
+ {n:'날쌩마',t:'불',hp:22},
+ {n:'브케인',t:'불',hp:13,evo:'마그케인',evoLv:5},
+ {n:'마그케인',t:'불',hp:18,evo:'블레이범',evoLv:10},
+ {n:'블레이범',t:'불',hp:23},
+ {n:'리아코',t:'물',hp:13,evo:'엘리게이',evoLv:5},
+ {n:'엘리게이',t:'물',hp:18,evo:'장크로다일',evoLv:10},
+ {n:'장크로다일',t:'물',hp:23},
+ {n:'토게피',t:'페어리',hp:11,evo:'토게틱',evoLv:5},
+ {n:'토게틱',t:'페어리',hp:17,evo:'토게키스',evoLv:10},
+ {n:'토게키스',t:'페어리',hp:22},
+ {n:'피츄',t:'전기',hp:11,evo:'피카츄',evoLv:4},
+ {n:'우파',t:'물',hp:13,evos:['누오','토오'],evoLv:8},
+ {n:'누오',t:'물',hp:22},
+ {n:'토오',t:'독',hp:22},
+ {n:'라이코',t:'전기',hp:26,rare:2},
+ {n:'앤테이',t:'불',hp:26,rare:2},
+ {n:'스이쿤',t:'물',hp:26,rare:2},
+ {n:'루기아',t:'초',hp:26,rare:2},
+ {n:'칠색조',t:'불',hp:26,rare:2},
+ {n:'아차모',t:'불',hp:13,evo:'영치코',evoLv:5},
+ {n:'영치코',t:'불',hp:18,evo:'번치코',evoLv:10},
+ {n:'번치코',t:'불',hp:23},
+ {n:'물짱이',t:'물',hp:13,evo:'늪짱이',evoLv:5},
+ {n:'늪짱이',t:'물',hp:18,evo:'대짱이',evoLv:10},
+ {n:'대짱이',t:'물',hp:23},
+ {n:'팽도리',t:'물',hp:13,evo:'팽태자',evoLv:5},
+ {n:'팽태자',t:'물',hp:18,evo:'엠페르트',evoLv:10},
+ {n:'엠페르트',t:'물',hp:23},
+ {n:'불꽃숭이',t:'불',hp:13,evo:'파이숭이',evoLv:5},
+ {n:'파이숭이',t:'불',hp:18,evo:'초염몽',evoLv:10},
+ {n:'초염몽',t:'불',hp:23},
+ {n:'다크라이',t:'악',hp:26,rare:2},
+ {n:'조로아',t:'악',hp:13,evo:'조로아크',evoLv:8},
+ {n:'조로아크',t:'악',hp:22},
+ {n:'달막화',t:'불',hp:13,evo:'불비달마',evoLv:8},
+ {n:'불비달마',t:'불',hp:22},
+ {n:'큐레무',t:'드래곤',hp:26,rare:2},
+ {n:'토네로스',t:'비행',hp:26,rare:2},
+ {n:'볼트로스',t:'전기',hp:26,rare:2},
+ {n:'랜드로스',t:'땅',hp:26,rare:2},
+ {n:'나몰빼미',t:'풀',hp:13,evo:'빼미스로우',evoLv:5},
+ {n:'빼미스로우',t:'풀',hp:18,evo:'모크나이퍼',evoLv:10},
+ {n:'모크나이퍼',t:'풀',hp:23},
+ {n:'냐오불',t:'불',hp:13,evo:'냐오히트',evoLv:5},
+ {n:'냐오히트',t:'불',hp:18,evo:'어흥염',evoLv:10},
+ {n:'어흥염',t:'불',hp:23},
+ {n:'미미큐',t:'고스트',hp:20},
+ {n:'네크로즈마',t:'초',hp:26,rare:2},
+ {n:'염버니',t:'불',hp:13,evo:'래비풋',evoLv:5},
+ {n:'래비풋',t:'불',hp:18,evo:'에이스번',evoLv:10},
+ {n:'에이스번',t:'불',hp:23},
+ {n:'치고마',t:'격투',hp:14,evo:'우라오스',evoLv:10},
+ {n:'우라오스',t:'격투',hp:26,rare:2},
+
+ /* (2) 특별한 모습 48개 — base 는 "같은 포켓몬의 다른 모습" 으로 묶어 보여줄 원종.
+    변종은 진화가 아니므로 evo/evos 를 절대 넣지 않습니다 (진화 라인이 망가집니다).
+    이름에 공백이 있습니다 — 파일명과 같아야 합니다 */
+ {n:'거다이 피카츄',t:'전기',hp:14,base:'피카츄'},
+ {n:'거다이 리자몽',t:'불',hp:23,base:'리자몽'},
+ {n:'거다이 이상해꽃',t:'풀',hp:23,base:'이상해꽃'},
+ {n:'거다이 거북왕',t:'물',hp:23,base:'거북왕'},
+ {n:'거다이 이브이',t:'노말',hp:15,base:'이브이'},
+ {n:'거다이 잠만보',t:'노말',hp:25,base:'잠만보'},
+ {n:'거다이 팬텀',t:'고스트',hp:21,base:'팬텀'},
+ {n:'거다이 나옹',t:'노말',hp:13,base:'나옹'},
+ {n:'거다이 버터플',t:'벌레',hp:17,base:'버터플'},
+ {n:'거다이 라프라스',t:'물',hp:22,base:'라프라스'},
+ {n:'거다이 괴력몬',t:'격투',hp:24,base:'괴력몬'},
+ {n:'거다이 에이스번',t:'불',hp:23,base:'에이스번'},
+ {n:'거다이 우라오스',t:'격투',hp:26,rare:2,base:'우라오스'},
+ {n:'알로라 라이츄',t:'전기',hp:19,base:'라이츄'},
+ {n:'알로라 식스테일',t:'얼음',hp:14,base:'식스테일'},
+ {n:'알로라 나인테일',t:'얼음',hp:20,base:'나인테일'},
+ {n:'알로라 나옹',t:'악',hp:13,base:'나옹'},
+ {n:'알로라 페르시온',t:'악',hp:18,base:'페르시온'},
+ {n:'알로라 텅구리',t:'불',hp:19,base:'텅구리'},
+ {n:'알로라 나시',t:'풀',hp:22,base:'나시'},
+ {n:'갈라르 프리져',t:'초',hp:24,rare:2,base:'프리져'},
+ {n:'갈라르 썬더',t:'격투',hp:24,rare:2,base:'썬더'},
+ {n:'갈라르 파이어',t:'악',hp:24,rare:2,base:'파이어'},
+ {n:'갈라르 야돈',t:'초',hp:15,base:'야돈'},
+ {n:'갈라르 야도란',t:'독',hp:20,base:'야도란'},
+ {n:'갈라르 또도가스',t:'독',hp:22,base:'또도가스'},
+ {n:'갈라르 포니타',t:'초',hp:13,base:'포니타'},
+ {n:'갈라르 날쌩마',t:'초',hp:22,base:'날쌩마'},
+ {n:'갈라르 불비달마',t:'얼음',hp:22,base:'불비달마'},
+ {n:'히스이 가디',t:'불',hp:13,base:'가디'},
+ {n:'히스이 윈디',t:'불',hp:22,base:'윈디'},
+ {n:'히스이 조로아',t:'고스트',hp:13,base:'조로아'},
+ {n:'히스이 조로아크',t:'고스트',hp:22,base:'조로아크'},
+ {n:'히스이 블레이범',t:'불',hp:23,base:'블레이범'},
+ {n:'팔데아 우파',t:'독',hp:13,base:'우파'},
+ {n:'록스타 피카츄',t:'전기',hp:14,base:'피카츄'},
+ {n:'드레스 피카츄',t:'전기',hp:14,base:'피카츄'},
+ {n:'레슬러 피카츄',t:'전기',hp:14,base:'피카츄'},
+ {n:'오리진 기라티나',t:'고스트',hp:26,rare:2,base:'기라티나'},
+ {n:'원시 가이오가',t:'물',hp:26,rare:2,base:'가이오가'},
+ {n:'원시 그란돈',t:'땅',hp:26,rare:2,base:'그란돈'},
+ {n:'검왕 자시안',t:'페어리',hp:26,rare:2,base:'자시안'},
+ {n:'방패왕 자마젠타',t:'격투',hp:26,rare:2,base:'자마젠타'},
+ {n:'황혼 네크로즈마',t:'초',hp:26,rare:2,base:'네크로즈마'},
+ {n:'새벽 네크로즈마',t:'초',hp:26,rare:2,base:'네크로즈마'},
+ {n:'영물 토네로스',t:'비행',hp:26,rare:2,base:'토네로스'},
+ {n:'영물 볼트로스',t:'전기',hp:26,rare:2,base:'볼트로스'},
+ {n:'영물 랜드로스',t:'땅',hp:26,rare:2,base:'랜드로스'}
 ];
 
 /* 이름 → 인덱스 */
@@ -1725,6 +1863,34 @@ function chainLevels(i){
 }
 /* 갈래가 하나라도 있는 계보인가 (있으면 도감에서 세로로 그립니다) */
 function chainBranches(i){ return chainLevels(i).some(r=>r.length > 1); }
+
+/* ---- 14차: "같은 포켓몬의 다른 모습" (거다이맥스 · 리전폼 · 코스튬 피카츄) ----
+   변종은 진화가 아닙니다. 진화 트리에 끼워 넣으면 라인이 망가지므로
+   evo/evos 는 절대 넣지 않고 base(원종 이름) 로만 묶습니다.
+   도감 상세에서 원종과 나란히 한 줄로 보여 줍니다 */
+const FORMS = {};                                  /* 원종 번호 → [다른 모습 번호들] */
+MONS.forEach((m,i)=>{
+  if(!m.base) return;
+  const b = IDX[m.base];
+  if(b == null || b === i) return;
+  (FORMS[b] = FORMS[b] || []).push(i);
+});
+/* i 와 "같은 포켓몬" 인 번호 전부 — 원종을 맨 앞에 두고 다른 모습들 */
+function formFamily(i){
+  const m = MONS[i];
+  if(!m) return [i];
+  const b = (m.base != null && IDX[m.base] != null) ? IDX[m.base] : i;
+  return [b].concat(FORMS[b] || []);
+}
+/* 오답으로 쓰면 헷갈리는 "너무 닮은 친구들" — 같은 진화 라인 + 같은 모습 식구까지 */
+function kinOf(i){
+  const out = [];
+  const add = x => { if(out.indexOf(x) < 0) out.push(x); };
+  formFamily(i).forEach(add);
+  out.slice().forEach(k => chainOf(k).forEach(add));
+  out.slice().forEach(k => formFamily(k).forEach(add));
+  return out;
+}
 function megaForm(m){
   if(!m.mega) return null;
   return { n:m.mega.n, t:m.t, hp:m.hp + 8,
@@ -1900,7 +2066,9 @@ function drawMark(kind,c1,c2,c3){
 }
 
 function monSvg(m,cls){
-  const a = m.art;
+  /* 14차: 새 108마리는 진짜 그림(webp)만 씁니다 — art 가 없어도 절대 터지지 않게
+     타입 색으로 만든 동그란 기본 그림을 대신 씁니다 (그림 로딩 실패 대비) */
+  const a = m.art || {form:'round', c1:(MOVES[m.t] && MOVES[m.t].c) || '#BFD6E8', eyes:'round'};
   const c1 = a.c1, c2 = a.c2 || dark(a.c1,.78), c3 = a.c3 || '#F2514A';
   const sh = dark(c1,.84);
   const marks = a.marks || [];
@@ -2692,7 +2860,22 @@ const REGION_TYPES = [
   ['불','드래곤','전기','초','페어리']   /* 🔥 산꼭대기 */
 ];
 /* 타입만으로는 어울리지 않는 몇몇 친구는 이름으로 따로 정합니다 */
-const REGION_FIX = { '프테라':2 };      /* 화석·박쥐날개 — 동굴이 어울립니다 */
+const REGION_FIX = {
+  '프테라':2,                                  /* 화석·박쥐날개 — 동굴이 어울립니다 */
+  /* 14차: 새로 온 108마리가 타입만으로는 산꼭대기에 너무 몰립니다(불이 40마리).
+     사는 모습이 어울리는 곳으로 옮겨서 네 지역을 고르게 만듭니다.
+     기존 103마리는 프테라 말고는 하나도 건드리지 않았습니다.
+     같은 진화 라인·같은 원종은 되도록 같은 곳에 둡니다 */
+  /* 🌿 풀숲 — 들판과 숲에 사는 짐승들 */
+  '가디':0,'윈디':0,'히스이 가디':0,'히스이 윈디':0,
+  '포니타':0,'날쌩마':0,'갈라르 포니타':0,'갈라르 날쌩마':0,
+  '아차모':0,'영치코':0,'번치코':0,
+  '냐오불':0,'냐오히트':0,'어흥염':0,
+  '염버니':0,'래비풋':0,'에이스번':0,'거다이 에이스번':0,
+  /* 🕳 동굴 — 굴을 파거나 어두운 곳을 좋아하는 친구들 */
+  '브케인':2,'마그케인':2,'블레이범':2,'히스이 블레이범':2,
+  '달막화':2,'불비달마':2,'알로라 텅구리':2
+};
 
 function regionOfMon(i){
   const m = MONS[i];
@@ -3160,6 +3343,9 @@ function pickQuizType(wm,mi){
   const w = c.map(t=>{
     let v = 1 / (1 + Math.abs(diffOf(t,wm) - want));
     if(nstage && t.ns) v *= 1 / (1 + 0.4 * Math.abs(t.ns - nstage));
+    /* 14차: 유형마다 정해 둔 비중 — 읽기 연습이 되는 H_NAME 은 크게,
+       한글을 읽을 일이 없는 H_PIC 은 작게 (H_PIC 은 안심 유형으로만 남깁니다) */
+    if(t.w) v *= t.w;
     return v;
   });
   return { type: weightedPick(c,w), want: want, nstage: nstage };
@@ -3290,7 +3476,12 @@ function viewField(){
       aria-label="${it.n}"><b>${it.e}</b></div>`;
   }).join('');
   const m = pMon();
-  const next = m.evo && IDX[m.evo] != null ? `Lv.${m.evoLv} 에 ${m.evo}` : (m.mega ? `Lv.${MEGA_LV} 에 메가진화 ✨` : '최고로 컸어요!');
+  /* 14차: 갈래 진화(이브이·코스모움·우파)도 제대로 알려 줍니다.
+     예전에는 m.evo 만 봐서 갈래인 친구는 "최고로 컸어요!" 라고 잘못 나왔습니다 */
+  const evn = evoNames(m).filter(n => IDX[n] != null);
+  const next = evn.length
+    ? `Lv.${m.evoLv} 에 ${evn.length > 1 ? evn.length + '가지 중 하나로' : evn[0]}`
+    : (m.mega ? `Lv.${MEGA_LV} 에 메가진화 ✨` : '최고로 컸어요!');
   const bag = bagTotal();
   return `
   <div class="buddy">
@@ -3518,6 +3709,9 @@ function quizHead(q,wm){
       inner = word ? `<div class="qword">${emo}</div>` : artBox(wm,0,''); break;
   }
   if(!word) return inner;
+  /* 14차: 이름 읽고 고르기는 "이 그림의 이름" 을 묻는 문제입니다.
+     옆에 야생 포켓몬 그림을 두면 어느 그림 이름을 묻는지 헷갈리므로 이 유형만 뺍니다 */
+  if(q.id === 'H_NAME') return `<div class="qsubj">${inner}</div>`;
   /* 계산식·빠진 글자 칸은 가로로 길어서, 야생 포켓몬을 더 바깥에 놓아야 글자를 안 가립니다 */
   const wide = (q.head === 'expr' || q.head === 'fill' || q.head === 'clock' || q.head === 'dots' || q.head === 'jong') ? ' wide' : '';
   return `<div class="qsubj${wide}">${inner}<div class="qfoe">${artBox(wm,0,'')}</div></div>`;
@@ -3542,6 +3736,8 @@ function viewQuiz(){
   const opts = q.options.map((v,i)=>{
     const cls = ['opt'];
     if(q.render === 'num') cls.push('num');
+    /* 14차: 보기가 낱말·이름(글자 여러 개)이면 글자 크기를 줄이고 두 줄로 접습니다 */
+    if(q.render === 'word') cls.push('word');
     if(q.seq){
       if(q.used.indexOf(i) >= 0) cls.push('used');
     } else {
@@ -3561,7 +3757,9 @@ function viewQuiz(){
      포획 문제에는 절대 넣지 않습니다 (잡을 길은 언제나 열려 있어야 합니다) */
   const back = (q.purpose === 'mega' || q.purpose === 'ult')
     ? `<button class="btn btn-white qback" data-act="qback">🔙 그냥 싸울래</button>` : '';
-  return `<div class="quiz" style="--cols:${q.cols}">${head}${slots}
+  /* 14차: 보기 글자가 길수록 글자를 작게 — 긴 이름(거다이 이상해꽃)도 안 넘칩니다 */
+  const wfs = (q.render === 'word') ? `;--wfs:${wordFs(q.options)}` : '';
+  return `<div class="quiz" style="--cols:${q.cols}${wfs}">${head}${slots}
     <div class="opts">${opts}</div>${back}</div>`;
 }
 
@@ -3626,6 +3824,22 @@ function chainHtmlOf(i){
     `<div class="chain-row${row.length > 3 ? ' many' : ''}">${row.map(step).join('')}</div>`
   ).join('');
   return `<div class="chain chain-tree">${rows}</div>`;
+}
+
+/* 14차: 같은 포켓몬의 다른 모습 줄 — 아직 못 만난 모습은 ??? 로 가려 둡니다.
+   만난 모습을 누르면 그 모습의 상세로 넘어갑니다 (진화 계보와는 아무 상관이 없습니다) */
+function formsHtmlOf(i){
+  const fam = formFamily(i);
+  if(fam.length < 2) return '';
+  const cells = fam.map(fi=>{
+    const fm = MONS[fi], seen = S.dex.indexOf(fi) >= 0, now = (fi === i);
+    const act = (seen && !now) ? `info:${fi}` : 'nope';
+    return `<div class="step${now ? ' now' : ''}${seen ? '' : ' dim'}" data-act="${act}" role="button" tabindex="0">
+      ${artBox(fm,0,'')}<div class="cn">${seen ? fm.n : '???'}</div></div>`;
+  }).join('');
+  return `<div class="formwrap">
+    <div class="formttl">✨ 다른 모습 ${fam.filter(f=>S.dex.indexOf(f)>=0).length} / ${fam.length}</div>
+    <div class="chain chain-row many formrow">${cells}</div></div>`;
 }
 
 function renderModal(){
@@ -3724,13 +3938,16 @@ function renderModal(){
   const owned = S.mons[i];
   const chain = chainOf(i);
   const chainHtml = chainHtmlOf(i);
+  const formsHtml = formsHtmlOf(i);          /* 14차: 같은 포켓몬의 다른 모습 */
   modalEl.className = 'on';
-  const tree = chain.length > 1 && chainBranches(i);   /* 갈래 계보면 창을 조금 작게 */
+  /* 갈래 계보거나 다른 모습이 붙으면 창을 조금 작게 해서 360×640 에서도 버튼까지 다 보이게 */
+  const tree = (chain.length > 1 && chainBranches(i)) || !!formsHtml;
   modalEl.innerHTML = `<div class="sheet${tree ? ' tree' : ''}">
     ${tree ? artBox(m,0,'') : artBox(m,150)}
     <div class="nm">${m.n}</div>
     <div class="meta">${TYPE_EMOJI[m.t]||'⭐'} ${m.t} 타입 ${owned ? `· Lv.${owned.lv}` : ''}${isKo(i) ? ' · 😵 쓰러짐' : ''}</div>
     ${chain.length > 1 ? chainHtml : ''}
+    ${formsHtml}
     ${i === S.partner && evoBtnHtml() ? `<div class="evorow" style="width:100%">${evoBtnHtml()}</div>` : ''}
     <div class="row">
       <button class="btn btn-yellow" data-act="sayname:${i}" style="min-height:56px;font-size:17px;">🔊 이름 듣기</button>
@@ -5922,6 +6139,7 @@ function openReviveQuiz(){
   S.learn.numCap = CAP_BY_STAGE[1];
   /* 기운 차리기는 "쓰러진 친구" 이야기라서 소재를 그 친구로 고정합니다 */
   const subj = monSubject(wm);
+  CUR_WANT = 1;                    /* 14차: 쓰러졌을 때는 오답도 제일 안 헷갈리게 */
   const q = t.build(subj);
   q.subj = subj;
   q.id = t.id; q.kind = t.kind; q.want = 1;
@@ -6050,7 +6268,7 @@ function doUlt(){
 }
 
 /* 메가·필살기용 문제 하나 — 약점 조준은 끕니다 (특별한 순간이라 얄궂으면 안 됩니다) */
-const FAST_IDS = ['H_FIRST_E','H_FIRST_M','H_LAST','H_CHO','H_JONG','H_PIC','H_JONGPICK',
+const FAST_IDS = ['H_FIRST_E','H_FIRST_M','H_LAST','H_CHO','H_JONG','H_PIC','H_JONGPICK','H_NAME',
                   'N_COUNT','N_CMP','N_CMP_LO','N_SHAPE','N_ADD','N_SUB','N_LV',
                   'N_SEQ','N_NTH','N_PAT','N_SPLIT','N_TEN','N_CLOCK','N_DIFF'];
 function openActionQuiz(purpose){
@@ -6081,6 +6299,7 @@ function openActionQuiz(purpose){
   NO_WEAK = true;                     /* 약점 조준 끔 */
   const subj = pickSubject(t, wm);
   NO_WEAK = false;
+  CUR_WANT = want;                 /* 14차: 오답을 얼마나 비슷하게 줄지 */
   const q = t.build(subj);
   q.subj = subj; q.weak = false;
   q.id = t.id; q.kind = t.kind; q.want = want;
@@ -6194,7 +6413,9 @@ function doMega(){
 
 /* 그림 고르기용 오답 — 이미 도감에서 본 아이를 먼저 씁니다 (아는 얼굴이 더 재미있게) */
 function picDistract(mi,count){
-  const chain = chainOf(mi);                 /* 같은 진화 라인은 너무 닮아서 제외 */
+  /* 같은 진화 라인은 너무 닮아서 제외.
+     14차: 같은 포켓몬의 다른 모습(거다이 피카츄 · 알로라 라이츄 …)도 함께 제외합니다 */
+  const chain = kinOf(mi);
   const bad = c => c === mi || chain.indexOf(c) >= 0;
   const out = [];
   shuffle(S.dex.slice()).forEach(c=>{
@@ -6207,6 +6428,67 @@ function picDistract(mi,count){
   }
   return out;
 }
+
+/* ---- 14차: 그림 보고 이름 고르기(H_NAME) 의 오답 이름 만들기 ----
+   너무 다르면 그림만 보고 찍고, 너무 비슷하면 좌절합니다. 난이도로 닮은 정도를 조절합니다.
+     want 1     쉬움   : 글자 수가 다르고 첫 글자도 다른 이름   (피카츄 / 잠만보 / 뮤)
+     want 2~3   보통   : 글자 수는 같고 첫·끝 글자는 다른 이름  (피카츄 / 파이리 / 또가스)
+     want 4~5   어려움 : 끝 글자나 첫 글자까지 같은 이름        (피카츄 / 라이츄 / 삐삐)
+   ⚠️ 같은 진화 라인과 "같은 포켓몬의 다른 모습" 은 오답으로 쓰지 않습니다.
+      진화 전후를 오답으로 주면 아이가 "둘 다 맞는 거 아니야?" 하고 혼란스러워합니다.
+   ⚠️ 낱말은 같은 이모지를 쓰는 낱말(계란/달걀, 차/자동차)을 빼야 합니다 — 둘 다 정답이 됩니다 */
+function nameDistract(subj,count,want,avoid){
+  const a = subj.n;
+  let pool;
+  if(subj.isMon !== false){
+    const mi = (subj.mi != null) ? subj.mi : IDX[a];
+    const kin = kinOf(mi);
+    const seen = [], rest = [];
+    MONS.forEach((m,c)=>{
+      if(m.n === a || kin.indexOf(c) >= 0) return;
+      (S.dex.indexOf(c) >= 0 ? seen : rest).push(m.n);
+    });
+    pool = shuffle(seen).concat(shuffle(rest));      /* 이미 만난 친구 이름을 앞에 둡니다 */
+  } else {
+    pool = shuffle(WORD_ALL.filter(w => w.n !== a && w.emoji !== subj.emoji).map(w => w.n));
+  }
+  const sameLen  = n => n.length === a.length;
+  const nearLen  = n => Math.abs(n.length - a.length) <= 1;
+  const sameEnd  = n => n[n.length-1] === a[a.length-1];
+  const sameHead = n => n[0] === a[0];
+  const tiers = want >= 4
+    ? [ n => sameLen(n) && (sameEnd(n) || sameHead(n)),
+        n => nearLen(n) && (sameEnd(n) || sameHead(n)),
+        n => sameLen(n), () => true ]
+    : want >= 2
+    ? [ n => sameLen(n) && !sameEnd(n) && !sameHead(n),
+        n => sameLen(n), n => nearLen(n), () => true ]
+    : [ n => !sameLen(n) && !sameHead(n),
+        n => !sameLen(n), n => !sameHead(n), () => true ];
+  const out = [];
+  tiers.forEach(f=>{
+    if(out.length >= count) return;
+    for(let k=0;k<pool.length && out.length < count;k++){
+      const n = pool[k];
+      if(n === a || out.indexOf(n) >= 0) continue;
+      /* 문제 글에 이미 들어 있는 낱말은 오답으로 쓰지 않습니다 ('봐' 가 오답인데
+         "읽어 봐!" 라고 말하면 아이가 그걸 정답으로 착각합니다) */
+      if(avoid && avoid.indexOf(n) >= 0) continue;
+      if(f(n)) out.push(n);
+    }
+  });
+  return out;
+}
+/* 보기 글자가 길면 글자 크기를 줄입니다 — 360×640 에서 넘치지 않게 (--wfs = 타일 대비 비율) */
+function wordFs(opts){
+  let L = 1;
+  opts.forEach(o=>{ const s = String(o); if(s.length > L) L = s.length; });
+  if(L <= 2) return 0.34;
+  if(L <= 4) return 0.31;
+  if(L <= 6) return 0.24;
+  return 0.185;
+}
+
 /* 이미 화면에 보이는 글자와 겹치지 않는 오답 */
 function distExcept(a,count,level,bad){
   const out = [];
@@ -6327,6 +6609,9 @@ function pickSubject(t, wm){
    이 함수 하나만 "무엇을 읽을지" 를 정합니다. 유형은 여기서 건드리지 않습니다 */
 let WEAK_HIT = false;              /* 방금 고른 낱말이 약점 겨냥이었나 (측정·표시용) */
 let NO_WEAK  = false;              /* 10차: 메가·필살기 문제에서는 약점 조준을 끕니다 */
+/* 14차: 이번 문제의 난이도(별 개수) — build(s) 는 인수가 하나뿐이라 여기에 담아 둡니다.
+   '이름 읽고 고르기' 가 오답을 얼마나 비슷하게 줄지 정하는 데 씁니다 */
+let CUR_WANT = 2;
 function pickWord(pool){
   WEAK_HIT = false;
   /* ① 약점 겨냥 — 확률로 잘라서 전체의 30% 를 절대 넘지 않습니다 */
@@ -6363,9 +6648,47 @@ const QUIZ_TYPES = [
       speak(){ say(s.n,{rate:0.85}); setTimeout(()=>say(`첫 글자, ${a}`,{rate:0.6,pitch:1.2}), 950); } };
   } },
 
+/* ★ 14차: 그림을 보고 한글 이름 고르기 — 읽기 학습의 핵심입니다.
+   아래 H_PIC 은 "이름을 들려주고 그림 고르기" 라서 한글을 읽을 일이 아예 없었습니다.
+   이 유형은 방향이 반대입니다 — 그림 하나를 보여 주고 한글 이름 셋 중에서 고릅니다.
+   그래서 문제를 낼 때 이름을 절대 소리로 알려 주지 않습니다 (알려 주면 읽을 필요가 없어집니다).
+   포켓몬(그림)과 낱말(이모지) 양쪽 다 소재로 씁니다.
+   못 읽어서 갇히는 일은 없습니다 — 두 번 틀리면 기존 규칙대로 정답이 반짝입니다.
+   맞힌 뒤에는 goodSay 로 이름을 읽어 줘서 "이렇게 읽는 거였구나" 를 확인시켜 줍니다.
+   w:3.4 — 일반 출제에서 이 유형이 한글 문제의 주가 되게 하는 가중치입니다 */
+{ id:'H_NAME', kind:'ko', diff:2, w:3.4, ok:()=>true,
+  build(s){
+    const want = CUR_WANT;
+    const mon = s.isMon !== false;
+    /* 문제 글에 정답 이름이 들어 있으면 답을 알려 주는 셈입니다 ('이름' 이 정답인데
+       "이 그림 이름은?" 이라고 물으면 안 됩니다). 안 겹치는 문장을 골라 씁니다 */
+    const ASKS = mon
+      ? ['이 포켓몬 이름은 무엇일까?', '이 포켓몬은 누구일까?', '어느 것일까?']
+      : ['이 그림 이름은 무엇일까?', '이건 무슨 낱말일까?', '어느 것일까?'];
+    const TAIL = ' 글자를 잘 읽어 봐!';
+    const askTxt = ASKS.filter(x => x.indexOf(s.n) < 0)[0] || '어느 것일까?';
+    const sayTxt = (TAIL.indexOf(s.n) < 0) ? askTxt + TAIL : askTxt;
+    /* 보기 수 — 기본 셋, 실력이 붙으면(별 넷 이상) 넷 */
+    const n = (want >= 4) ? 4 : 3;
+    let opts = [s.n].concat(nameDistract(s, n - 1, want, sayTxt));
+    /* 이름이 길면(거다이 이상해꽃 · 메가이상해꽃) 넷은 360 화면에서 넘칩니다 — 셋으로 줄입니다 */
+    if(opts.length > 3 && opts.some(o => o.length > 4)) opts = opts.slice(0,3);
+    /* 만약을 대비해 — 보기가 둘밖에 안 모이면 아무 이름으로라도 채웁니다 (막히지 않게) */
+    if(opts.length < 3){
+      nameDistract(s, 3, 1, sayTxt).forEach(x=>{ if(opts.length < 3 && opts.indexOf(x) < 0) opts.push(x); });
+    }
+    opts = shuffle(opts);
+    return { head:'art', ask:askTxt, cols:opts.length, render:'word',
+      options:opts, answer:s.n, judge:'equal',
+      goodSay:`잘했어! ${s.n}`,
+      speak(){ say(sayTxt,{rate:0.78}); } };
+  } },
+
 /* 이름을 듣고 그림 고르기 — 글자를 아직 못 읽어도 풀 수 있는 문제.
-   9차: 이 유형만은 언제나 포켓몬입니다 (그림이 포켓몬 그림이라서) */
-{ id:'H_PIC', kind:'ko', diff:1, ok:s=>s.isMon !== false,
+   9차: 이 유형만은 언제나 포켓몬입니다 (그림이 포켓몬 그림이라서)
+   14차: 없애지 않고 남깁니다 — 마음이 꺾였을 때 나오는 SAFE_IDS 안심 유형으로는 여전히 최고입니다.
+         다만 읽기 연습이 안 되므로 일반 출제 비중만 크게 줄였습니다 (w:0.3) */
+{ id:'H_PIC', kind:'ko', diff:1, w:0.3, ok:s=>s.isMon !== false,
   build(s){
     const mi = (s.mi != null) ? s.mi : IDX[s.n];
     return { head:'hidden', ask:`${s.n}! 어느 그림일까?`, cols:3, render:'art',
@@ -6694,6 +7017,7 @@ function openQuiz(){
   S.learn.numCap = sel.nstage ? CAP_BY_STAGE[sel.nstage] : 9;
   /* 9차: 유형은 그대로, 소재만 포켓몬 ↔ 낱말로 갈아끼웁니다 */
   const subj = pickSubject(t, wm);
+  CUR_WANT = sel.want;             /* 14차: 오답을 얼마나 비슷하게 줄지 */
   const q = t.build(subj);
   q.subj = subj;
   q.weak = WEAK_HIT;
@@ -6771,7 +7095,9 @@ function answerPick(i){
   if(isRight(q,v)){
     if(el) el.classList.add('good');
     lock(3400);              /* 볼 던지는 연출이 끝날 때까지 다른 입력 차단 */
-    SFX.good(); say('잘했어!');
+    /* 14차: 이름 읽고 고르기는 맞힌 뒤에 이름을 읽어 줍니다 — "이렇게 읽는 거였구나" 확인.
+       문제를 낼 때는 절대 읽어 주지 않습니다 (그러면 읽을 필요가 없어집니다) */
+    SFX.good(); say(q.goodSay || '잘했어!');
     noteResult(q);
     awardStars(q);
     setTimeout(quizDone, 620);
