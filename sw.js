@@ -1,5 +1,5 @@
 /* 자동 생성 파일 — 직접 고치지 마세요. build.js 가 다시 만듭니다. */
-const CACHE = 'hajun-pokemon-82f17dbfbe';
+const CACHE = 'hajun-pokemon-8de58b09d4';
 const ASSETS = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-180.png'];
 
 self.addEventListener('install', e => {

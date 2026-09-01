@@ -119,8 +119,50 @@ body{
 
 .title-wrap{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;text-align:center;padding:10px;
+  gap:6px;text-align:center;padding:10px;position:relative;
 }
+/* ---------- 18차 A: 어른 설정 ----------
+   아이 동선에서 벗어난 시작 화면 구석에 흐릿한 톱니바퀴 하나.
+   눌러도 덧셈 문제(adultGate)를 통과해야 열립니다 */
+.setgear{
+  position:absolute;right:5px;top:5px;width:44px;min-height:44px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  font-family:var(--font);color:var(--ink);
+  background:rgba(255,255,255,.42);border:3px solid var(--edge);border-radius:14px;
+  opacity:.45;cursor:pointer;padding:0;
+}
+.setgear:active{transform:translateY(2px);opacity:.8;}
+.setwrap{
+  flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;gap:9px;
+}
+.setcard{
+  background:#fff;border:4px solid var(--edge);border-radius:18px;box-shadow:var(--shadow-sm);
+  padding:9px 10px;display:flex;flex-direction:column;gap:7px;
+}
+.sethd{font-weight:900;font-size:16px;letter-spacing:-.03em;}
+.setline{display:flex;align-items:baseline;gap:6px;font-weight:800;font-size:13px;color:var(--ink-soft);}
+.setline .r{margin-left:auto;font-weight:900;font-size:14px;color:var(--ink);text-align:right;}
+.setnote{font-weight:800;font-size:11.5px;color:var(--ink-soft);line-height:1.35;}
+.setlab{font-weight:900;font-size:14px;letter-spacing:-.03em;}
+.setlab small{display:block;font-weight:800;font-size:11.5px;color:var(--ink-soft);letter-spacing:0;}
+.seg{display:grid;gap:3px;}
+.seg.c3{grid-template-columns:repeat(3,1fr);}
+.seg.c4{grid-template-columns:repeat(4,1fr);}
+.segb{
+  font-family:var(--font);font-weight:900;font-size:14px;min-height:44px;padding:2px;
+  color:var(--ink);background:var(--cream);border:3px solid var(--edge);border-radius:12px;
+  box-shadow:0 3px 0 var(--edge);cursor:pointer;letter-spacing:-.04em;
+}
+.segb.on{background:var(--sun);}
+.segb:active{transform:translateY(3px);box-shadow:none;}
+.setjamo{display:flex;flex-wrap:wrap;gap:4px;}
+.setjamo span{
+  font-weight:900;font-size:15px;background:#FFE9E4;border:2px solid var(--edge);
+  border-radius:8px;padding:1px 7px;line-height:1.4;
+}
+.setrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.setrow .btn{min-height:52px;font-size:16px;}
 .title-wrap h1{font-size:clamp(32px,9.5vw,50px);margin:0;}
 .title-wrap h1 .l0{display:block;font-size:clamp(26px,7.6vw,38px);color:var(--sun);margin-bottom:-2px;}
 .title-wrap h1 .l2{display:block;font-size:clamp(24px,7vw,36px);color:var(--sun);}
@@ -997,6 +1039,12 @@ body{
   background:#fff;border:3px solid var(--edge);border-radius:14px;box-shadow:0 3px 0 var(--edge);
 }
 .plate.q{background:var(--sun);font-size:23px;font-weight:900;line-height:1;}
+/* 18차: 묶어 세기·돈 세기 — 접시·동전이 여러 개라 좁은 폰에서는 다음 줄로 접힙니다 */
+.splitrow.wrap{flex-wrap:wrap;gap:7px;}
+.plate.coin{
+  background:#FFE9A8;border-radius:50%;min-width:46px;min-height:46px;padding:2px;
+  font-size:16px;font-weight:900;line-height:1;letter-spacing:-.06em;
+}
 
 .opts{
   display:grid;gap:var(--gap);justify-content:center;
@@ -1605,6 +1653,21 @@ body.qk{overflow:hidden;}
   .wrdots i{width:11px;height:11px;border-width:2px;}
   .wrrow .btn{min-height:50px;font-size:13px;}
   .wrrow .btn .e{font-size:18px;}
+  /* 18차: 짧은 폰에서 어른 설정 · 새 수학 그림도 같이 줄입니다.
+     ⚠️ .segb 의 44px 은 줄이지 않습니다 (터치 타겟 최소 크기) */
+  .setwrap{gap:7px;}
+  .setcard{padding:7px 8px;gap:6px;border-width:3px;border-radius:16px;}
+  .sethd{font-size:15px;}
+  .setline{font-size:12px;}
+  .setline .r{font-size:13px;}
+  .setlab{font-size:13px;}
+  .setlab small{font-size:11px;}
+  .setnote{font-size:11px;}
+  .setjamo span{font-size:14px;padding:1px 6px;}
+  .setrow .btn{min-height:48px;font-size:15px;}
+  .setgear{width:44px;min-height:44px;font-size:17px;}
+  .plate.coin{min-width:42px;min-height:42px;font-size:14px;}
+  .splitrow.wrap{gap:6px;}
 }
 </style>
 
@@ -2897,11 +2960,34 @@ function weightedPick(arr,w){
    셈은 한자어(삼 더하기 사), 개수는 고유어(하나 둘 셋) 가 자연스럽습니다 */
 const SINO = ['영','일','이','삼','사','오','육','칠','팔','구','십',
               '십일','십이','십삼','십사','십오','십육','십칠','십팔','십구','이십'];
-function sino(n){ return SINO[n] != null ? SINO[n] : String(n); }
+/* 18차: 두 자리 수까지 한자어로 읽습니다 — 30 은 "삼십", 42 는 "사십이".
+   20 까지는 예전과 글자 하나까지 똑같습니다 (표에서 그대로 꺼내 씁니다) */
+function sino(n){
+  if(SINO[n] != null) return SINO[n];
+  if(typeof n === 'number' && n === Math.floor(n) && n > 20 && n < 100){
+    const t = Math.floor(n/10), o = n % 10;
+    return (t > 1 ? SINO[t] : '') + '십' + (o ? SINO[o] : '');
+  }
+  return String(n);
+}
+/* 18차: 백 단위 — 돈 세기에 씁니다. 100 은 "백", 500 은 "오백" */
+function sinoHund(n){
+  if(typeof n !== 'number' || n % 100 !== 0 || n <= 0 || n >= 1000) return sino(n);
+  const h = n / 100;
+  return (h > 1 ? SINO[h] : '') + '백';
+}
 /* 개수는 고유어로 — "하나, 둘, 셋" */
-const NATIVE = ['','하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉','열'];
+const NATIVE = ['','하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉','열','열하나','열둘'];
+/* 18차: 고유어 두 자리 — 37 은 "서른일곱". 6살이 실제로 쓰는 말이라 이쪽이 먼저 익숙합니다 */
+const NATIVE_TEN = ['','열','스물','서른','마흔','쉰','예순','일흔','여든','아흔'];
+function nativeTens(n){
+  if(typeof n !== 'number' || n < 10 || n > 99) return sino(n);
+  const t = Math.floor(n/10), o = n % 10;
+  return NATIVE_TEN[t] + (o ? NATIVE[o] : '');
+}
 /* 12차(⑤): 개수를 셀 때 붙는 관형사 — "세 개" 가 맞고 "셋 개" · "삼 개" 는 틀립니다 */
-const NATIVE_UNIT = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열'];
+/* 18차: 11·12 도 넣습니다 — "열한 시" · "열두 시" 가 맞고 "십일 시" 는 틀립니다 */
+const NATIVE_UNIT = ['','한','두','세','네','다섯','여섯','일곱','여덟','아홉','열','열한','열두'];
 function nativeUnit(n){ return NATIVE_UNIT[n] != null ? NATIVE_UNIT[n] : sino(n); }
 function nativeCount(n){
   const a = [];
@@ -2981,9 +3067,12 @@ function numCap(){
   return (typeof c === 'number' && c >= 5 && c <= 9) ? c : 9;
 }
 
-/* 정시 시계 그림 — 짧은바늘은 빨강(시), 긴바늘은 파랑(12시 고정).
-   외부 그림을 쓰지 않고 인라인 SVG 로 그립니다 */
-function clockSvg(h){
+/* 시계 그림 — 짧은바늘은 빨강(시), 긴바늘은 파랑(분).
+   외부 그림을 쓰지 않고 인라인 SVG 로 그립니다.
+   18차(C-④): 아빠 요청 — 6살이 두 바늘을 헷갈리지 않게 바늘 옆에 "시" · "분" 을 작게 씁니다.
+   18차(C-③): 분(m)을 받습니다. m 을 안 주면 예전과 똑같이 정시입니다 */
+function clockSvg(h, m){
+  const mm = (typeof m === 'number' && isFinite(m)) ? ((m % 60) + 60) % 60 : 0;
   const rad = a => (a - 90) * Math.PI / 180;
   let ticks = '';
   for(let i=0;i<12;i++){
@@ -2997,14 +3086,38 @@ function clockSvg(h){
     const a = rad(p[1]);
     nums += `<text x="${(50+24*Math.cos(a)).toFixed(1)}" y="${(50+24*Math.sin(a)+5.2).toFixed(1)}" text-anchor="middle" font-size="15" font-weight="900" fill="#3B3226">${p[0]}</text>`;
   });
-  const ha = rad((h % 12) * 30);
+  /* 짧은바늘(시) — 분이 지난 만큼 조금 더 돌아갑니다. 30분이면 두 수 사이에 놓입니다 */
+  const ha = rad((h % 12) * 30 + mm * 0.5);
+  const ma = rad(mm * 6);
+  /* 바늘 옆 글자 — 바늘 가운데쯤에서 옆으로 살짝 비켜 놓습니다 (바늘을 가리지 않게) */
+  const tag = (a, len, off, txt, col) => {
+    const x = 50 + len*Math.cos(a) - off*Math.sin(a);
+    const y = 50 + len*Math.sin(a) + off*Math.cos(a);
+    return `<text x="${x.toFixed(1)}" y="${(y+3.4).toFixed(1)}" text-anchor="middle" font-size="10.5"`
+      + ` font-weight="900" fill="${col}" stroke="#fff" stroke-width="2.8" paint-order="stroke">${txt}</text>`;
+  };
   return `<svg class="qclock" viewBox="0 0 100 100" aria-hidden="true">
     <circle cx="50" cy="50" r="45" fill="#fff" stroke="#3B3226" stroke-width="5"/>
     ${ticks}${nums}
-    <line x1="50" y1="50" x2="50" y2="16" stroke="#4FA8E8" stroke-width="4" stroke-linecap="round"/>
+    <line x1="50" y1="50" x2="${(50+34*Math.cos(ma)).toFixed(1)}" y2="${(50+34*Math.sin(ma)).toFixed(1)}" stroke="#4FA8E8" stroke-width="4" stroke-linecap="round"/>
     <line x1="50" y1="50" x2="${(50+21*Math.cos(ha)).toFixed(1)}" y2="${(50+21*Math.sin(ha)).toFixed(1)}" stroke="#E8412F" stroke-width="6" stroke-linecap="round"/>
     <circle cx="50" cy="50" r="4.5" fill="#3B3226"/>
+    ${tag(ma, 25, 8.5, '분', '#2C7FB8')}
+    ${tag(ha, 13, -8.5, '시', '#C0271A')}
   </svg>`;
+}
+
+/* 18차(C-①): 시계 문제의 시각 — 바로 앞에 나온 시각은 다시 뽑지 않습니다.
+   아빠가 "10시만 계속 나온다" 고 했습니다. 검사로는 분포가 고르지만
+   같은 시각이 연달아 나오면 아이 눈에는 "또 10시" 로 보입니다.
+   저장할 필요가 없어서 메모리 변수로만 둡니다 (정시·30분 문제가 같이 씁니다) */
+let CLOCK_RECENT = [];
+function pickClockHour(){
+  let h = rint(1,12), g = 0;
+  while(CLOCK_RECENT.indexOf(h) >= 0 && g++ < 40) h = rint(1,12);
+  CLOCK_RECENT.unshift(h);
+  if(CLOCK_RECENT.length > 2) CLOCK_RECENT.length = 2;
+  return h;
 }
 
 /* =========================================================
@@ -3706,7 +3819,8 @@ function foeTough(mi){
 /* 야생 포켓몬의 최대 체력 — 내가 크면 상대도 같이 큽니다.
    절반(몬스터볼이 열리는 지점)까지 대략 세 턴 걸리게 맞췄습니다 */
 function wildMaxHp(mi){
-  return Math.max(10, Math.round((34 + pLv()*3.2) * (0.86 + foeTough(mi)*0.015)));
+  /* 18차: 어른 설정 "전투 난이도" 가 여기에 곱해집니다 (보통 = 1.00, 예전과 똑같음) */
+  return Math.max(10, Math.round((34 + pLv()*3.2) * (0.86 + foeTough(mi)*0.015) * battleMul().hp));
 }
 
 /* 상대가 나에게 주는 피해 — 내 최대 체력의 20%(약한 애)~27%(전설) 정도.
@@ -3716,7 +3830,8 @@ function foeDamage(){
   /* 12차: 체력이 전투 사이에 이어지게 되면서(②) 예전 20~27% 는 너무 가혹해졌습니다.
      11~15% 로 낮춰서 "한 배틀에 대략 3분의 1이 닳는다" 로 맞춥니다.
      그래도 세 번 싸우면 회복약이 꼭 필요할 만큼은 닳습니다 */
-  const base = Math.max(2, Math.round(pMaxHp() * (0.115 + foeTough(S.wild.mi) * 0.0045)));
+  /* 18차: 어른 설정 "전투 난이도" 를 곱합니다 (보통 = 1.00, 예전과 똑같음) */
+  const base = Math.max(2, Math.round(pMaxHp() * (0.115 + foeTough(S.wild.mi) * 0.0045) * battleMul().dmg));
   let d = base + Math.floor(Math.random() * (Math.round(base * 0.4) + 1));
   /* 메가진화 중에는 훨씬 덜 아픕니다 — 메가는 확실히 세야 합니다 */
   if(S.megaOn) d = Math.round(d * 0.55);
@@ -3748,13 +3863,24 @@ function swapHp(){
   S.hp = Math.max(Math.round(S.maxHp * 0.5), Math.min(S.maxHp, keep));
 }
 
-/* 하준이가 지금까지 얼마나 컸나 — 여기까지만 어려워집니다 */
+/* 하준이가 지금까지 얼마나 컸나 — 여기까지만 어려워집니다.
+   18차: 아빠가 "지금 좀 쉽다" 고 했습니다. 천장을 6으로 한 칸 올리고,
+   각 칸에 닿는 조건도 조금 앞당겼습니다. 대신 밑바닥(2)은 그대로 둡니다 —
+   막 시작한 아이에게 어려운 문제가 가면 안 됩니다 */
 function skillCap(){
   const d = S.dex.length, lv = pLv();
-  if(d >= 16 || lv >= 15) return 5;
-  if(d >= 9  || lv >= 10) return 4;
-  if(d >= 4  || lv >= 5)  return 3;
+  if(d >= 30 || lv >= 20) return 6;
+  if(d >= 13 || lv >= 13) return 5;
+  if(d >= 7  || lv >= 8)  return 4;
+  if(d >= 3  || lv >= 4)  return 3;
   return 2;
+}
+/* 18차: 기본 난이도 자체를 조금 올립니다 (아빠: "지금 좀 쉽다고 느껴지긴해").
+   많이 잡아 본 아이에게는 문제 별표가 한두 칸 위에서 시작합니다.
+   comfort() 가 여전히 위에서 깎아 주므로 헤매면 바로 쉬워집니다 */
+function wantBase(){
+  const d = S.dex.length;
+  return d >= 40 ? 2 : d >= 12 ? 1 : 0;
 }
 /* 헤맨 만큼 낮춰 줍니다. -99 는 "지금은 무조건 제일 쉬운 걸로" */
 function comfort(){
@@ -3765,10 +3891,12 @@ function comfort(){
 }
 /* 한글만 계속 나오면 지루해서 숫자를 섞습니다 */
 function wantNumber(){
+  /* 18차 B: 수학 유형이 13가지 늘어서 기본 비율을 0.30 → 0.36 으로 조금 올립니다.
+     그래도 한글이 주인공입니다 (열 문제 중 예닐곱은 한글) */
   const r = S.qRecent;
-  let p = 0.30;
-  if(r.length >= 1 && r[0].kind === 'num') p = 0.12;
-  else if(r.length >= 2 && r[0].kind === 'ko' && r[1].kind === 'ko') p = 0.45;
+  let p = 0.36;
+  if(r.length >= 1 && r[0].kind === 'num') p = 0.14;
+  else if(r.length >= 2 && r[0].kind === 'ko' && r[1].kind === 'ko') p = 0.50;
   return Math.random() < p;
 }
 /* =========================================================
@@ -3787,10 +3915,54 @@ const STAGE_RATE  = 0.7;    /* 한 번에 맞힌 비율이 이 이상이면 승�
 const DECAY_EVERY = 12;     /* 12문제마다 틀린 기억이 절반으로 */
 const WEAK_P      = 0.30;   /* 약점 겨냥 문제의 최대 비율 — 이 값을 넘을 수 없습니다 */
 
+/* =========================================================
+   18차 A: 어른이 직접 정하는 값 (S.learn.set)
+   ---------------------------------------------------------
+   아빠가 하준이 실력을 제일 잘 압니다. 자동 승급만으로는 어긋날 수 있어서
+   아빠가 손으로 잡을 수 있는 손잡이를 다섯 개 둡니다.
+     koStage / numStage  0 = 자동(지금까지처럼) · 1~6 = 그 단계로 고정
+     battle  0 쉬움 · 1 보통(예전과 똑같음) · 2 어려움
+     want    -1 · 0 · +1   문제 유형 난이도 보정
+     weak    0 낮음 · 1 보통(0.30) · 2 높음   약점 집중도
+   ⚠️ 어떤 값으로 맞춰도 좌절 방지 장치(comfort · 틀려도 벌 없음)는 그대로 돕니다
+   ========================================================= */
+const SET_BATTLE = [
+  {n:'쉬움', hp:0.78, dmg:0.75},
+  {n:'보통', hp:1.00, dmg:1.00},
+  {n:'어려움', hp:1.28, dmg:1.30}
+];
+const SET_WEAK = [ {n:'낮음', p:0.15}, {n:'보통', p:0.30}, {n:'높음', p:0.45} ];
+function freshSet(){ return {koStage:0, numStage:0, battle:1, want:0, weak:1}; }
+/* 저장에서 읽어 온 값 다듬기 — 이상하면 조용히 자동으로 돌아갑니다 */
+function saneSet(d){
+  const s = freshSet();
+  if(!d || typeof d !== 'object') return s;
+  const int = (v,lo,hi) => (typeof v === 'number' && isFinite(v)) ? Math.max(lo, Math.min(hi, Math.round(v))) : null;
+  const ks = int(d.koStage,0,STAGE_MAX);  if(ks != null) s.koStage = ks;
+  const ns = int(d.numStage,0,STAGE_MAX); if(ns != null) s.numStage = ns;
+  const bt = int(d.battle,0,2);           if(bt != null) s.battle = bt;
+  const wt = int(d.want,-1,1);            if(wt != null) s.want = wt;
+  const wk = int(d.weak,0,2);             if(wk != null) s.weak = wk;
+  return s;
+}
+function setOf(){
+  if(!S.learn) S.learn = freshLearn();
+  if(!S.learn.set) S.learn.set = freshSet();
+  return S.learn.set;
+}
+function battleMul(){ return SET_BATTLE[setOf().battle] || SET_BATTLE[1]; }
+function wantAdj(){ return setOf().want; }
+function weakShare(){ return (SET_WEAK[setOf().weak] || SET_WEAK[1]).p; }
+/* 어른이 고정한 단계 (0 이면 자동) */
+function fixedStage(kind){
+  const s = setOf();
+  return kind === 'num' ? s.numStage : s.koStage;
+}
+
 function freshLearn(){
   return { ko:{stage:1, seen:0, ok:0, hist:[]},
            num:{stage:1, seen:0, ok:0, hist:[]},
-           tag:{}, q:0, numCap:9 };
+           tag:{}, q:0, numCap:9, set:freshSet() };
 }
 /* 저장에서 읽어 온 값 다듬기 — 이상해도 아이가 갇히지 않게 항상 성한 모양을 돌려줍니다 */
 function saneLearn(d){
@@ -3810,15 +3982,20 @@ function saneLearn(d){
     });
   }
   if(typeof d.q === 'number' && isFinite(d.q) && d.q > 0) L.q = Math.floor(d.q);
+  /* 18차: 어른이 정한 값. 이 값이 없는 옛 저장은 전부 "자동" 으로 열립니다 */
+  L.set = saneSet(d.set);
   return L;
 }
 function learnOf(kind){
   if(!S.learn) S.learn = freshLearn();
   return S.learn[kind === 'num' ? 'num' : 'ko'];
 }
-/* 이번 문제에 쓸 소재 단계 — 45% 지금 / 40% 예전 / 15% 다음 맛보기 */
+/* 이번 문제에 쓸 소재 단계 — 45% 지금 / 40% 예전 / 15% 다음 맛보기.
+   18차: 어른이 단계를 고정해 두면 그 단계를 "지금 단계" 로 삼습니다.
+   섞는 비율은 그대로라서 4단계로 고정해도 쉬운 낱말이 계속 섞여 나옵니다 */
 function pickStage(kind){
-  const st = learnOf(kind).stage;
+  const fx = fixedStage(kind);
+  const st = fx > 0 ? fx : learnOf(kind).stage;
   if(st <= 1) return Math.random() < 0.85 ? 1 : Math.min(STAGE_MAX, 2);
   const r = Math.random();
   if(r < 0.45) return st;                       /* 지금 단계 45% */
@@ -3875,16 +4052,29 @@ function diffOf(t,wm){ return typeof t.diff === 'function' ? t.diff(wm) : t.diff
 
 function pickQuizType(wm,mi){
   const cf = comfort();
-  let want = 1 + Math.round(foeTough(mi)/2) + cf + pick([-1,-1,0,0,0,1]);
+  let want = 1 + wantBase() + Math.round(foeTough(mi)/2) + cf + pick([-1,-1,0,0,0,1]);
   let safe = false;
   if(cf === -99){ want = 1; safe = true; }
-  else want = Math.max(1, Math.min(skillCap(), want));
+  else {
+    want = Math.max(1, Math.min(skillCap(), want));
+    /* 18차: 어른이 정한 보정은 천장(skillCap) 다음에 더합니다.
+       그래야 "+1" 로 맞췄을 때 실제로 한 칸 올라가는 게 보입니다.
+       두 번 연달아 헤맸을 때(cf === -99)는 여기까지 오지 않습니다 — 좌절 방지가 언제나 먼저입니다 */
+    want = Math.max(1, Math.min(6, want + wantAdj()));
+  }
 
   const kind = wantNumber() ? 'num' : 'ko';
   let pool = QUIZ_TYPES.filter(t => t.ok(wm));
   if(safe) pool = pool.filter(t => SAFE_IDS.indexOf(t.id) >= 0);
   const recent = S.qRecent.map(r => r.id);
-  const near = t => Math.abs(diffOf(t,wm) - want) <= 1;
+  /* 18차: 기본 난이도를 올리자 별표가 5~6 으로 올라가면서
+     읽기 학습의 주인공인 H_NAME(diff 2)이 후보에서 빠져 4%까지 떨어졌습니다.
+     H_NAME 은 CUR_WANT 로 스스로 어려워지는 유형입니다 —
+     별표가 높으면 보기를 넷으로 늘리고 오답도 정답과 더 비슷하게 만듭니다.
+     그래서 이 유형만은 별표와 상관없이 후보에 남깁니다 (거리는 1로 봅니다) */
+  const SELF_SCALE = ['H_NAME'];
+  const dist = t => SELF_SCALE.indexOf(t.id) >= 0 ? 1 : Math.abs(diffOf(t,wm) - want);
+  const near = t => dist(t) <= 1;
 
   /* 조건을 다 만족하는 것부터 찾고, 없으면 한 겹씩 풀어 줍니다 */
   let c = pool.filter(t => t.kind === kind && near(t) && recent.indexOf(t.id) < 0);
@@ -3898,7 +4088,7 @@ function pickQuizType(wm,mi){
      유형 고르기(위)는 포켓몬 강함 축 그대로 — 여기서는 같은 난이도 안에서만 살짝 기울입니다 */
   const nstage = (kind === 'num') ? pickStage('num') : 0;
   const w = c.map(t=>{
-    let v = 1 / (1 + Math.abs(diffOf(t,wm) - want));
+    let v = 1 / (1 + dist(t));
     if(nstage && t.ns) v *= 1 / (1 + 0.4 * Math.abs(t.ns - nstage));
     /* 14차: 유형마다 정해 둔 비중 — 읽기 연습이 되는 H_NAME 은 크게,
        한글을 읽을 일이 없는 H_PIC 은 작게 (H_PIC 은 안심 유형으로만 남깁니다) */
@@ -3987,7 +4177,9 @@ function render(){
     rkpick: ['같이 싸울 팀을 골라!', viewRkPick],
     rkend:  [(S.rkEnd && S.rkEnd.win) ? '이겼다!' : '괜찮아!', viewRkEnd],
     /* 17차: 손가락으로 글씨 쓰기 — 배틀·포획과 완전히 따로 돕니다 */
-    write:  ['✏️ 글씨 쓰기', viewWrite]
+    write:  ['✏️ 글씨 쓰기', viewWrite],
+    /* 18차: 어른 설정 — adultGate 를 지나야만 여기로 옵니다 */
+    set:    ['⚙️ 어른 설정', viewSet]
   }[S.screen];
   topTitle.textContent = V[0];
   screenEl.innerHTML = V[1]();
@@ -4004,6 +4196,8 @@ function viewTitle(){
     ${ballSvg('big-ball')}
     <h1 class="sticker"><span class="l0">하준아!</span>포켓몬<span class="l2">잡으러 가자!</span></h1>
     <p class="sub">읽고, 만나고, 잡아요</p>
+    ${/* 18차: 어른 설정 — 아이 동선(▶ 이어서)에서 벗어난 구석. 눌러도 덧셈 문제를 지나야 열립니다 */''}
+    <button class="setgear" data-act="settings" aria-label="어른 설정">⚙️</button>
   </div>
   ${has ? `
   <div class="start-row">
@@ -4197,7 +4391,8 @@ const COUNT_IDS = ['N_NTH','N_COUNT','N_PAT','N_DIFF','N_SEQ'];
    숫자 유형에서 무언가를 보여 주는 머리(식·볼·점·시계)는 전부 이 상자 안에 혼자 들어갑니다.
    장식(낱말 이모지·야생 포켓몬)은 상자 바깥 위 줄(.qdeco)에만 놓입니다.
    그래서 어떤 낱말이 걸려도 세는 줄 안에는 세는 대상 말고는 아무것도 못 들어옵니다 */
-const NUM_BOX_HEADS = ['expr','balls','dots','clock','split'];
+/* 18차: 새로 생긴 머리(row 한 줄 · grp 묶음 · share 나누기 · coin 동전)도 전부 상자 안에 넣습니다 */
+const NUM_BOX_HEADS = ['expr','balls','dots','clock','split','row','grp','share','coin'];
 function numBoxed(q){
   return (q.kind === 'num' && NUM_BOX_HEADS.indexOf(q.head) >= 0)
       || COUNT_IDS.indexOf(q.id) >= 0;
@@ -4216,8 +4411,11 @@ function countRow(q){
       for(let i=0;i<q.headData.b;i++) r2 += '<i class="dot b"></i>';
       return `<div class="dotrows"><div class="dotrow">${r1}</div><div class="dotrow">${r2}</div></div>`;
     }
-    case 'clock':
-      return clockSvg(q.headData);
+    /* 18차(C-③): 정시는 숫자 하나(예전 그대로), 30분 문제는 {h, m} 로 옵니다 */
+    case 'clock': {
+      const c = q.headData;
+      return (c && typeof c === 'object') ? clockSvg(c.h, c.m) : clockSvg(c);
+    }
     /* 12차(⑤): 나눠 담기 — 전체 구슬 → 두 접시 */
     case 'split': {
       let all = '', one = '';
@@ -4229,6 +4427,35 @@ function countRow(q){
         <div class="splitrow"><span class="plate">${one}</span><span class="plate q">❓</span></div>
       </div>`;
     }
+    /* 18차: 구슬 한 줄 — 둘씩 짝 짓기(홀짝)에 씁니다. 많아지면 알아서 다음 줄로 접힙니다 */
+    case 'row': {
+      let all = '';
+      for(let i=0;i<q.headData;i++) all += '<i class="dot a"></i>';
+      return `<div class="splitall">${all}</div>`;
+    }
+    /* 18차: 묶어 세기 — 접시 b 개에 구슬 a 개씩 */
+    case 'grp': {
+      let one = '';
+      for(let i=0;i<q.headData.a;i++) one += '<i class="dot a"></i>';
+      let rows = '';
+      for(let i=0;i<q.headData.b;i++) rows += `<span class="plate">${one}</span>`;
+      return `<div class="splitrow wrap">${rows}</div>`;
+    }
+    /* 18차: 똑같이 나누기 — 위에 전체 구슬, 아래에 빈 접시 n 개 */
+    case 'share': {
+      let all = '', plates = '';
+      for(let i=0;i<q.headData.t;i++) all += '<i class="dot a"></i>';
+      for(let i=0;i<q.headData.n;i++) plates += `<span class="plate q">❓</span>`;
+      return `<div class="splitwrap">
+        <div class="splitall">${all}</div>
+        <div class="splitdown" aria-hidden="true">▼</div>
+        <div class="splitrow">${plates}</div>
+      </div>`;
+    }
+    /* 18차: 돈 세기 — 동전에 숫자를 써 둡니다 */
+    case 'coin':
+      return `<div class="splitrow wrap">`
+        + q.headData.map(v=>`<span class="plate coin">${v}</span>`).join('') + `</div>`;
     default:
       return `<div class="num">${q.headData}</div>`;
   }
@@ -4265,9 +4492,12 @@ function quizHead(q,wm){
       inner = `<div class="quiz-expr">${word ? emo : artBox(wm,0,'')}<div class="num">${txt}</div></div>`;
       break;
     }
-    /* 10차: 정시 시계 */
-    case 'clock':
-      inner = `<div class="quiz-expr">${word ? emo : artBox(wm,0,'')}${clockSvg(q.headData)}</div>`; break;
+    /* 10차: 시계 (18차: 30분 문제는 {h,m} 로 옵니다) */
+    case 'clock': {
+      const c = q.headData;
+      const svg = (c && typeof c === 'object') ? clockSvg(c.h, c.m) : clockSvg(c);
+      inner = `<div class="quiz-expr">${word ? emo : artBox(wm,0,'')}${svg}</div>`; break;
+    }
     /* 10차: 차이 구하기 — 위아래 두 줄을 눈으로 견줍니다 */
     case 'dots': {
       let r1 = '', r2 = '';
@@ -4382,6 +4612,97 @@ function viewDex(){
   ${swap
     ? `<button class="btn btn-big btn-white" data-act="swapcancel">↩️ 다시 고를래</button>`
     : `<button class="btn btn-big btn-green" data-act="back">🌿 계속 탐험하기</button>`}`;
+}
+
+/* =========================================================
+   18차 A: 어른 설정 화면
+   ---------------------------------------------------------
+   들어오는 길은 시작 화면 오른쪽 위 흐릿한 ⚙️ 하나뿐이고,
+   누르면 adultGate() 덧셈 문제를 지나야 열립니다 (6살은 못 들어옵니다).
+   윗칸은 "지금 하준이" — 아빠가 판단할 근거.
+   아랫칸은 손잡이 다섯 개. 바꾸면 그 자리에서 저장됩니다.
+   ========================================================= */
+
+/* 꼬리표(c3 · v5 · j8)를 사람이 읽는 자모로 */
+function jamoName(k){
+  const t = String(k)[0], i = parseInt(String(k).slice(1),10);
+  if(t === 'c') return CHO_CHAR[i] || '?';
+  if(t === 'v') return JUNG_L[i] || '?';
+  if(t === 'j') return JONG_L[i] || '?';
+  return '?';
+}
+/* 최근 성적 — hist 는 이번에 켠 뒤의 기록입니다 (저장하지 않습니다) */
+function recentRate(g){
+  if(!g || !Array.isArray(g.hist) || !g.hist.length) return null;
+  let ok = 0;
+  g.hist.forEach(v=>{ ok += v ? 1 : 0; });
+  return {ok:ok, n:g.hist.length, pct:Math.round(ok / g.hist.length * 100)};
+}
+function segHtml(kind, list, cur, cols){
+  return `<div class="seg c${cols}">` + list.map(o=>
+    `<button class="segb${o.v === cur ? ' on' : ''}" data-act="set:${kind}:${o.v}">${o.t}</button>`
+  ).join('') + `</div>`;
+}
+const SET_STAGE_OPTS = [{v:0,t:'자동'},{v:1,t:'1'},{v:2,t:'2'},{v:3,t:'3'},{v:4,t:'4'},{v:5,t:'5'},{v:6,t:'6'}];
+
+function viewSet(){
+  if(!S.learn) S.learn = freshLearn();
+  const L = S.learn, st = setOf();
+  const stageLine = (kind, name) => {
+    const g = learnOf(kind);
+    const fx = fixedStage(kind);
+    const r = recentRate(g);
+    const nowPct = g.seen ? Math.round(g.ok / g.seen * 100) : null;
+    return `<div class="setline">${name} 단계
+      <span class="r">${fx > 0 ? `${fx} 단계 (어른이 고정)` : `${g.stage} 단계 (자동)`}</span></div>
+      <div class="setline">이 단계에서 맞힌 것
+      <span class="r">${g.seen ? `${g.ok} / ${g.seen}${nowPct != null ? ` · ${nowPct}%` : ''}` : '아직 없어요'}</span></div>
+      <div class="setline">이번에 켠 뒤 최근
+      <span class="r">${r ? `${r.ok} / ${r.n} · ${r.pct}%` : '아직 없어요'}</span></div>`;
+  };
+  const weak = weakTagList().slice(0,14);
+  const bm = battleMul(), wk = SET_WEAK[st.weak] || SET_WEAK[1];
+  const wantTxt = st.want > 0 ? '+1 (조금 더 어렵게)' : st.want < 0 ? '-1 (조금 더 쉽게)' : '0 (그대로)';
+  return `
+  <div class="setwrap">
+    <div class="setcard">
+      <div class="sethd">📊 지금 하준이</div>
+      ${stageLine('ko','📖 한글')}
+      <div class="setline" style="height:3px"></div>
+      ${stageLine('num','🔢 수학')}
+      <div class="setline" style="height:3px"></div>
+      <div class="setline">지금까지 푼 문제 <span class="r">${L.q || 0} 개</span></div>
+      <div class="setline">도감 · 파트너 레벨
+        <span class="r">${S.dex.length}마리 · Lv.${S.partner != null && MONS[S.partner] ? pLv() : '-'}</span></div>
+      <div class="setline">모은 별 · 로켓단 이긴 횟수 <span class="r">⭐${S.stars} · ${S.rkWin || 0}번</span></div>
+      <div class="setline">지금 문제 별표 <span class="r">최대 ${'⭐'.repeat(Math.min(6, Math.max(1, skillCap() + st.want)))}</span></div>
+      <div class="setline" style="height:3px"></div>
+      <div class="setlab">최근에 헷갈린 자모<small>틀리면 기억해 두고 조금 더 자주 냅니다 (12문제마다 절반으로 옅어집니다)</small></div>
+      ${weak.length
+        ? `<div class="setjamo">${weak.map(k=>`<span>${jamoName(k)}</span>`).join('')}</div>`
+        : `<div class="setnote">아직 없어요 — 잘 하고 있습니다 👍</div>`}
+    </div>
+
+    <div class="setcard">
+      <div class="sethd">🎚️ 난이도 (바꾸면 바로 저장)</div>
+      <div class="setlab">📖 한글 단계<small>고정하면 그 단계가 "지금 단계" 가 됩니다. 쉬운 낱말은 계속 섞여 나옵니다</small></div>
+      ${segHtml('ko', SET_STAGE_OPTS, st.koStage, 4)}
+      <div class="setlab">🔢 수학 단계<small>수의 크기를 정합니다 (1단계 다섯까지 ~ 6단계 아홉까지)</small></div>
+      ${segHtml('num', SET_STAGE_OPTS, st.numStage, 4)}
+      <div class="setlab">⚔️ 전투 난이도<small>지금: 야생 체력 ×${bm.hp.toFixed(2)} · 상대 피해 ×${bm.dmg.toFixed(2)}</small></div>
+      ${segHtml('battle', [{v:0,t:'쉬움'},{v:1,t:'보통'},{v:2,t:'어려움'}], st.battle, 3)}
+      <div class="setlab">⭐ 문제 난이도 보정<small>지금: ${wantTxt}</small></div>
+      ${segHtml('want', [{v:-1,t:'-1'},{v:0,t:'0'},{v:1,t:'+1'}], st.want, 3)}
+      <div class="setlab">🎯 약점 집중도<small>지금: ${wk.n} — 틀린 자모를 겨냥한 문제가 최대 ${Math.round(wk.p*100)}%</small></div>
+      ${segHtml('weak', [{v:0,t:'낮음'},{v:1,t:'보통'},{v:2,t:'높음'}], st.weak, 3)}
+      <div class="setnote">⚠️ 어떻게 맞춰도 두 번 연달아 헤매면 저절로 제일 쉬운 문제가 나옵니다.
+      틀려도 체력이 줄거나 잃는 것은 없습니다.</div>
+    </div>
+  </div>
+  <div class="setrow">
+    <button class="btn btn-white" data-act="setreset">↩️ 자동으로</button>
+    <button class="btn btn-green" data-act="setclose">✅ 다 했어요</button>
+  </div>`;
 }
 
 /* 진화 계보 그림 — 갈래가 없으면 예전처럼 가로 한 줄,
@@ -7415,7 +7736,10 @@ function doUlt(){
 /* 메가·필살기용 문제 하나 — 약점 조준은 끕니다 (특별한 순간이라 얄궂으면 안 됩니다) */
 const FAST_IDS = ['H_FIRST_E','H_FIRST_M','H_LAST','H_CHO','H_JONG','H_PIC','H_JONGPICK','H_NAME',
                   'N_COUNT','N_CMP','N_CMP_LO','N_SHAPE','N_ADD','N_SUB','N_LV',
-                  'N_SEQ','N_NTH','N_PAT','N_SPLIT','N_TEN','N_CLOCK','N_DIFF'];
+                  'N_SEQ','N_NTH','N_PAT','N_SPLIT','N_TEN','N_CLOCK','N_DIFF',
+                  /* 18차: 새 수학 유형은 전부 한 번 눌러서 끝나는 유형이라 여기 다 넣습니다 */
+                  'N_HEAVY','N_LONGER','N_ADD3','N_PAIR','N_GROUP','N_SHARE','N_TENS',
+                  'N_TWO_CMP','N_TWO_SAY','N_MONEY','N_CLOCK30','N_LVUP','N_BAG'];
 function openActionQuiz(purpose){
   if(!S.wild || S.catching || S.acting || S.turn !== 'me') return;
   if(purpose === 'mega' && !canMega()) return;
@@ -7736,8 +8060,9 @@ function monSubject(wm){
    "잡으면서 이름을 배우는" 재미를 남깁니다 */
 function pickSubject(t, wm){
   const mine = monSubject(wm);
-  /* 그림 고르기·레벨 덧셈은 포켓몬이어야만 말이 됩니다 */
-  if(t.id === 'H_PIC' || t.id === 'N_LV') return mine;
+  /* 그림 고르기·레벨 덧셈은 포켓몬이어야만 말이 됩니다
+     18차: 파트너 레벨 문제(N_LVUP)도 포켓몬 이야기라 소재를 포켓몬으로 고정합니다 */
+  if(t.id === 'H_PIC' || t.id === 'N_LV' || t.id === 'N_LVUP') return mine;
   if(!WORD_ALL.length) return mine;
 
   let p = 0.40;                                                 /* 기본 포켓몬 4 : 낱말 6 */
@@ -7767,7 +8092,7 @@ function pickWord(pool){
   WEAK_HIT = false;
   /* ① 약점 겨냥 — 확률로 잘라서 전체의 30% 를 절대 넘지 않습니다 */
   const tags = NO_WEAK ? [] : weakTagList();
-  if(tags.length && Math.random() < WEAK_P){
+  if(tags.length && Math.random() < weakShare()){    /* 18차: 어른 설정으로 조절 (기본은 예전과 같은 0.30) */
     const wk = pool.filter(w => w.tags.some(x => tags.indexOf(x) >= 0));
     if(wk.length){ WEAK_HIT = true; return wk[Math.floor(Math.random()*wk.length)]; }
   }
@@ -8133,12 +8458,21 @@ const QUIZ_TYPES = [
       speak(){ say(`${sino(a)}에 몇을 더하면 십이 될까?`,{rate:0.72}); } };
   } },
 
-/* ⑧ 정시 시계 — 짧은바늘이 가리키는 수를 읽습니다 */
-{ id:'N_CLOCK', kind:'num', diff:3, ns:5, ok:()=>true,
+/* ⑧ 정시 시계 — 짧은바늘이 가리키는 수를 읽습니다.
+   18차(C-②): diff 3→2 · ns 5→3 · w 1.8 — 아빠 요청대로 더 일찍, 더 자주 나옵니다.
+   18차(C-①): pickClockHour() 가 직전 두 번에 나온 시각을 피해서 뽑습니다 */
+{ id:'N_CLOCK', kind:'num', diff:2, ns:3, w:1.8, ok:()=>true,
   build(){
-    const h = rint(1,12);
+    const h = pickClockHour();
+    /* 시계에 "0시" 는 없습니다 — 보기를 1~12 안에서만 만듭니다 */
+    const opts = [h];
+    shuffle([h-1, h+1, h-2, h+2, h+3, h-3]).forEach(v=>{
+      if(opts.length < 3 && v >= 1 && v <= 12 && opts.indexOf(v) < 0) opts.push(v);
+    });
+    for(let g=1; opts.length < 3 && g <= 12; g++){ if(opts.indexOf(g) < 0) opts.push(g); }
     return { head:'clock', headData:h, ask:'지금 몇 시일까?', cols:3, render:'num',
-      options:shuffle([h].concat(numDistract(h,2,12))), answer:h, judge:'equalNum',
+      options:shuffle(opts), answer:h, judge:'equalNum',
+      goodSay:`맞아! ${nativeUnit(h)} 시`,
       speak(){ say('짧은바늘을 봐. 몇 시일까?',{rate:0.7}); } };
   } },
 
@@ -8151,6 +8485,224 @@ const QUIZ_TYPES = [
       ask:'🟠 주황이 🔵 파랑보다 몇 개 더 많을까?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,a))), answer:ans, judge:'equalNum',
       speak(){ say(`주황은 ${nativeUnit(a)} 개, 파랑은 ${nativeUnit(b)} 개. 주황이 몇 개 더 많을까?`,{rate:0.68}); } };
+  } },
+
+/* ---------- 18차 B: 수학 13종 더 ----------
+   아빠 요청: "한글말고 수학적인것도 업데이트되면 좋고"
+   전부 기존 뼈대(head / render / judge)를 그대로 씁니다.
+   새로 만든 머리는 세 개(row · grp · share · coin)뿐이고, 모두 countRow 안의
+   상자(.countbox) 그림이라 12차(④)의 "세는 줄에는 세는 것만" 규칙을 지킵니다.
+   ⚠️ 모든 유형이 답을 먼저 정하거나 범위를 좁혀서 음수·0·이상한 답이 나올 수 없습니다 */
+
+/* ① 더 무거운 것 / 더 가벼운 것 — 세지 않고 아는 것으로 견줍니다 (실생활 감각) */
+{ id:'N_HEAVY', kind:'num', diff:1, ns:1, ok:()=>true,
+  build(){
+    /* [무거운 쪽, 가벼운 쪽] — 6살이 확실히 아는 것들만 */
+    const PAIRS = [['🐘','🐭'],['🚌','🚲'],['🐳','🐟'],['🏠','⛺'],['🍉','🍒'],
+                   ['🦁','🐤'],['🚚','🛴'],['🐮','🐝'],['🪨','🪶']];
+    const p = pick(PAIRS);
+    const heavy = Math.random() < 0.5;
+    const a = heavy ? p[0] : p[1];
+    return { head:'art', ask: heavy ? '더 무거운 것은 어느 것일까?' : '더 가벼운 것은 어느 것일까?',
+      cols:2, render:'text',
+      options:shuffle([p[0],p[1]]), answer:a, judge:'equal',
+      speak(){ say(heavy ? '더 무거운 것을 찾아 봐' : '더 가벼운 것을 찾아 봐',{rate:0.72}); } };
+  } },
+
+/* ② 더 긴 줄 / 더 짧은 줄 — 기존 dots 머리를 그대로 씁니다.
+   두 줄의 개수 차이를 두 개 이상으로 벌려서 눈으로 바로 보입니다 */
+{ id:'N_LONGER', kind:'num', diff:1, ns:1, ok:()=>true,
+  build(){
+    const a = rint(2,8);
+    let b = rint(1,8), g = 0;
+    while(Math.abs(a-b) < 2 && g++ < 40) b = rint(1,8);
+    if(Math.abs(a-b) < 2) b = (a >= 4) ? a-2 : a+2;
+    const O = '🟠 주황', B = '🔵 파랑';
+    const longQ = Math.random() < 0.55;
+    const longer = (a > b) ? O : B;
+    const shorter = (a > b) ? B : O;
+    return { head:'dots', headData:{a:a, b:b},
+      ask: longQ ? '어느 줄이 더 길까?' : '어느 줄이 더 짧을까?', cols:2, render:'word',
+      options:shuffle([O,B]), answer: longQ ? longer : shorter, judge:'equal',
+      speak(){ say(longQ ? '어느 줄이 더 길까?' : '어느 줄이 더 짧을까?',{rate:0.72}); } };
+  } },
+
+/* ③ 연속 더하기 — 셋을 이어서 더합니다. 합이 numCap() 을 절대 넘지 않습니다 */
+{ id:'N_ADD3', kind:'num', diff:4, ns:4, ok:()=>true,
+  build(){
+    const hi = Math.max(6, numCap());
+    const a = rint(1, hi-2);
+    const b = rint(1, hi-a-1);
+    const c = rint(1, hi-a-b);
+    const ans = a+b+c;
+    return { head:'expr',
+      headData:`${a} <span class="op">+</span> ${b} <span class="op">+</span> ${c} <span class="op">=</span> <span class="op">❓</span>`,
+      ask:'셋을 다 더하면 몇일까?', cols:3, render:'num',
+      options:shuffle([ans].concat(numDistract(ans,2,hi))), answer:ans, judge:'equalNum',
+      speak(){ say(`${sino(a)} 더하기 ${sino(b)} 더하기 ${sino(c)}${josa(sino(c),['은','는'])} 몇일까?`,{rate:0.7}); } };
+  } },
+
+/* ④ 둘씩 짝 짓기 — 홀수·짝수 감각. 어려운 낱말 대신 "딱 맞아 / 하나 남아" 로 묻습니다.
+   맞힌 뒤에 "다섯은 홀수야" 라고 말로 알려 줍니다 (말은 나중에 저절로 붙습니다) */
+{ id:'N_PAIR', kind:'num', diff:3, ns:3, ok:()=>true,
+  build(){
+    const n = rint(3, Math.max(6, numCap()));
+    const even = (n % 2 === 0);
+    const YES = '👍 딱 맞아', NO = '☝️ 하나 남아';
+    const nm = NATIVE[n] || sino(n);
+    return { head:'row', headData:n,
+      ask:'둘씩 짝을 지으면 어떻게 될까?', cols:2, render:'word',
+      options:shuffle([YES,NO]), answer: even ? YES : NO, judge:'equal',
+      goodSay:`맞아! ${nm}${josa(nm,['은','는'])} ${even ? '짝수' : '홀수'}야`,
+      speak(){ say(`구슬이 ${nativeUnit(n)} 개야. 둘씩 짝을 지으면 딱 맞을까, 하나가 남을까?`,{rate:0.64}); } };
+  } },
+
+/* ⑤ 묶어 세기 (곱셈의 씨앗) — 접시마다 똑같은 개수. 세어 보면 곱셈이 됩니다 */
+{ id:'N_GROUP', kind:'num', diff:5, ns:5, ok:()=>true,
+  build(){
+    const a = rint(2,3), b = rint(2,4);          /* 최대 3개씩 4접시 = 12개 */
+    const ans = a*b;
+    return { head:'grp', headData:{a:a, b:b},
+      ask:`한 접시에 ${nativeUnit(a)} 개씩! 구슬은 모두 몇 개일까?`, cols:3, render:'num',
+      options:shuffle([ans].concat(numDistract(ans,2,12))), answer:ans, judge:'equalNum',
+      speak(){ say(`한 접시에 ${nativeUnit(a)} 개씩, 접시가 ${nativeUnit(b)} 개야. `
+        + `구슬은 모두 몇 개일까?`,{rate:0.64}); } };
+  } },
+
+/* ⑥ 똑같이 나누기 (나누기의 씨앗) — 나누어지는 수만 냅니다. 답은 언제나 1 이상입니다 */
+{ id:'N_SHARE', kind:'num', diff:5, ns:5, ok:()=>true,
+  build(){
+    const n = rint(2,3);
+    const ans = (n === 2) ? rint(1,5) : rint(1,4);
+    const t = n * ans;
+    return { head:'share', headData:{t:t, n:n},
+      ask:`구슬 ${nativeUnit(t)} 개를 ${nativeUnit(n)} 접시에 똑같이 나누면?`, cols:3, render:'num',
+      options:shuffle([ans].concat(numDistract(ans,2,t))), answer:ans, judge:'equalNum',
+      goodSay:`맞아! 한 접시에 ${nativeUnit(ans)} 개`,
+      speak(){ say(`구슬 ${nativeUnit(t)} 개를 접시 ${nativeUnit(n)} 개에 똑같이 나눠 담으면, `
+        + `한 접시에 몇 개일까?`,{rate:0.62}); } };
+  } },
+
+/* ⑦ 10 단위 더하기 — 20 + 30. 낱개가 없어서 한 자리 덧셈만 알면 풀립니다 */
+{ id:'N_TENS', kind:'num', diff:4, ns:5, ok:()=>true,
+  build(){
+    const ta = rint(1,4), tb = rint(1, Math.min(5, 9-ta));
+    const a = ta*10, b = tb*10, ans = a+b;
+    const opts = [ans];
+    shuffle([ans+10, ans-10, ans+20, ans-20]).forEach(v=>{
+      if(opts.length < 3 && v >= 10 && v <= 90 && opts.indexOf(v) < 0) opts.push(v);
+    });
+    for(let g=10; opts.length < 3 && g <= 90; g += 10){ if(opts.indexOf(g) < 0) opts.push(g); }
+    return { head:'expr',
+      headData:`${a} <span class="op">+</span> ${b} <span class="op">=</span> <span class="op">❓</span>`,
+      ask:'더하면 몇일까?', cols:3, render:'num',
+      options:shuffle(opts), answer:ans, judge:'equalNum',
+      speak(){ say(`${sino(a)} 더하기 ${sino(b)}${josa(sino(b),['은','는'])} 몇일까?`,{rate:0.72}); } };
+  } },
+
+/* ⑧ 두 자리 수 비교 — 47 과 74 처럼 자리를 바꾼 수가 절반쯤 나옵니다 (십의 자리를 먼저 보게) */
+{ id:'N_TWO_CMP', kind:'num', diff:3, ns:4, ok:()=>true,
+  build(){
+    const a = rint(10,99);
+    const t = Math.floor(a/10), o = a%10;
+    let b;
+    if(o >= 1 && o !== t && Math.random() < 0.45) b = o*10 + t;
+    else { b = rint(10,99); let g = 0; while(b === a && g++ < 40) b = rint(10,99); }
+    if(b === a) b = (a < 99) ? a+1 : a-1;
+    const hiQ = Math.random() < 0.6;
+    return { head:'art', ask: hiQ ? '더 큰 수는 어느 것일까?' : '더 작은 수는 어느 것일까?',
+      cols:2, render:'num',
+      options:shuffle([a,b]), answer: hiQ ? Math.max(a,b) : Math.min(a,b), judge:'equalNum',
+      speak(){ say(`${sino(a)}${josa(sino(a),['과','와'])} ${sino(b)} 중에서 더 ${hiQ ? '큰' : '작은'} 수는?`,{rate:0.68}); } };
+  } },
+
+/* ⑨ 두 자리 수 읽기 — "서른일곱" 을 듣고 37 을 찾습니다.
+   고유어(서른일곱)와 한자어(삼십칠) 를 둘 다 들려줍니다 — 둘 다 쓰는 말입니다 */
+{ id:'N_TWO_SAY', kind:'num', diff:4, ns:5, ok:()=>true,
+  build(){
+    const a = rint(11,99);
+    const t = Math.floor(a/10), o = a%10;
+    const cand = [];
+    if(o >= 1 && o !== t) cand.push(o*10 + t);
+    [a+10, a-10, a+1, a-1].forEach(v=>{ if(v >= 10 && v <= 99) cand.push(v); });
+    const opts = [a];
+    shuffle(cand).forEach(v=>{ if(opts.length < 3 && opts.indexOf(v) < 0) opts.push(v); });
+    for(let g=10; opts.length < 3 && g <= 99; g++){ if(opts.indexOf(g) < 0) opts.push(g); }
+    const nat = nativeTens(a), chi = sino(a);
+    return { head:'hidden', ask:`&ldquo;${nat}&rdquo;${josa(nat,['은','는'])} 어느 수일까?`,
+      cols:3, render:'num',
+      options:shuffle(opts), answer:a, judge:'equalNum',
+      goodSay:`맞아! ${nat}, ${chi}`,
+      speak(){ say(`${nat}. ${chi}. 어느 수일까?`,{rate:0.62}); } };
+  } },
+
+/* ⑩ 돈 세기 — 100원·500원 동전. 실생활에서 바로 쓰는 수학입니다 */
+{ id:'N_MONEY', kind:'num', diff:6, ns:6, ok:()=>true,
+  build(){
+    const big = Math.random() < 0.45;
+    const k = big ? rint(1,4) : rint(2,5);
+    const coins = [];
+    if(big) coins.push(500);
+    for(let i=0;i<k;i++) coins.push(100);
+    const ans = (big ? 500 : 0) + k*100;
+    const opts = [ans];
+    shuffle([ans-100, ans+100, ans-200, ans+200]).forEach(v=>{
+      if(opts.length < 3 && v >= 100 && v <= 1000 && opts.indexOf(v) < 0) opts.push(v);
+    });
+    for(let g=100; opts.length < 3 && g <= 900; g += 100){ if(opts.indexOf(g) < 0) opts.push(g); }
+    const lab = v => `${v}원`;
+    return { head:'coin', headData:coins,
+      ask:'모두 얼마일까?', cols:3, render:'word',
+      options:shuffle(opts.map(lab)), answer:lab(ans), judge:'equal',
+      goodSay:`맞아! ${sinoHund(ans)} 원`,
+      speak(){ say(big
+        ? `오백 원짜리 한 개와 백 원짜리 ${nativeUnit(k)} 개. 모두 얼마일까?`
+        : `백 원짜리 ${nativeUnit(k)} 개. 모두 얼마일까?`,{rate:0.64}); } };
+  } },
+
+/* ⑪ 시계 30분 (18차 C-③) — 긴바늘이 6 을 가리킵니다.
+   짧은바늘이 두 수 사이에 놓이므로 "지나온 수" 를 읽는 연습이 됩니다 */
+{ id:'N_CLOCK30', kind:'num', diff:4, ns:5, w:1.8, ok:()=>true,
+  build(){
+    const h = pickClockHour();
+    const opts = [h];
+    for(let g=0; opts.length < 3 && g < 60; g++){ const v = rint(1,12); if(opts.indexOf(v) < 0) opts.push(v); }
+    const lab = v => `${v}시 30분`;
+    return { head:'clock', headData:{h:h, m:30},
+      ask:'몇 시 몇 분일까?', cols:3, render:'word',
+      options:shuffle(opts.map(lab)), answer:lab(h), judge:'equal',
+      goodSay:`맞아! ${nativeUnit(h)} 시 삼십 분`,
+      speak(){ say('긴바늘이 육을 가리키면 삼십 분이야. 짧은바늘이 지나온 수는 몇일까?',{rate:0.62}); } };
+  } },
+
+/* ⑫ 파트너 레벨 — 지금 우리 파트너의 진짜 레벨로 더합니다.
+   아빠가 좋아한 "레벨이 3인데 2 올라가면?" 을 실제 값으로 냅니다 */
+{ id:'N_LVUP', kind:'num', diff:4, ns:5, ok:()=>S.partner != null && !!pMon(),
+  build(){
+    const nm = pActive().n;
+    const a = pLv(), b = rint(1,3), ans = a+b;
+    return { head:'expr', headData:`Lv.${a} <span class="op">+</span>${b}`,
+      ask:`${nm}${josa(nm,['은','는'])} 지금 Lv.${a}! ${b} 올라가면 몇 레벨일까?`, cols:3, render:'num',
+      options:shuffle([ans].concat(numDistract(ans,2,ans+3))), answer:ans, judge:'equalNum',
+      /* "레벨 칠야" 같은 어색한 말이 안 나오게 기존 N_LV 와 같은 말투를 씁니다 */
+      speak(){ say(`${nm}${josa(nm,['은','는'])} 지금 레벨 ${sino(a)}. `
+        + `여기서 ${sino(b)} 올라가면 몇 레벨일까?`,{rate:0.7}); } };
+  } },
+
+/* ⑬ 가방 세기 — 지금 가방에 진짜 들어 있는 아이템으로 더합니다.
+   두 가지가 각각 1~9개 있을 때만 나옵니다 (없는데 묻는 일은 없습니다) */
+{ id:'N_BAG', kind:'num', diff:3, ns:4,
+  ok:()=>ITEMS.filter(it=>{ const n = itemCount(it.k); return n >= 1 && n <= 9; }).length >= 2,
+  build(){
+    const list = shuffle(ITEMS.filter(it=>{ const n = itemCount(it.k); return n >= 1 && n <= 9; })).slice(0,2);
+    const a = itemCount(list[0].k), b = itemCount(list[1].k), ans = a+b;
+    return { head:'expr',
+      headData:`${a} <span class="op">+</span> ${b} <span class="op">=</span> <span class="op">❓</span>`,
+      ask:`🎒 ${list[0].n} ${nativeUnit(a)} 개와 ${list[1].n} ${nativeUnit(b)} 개! 모두 몇 개일까?`,
+      cols:3, render:'num',
+      options:shuffle([ans].concat(numDistract(ans,2,18))), answer:ans, judge:'equalNum',
+      speak(){ say(`가방에 ${list[0].n} ${nativeUnit(a)} 개와 ${list[1].n} ${nativeUnit(b)} 개가 있어. `
+        + `모두 몇 개일까?`,{rate:0.64}); } };
   } }
 ];
 
@@ -9218,13 +9770,15 @@ const LOCKED_WHILE_BUSY = ['mv','atk','heal','ball','run','mega','ans','ord','pi
   /* 15차 — 로켓단. rkskip(건너뛰기) 은 연출 중에도 언제나 눌러야 하므로 넣지 않습니다 */
   'rkgo','rkrun','rkboost','rkswap','rkdone','rkfight'];
 
-/* 어른 확인 — 6살이 실수로 눌러도 잡은 포켓몬이 사라지지 않게 */
-function adultGate(){
+/* 어른 확인 — 6살이 실수로 눌러도 잡은 포켓몬이 사라지지 않게.
+   18차: 어른 설정 화면도 같은 문을 씁니다 (msg 만 갈아끼웁니다) */
+function adultGate(msg){
   const a = 3 + Math.floor(Math.random()*7), b = 4 + Math.floor(Math.random()*6);
-  const t = prompt(`정말 처음부터 새로 시작할까요?\n지금까지 잡은 포켓몬이 모두 사라집니다.\n\n계속하려면 어른이 답해 주세요.\n\n${a} + ${b} = ?`);
+  const head = msg || '정말 처음부터 새로 시작할까요?\n지금까지 잡은 포켓몬이 모두 사라집니다.';
+  const t = prompt(`${head}\n\n계속하려면 어른이 답해 주세요.\n\n${a} + ${b} = ?`);
   if(t === null) return false;
   if(parseInt(t,10) === a + b) return true;
-  alert('답이 달라요. 새로 시작하지 않았습니다.');
+  alert('답이 달라요. 아무것도 바꾸지 않았습니다.');
   return false;
 }
 
@@ -9334,6 +9888,34 @@ function act(a){
                    break;
     /* 보여줘 — 실패로 세지 않습니다. 언제든 몇 번이든 볼 수 있습니다 */
     case 'wrshow': { const w = wrState(); if(!w.done){ w.tip = '이렇게 그리는 거야! 👀'; wrGhost(1200); wrDots(); } break; }
+    /* 18차 A: 어른 설정 — 시작 화면 구석 ⚙️ 에서만 들어옵니다.
+       덧셈 문제(adultGate)를 못 풀면 화면이 아예 열리지 않습니다 */
+    case 'settings':
+      if(!adultGate('⚙️ 어른 설정 화면을 열까요?\n(난이도를 직접 정하는 곳입니다)')) return;
+      S.screen = 'set'; SFX.open(); render();
+      break;
+    case 'set': {
+      const q = String(arg || '').split(':');
+      const key = q[0], v = parseInt(q[1],10);
+      if(!isFinite(v)) break;
+      const st = setOf();
+      if(key === 'ko'   && v >= 0 && v <= STAGE_MAX) st.koStage = v;
+      else if(key === 'num' && v >= 0 && v <= STAGE_MAX) st.numStage = v;
+      else if(key === 'battle' && v >= 0 && v <= 2) st.battle = v;
+      else if(key === 'want' && v >= -1 && v <= 1) st.want = v;
+      else if(key === 'weak' && v >= 0 && v <= 2) st.weak = v;
+      else break;
+      SFX.open(); save(); render();
+      break;
+    }
+    case 'setreset':
+      setOf();                       /* S.learn 이 없어도 여기서 만들어 둡니다 */
+      S.learn.set = freshSet();
+      SFX.good(); save(); render();
+      break;
+    case 'setclose':
+      S.screen = 'title'; SFX.open(); save(); render();
+      break;
     case 'nope': tone(200,0.09,'sine',0.04); break;
   }
 }
