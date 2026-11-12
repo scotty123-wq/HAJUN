@@ -1315,13 +1315,69 @@ body.qk{overflow:hidden;}
   display:flex;align-items:center;box-shadow:0 3px 0 var(--edge);cursor:pointer;
 }
 #rk .rkstage{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;}
-.rkballoon{width:clamp(132px,44vw,206px);}
+.rkballoon{width:clamp(124px,38vw,172px);transform-origin:50% 8%;
+  animation:rkSway 3.4s ease-in-out infinite alternate;}
 .rkballoon svg{width:100%;height:auto;display:block;}
-.rkcrew{display:flex;align-items:flex-end;justify-content:center;gap:2px;}
-.rkcrew > div{width:clamp(78px,26vw,120px);}
-.rkcrew svg{width:100%;height:auto;display:block;}
-.rkcrew > div.rksay{animation:rkBob .5s ease-in-out infinite alternate;}
+/* 20차: 열기구가 바람에 살랑 — transform 만 씁니다 (레이아웃 안 흔들림) */
+@keyframes rkSway{from{transform:rotate(-3.5deg) translateY(0);}to{transform:rotate(3.5deg) translateY(-5px);}}
+
+/* 20차: 세 사람은 공식 그림(img).
+   원본이 정사각(320×320) 이라 칸도 정사각으로 둡니다 — 세로로 긴 칸에 넣으면
+   가로에 걸려서 그림이 작아집니다. 세 칸 합쳐 84vw + 여백 8px 라
+   320px 폰에서도 넘치지 않습니다 */
+.rkcrew{display:flex;align-items:flex-end;justify-content:center;gap:4px;}
+.rkcrew > div{
+  position:relative;flex:0 0 auto;
+  width:clamp(88px,28vw,120px);aspect-ratio:1;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.28));
+}
+.rkcrew svg, .rkcrew img{
+  width:100%;height:100%;object-fit:contain;object-position:50% 100%;display:block;
+}
+/* 그림이 없을 때(스프라이트 누락) 이름만이라도 — 화면이 깨지지 않게 */
+.rkalt{
+  display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%;
+  font-weight:900;font-size:15px;color:#fff;-webkit-text-stroke:5px var(--edge);paint-order:stroke fill;
+}
+/* 20차 대기: 셋이 각자 다른 주기로 둥실둥실 (어긋나게 해서 살아 보이게) */
+.rkcrew > div{animation:rkFloat 2.6s ease-in-out infinite alternate;}
+.rkcrew > div:nth-child(1){animation-duration:2.2s;}
+.rkcrew > div:nth-child(2){animation-duration:2.6s;animation-delay:-.5s;}
+.rkcrew > div:nth-child(3){animation-duration:3s;animation-delay:-1.1s;}
+@keyframes rkFloat{from{transform:translateY(3px);}to{transform:translateY(-5px);}}
+/* 말할 때만 앞으로 나옵니다 */
+.rkcrew > div.rksay{animation:rkBob .5s ease-in-out infinite alternate;z-index:2;}
 @keyframes rkBob{from{transform:translateY(0) scale(1);}to{transform:translateY(-7px) scale(1.07);}}
+/* 20차: 말풍선 — 말하는 사람 머리 위에만 뜹니다 (absolute 라 자리를 안 밀어냅니다) */
+.rkbub{
+  position:absolute;left:50%;bottom:100%;transform:translateX(-50%) scale(0);
+  margin-bottom:4px;max-width:min(44vw,150px);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;pointer-events:none;
+  background:#fff;border:3px solid var(--edge);border-radius:13px;
+  padding:3px 8px;font-weight:900;font-size:13px;line-height:1.15;
+  box-shadow:0 2px 0 var(--edge);
+}
+.rkcrew > div.rksay .rkbub{animation:rkBubIn .28s cubic-bezier(.2,1.7,.4,1) forwards;}
+@keyframes rkBubIn{from{transform:translateX(-50%) scale(.3);opacity:0;}to{transform:translateX(-50%) scale(1);opacity:1;}}
+/* 20차: 셋이 함께 있는 그림 — 등장 순간에만 크게 (아빠 요청) */
+.rktrio{
+  position:absolute;left:50%;top:50%;pointer-events:none;
+  width:clamp(200px,72vw,330px);transform:translate(-50%,-50%);
+}
+.rktrio img{width:100%;height:auto;display:block;
+  filter:drop-shadow(0 6px 6px rgba(0,0,0,.3));}
+/* 3인 그림은 등장 순간에만 있습니다.
+   ⚠️ 보이기·숨기기는 **자바스크립트 타이머가 클래스를 떼면서** 끝냅니다.
+      애니메이션에 기대서 숨기면, 애니메이션이 안 도는 기기에서 화면이 비어 버립니다 */
+.rkstage .rktrio{display:none;}
+.rkstage.intro .rktrio{display:block;animation:rkTrioIn .9s cubic-bezier(.2,1.5,.4,1);}
+.rkstage.intro.trio-out .rktrio{animation:rkTrioOut .4s ease forwards;}
+@keyframes rkTrioIn{from{transform:translate(-50%,-50%) scale(.35);opacity:0;}
+  to{transform:translate(-50%,-50%) scale(1);opacity:1;}}
+@keyframes rkTrioOut{to{transform:translate(-50%,-64%) scale(1.1);opacity:0;}}
+/* 3인 그림이 나오는 동안에는 세 사람 줄을 잠깐 숨깁니다 (intro 가 떨어지면 다시 보입니다) */
+.rkcrew{transition:opacity .35s ease;}
+.rkstage.intro .rkcrew{opacity:0;}
 #rk .drop-in{animation:rkDrop 1s cubic-bezier(.3,1.35,.5,1);}
 @keyframes rkDrop{from{transform:translateY(-115vh);}to{transform:translateY(0);}}
 #rk .away{animation:rkAway 1.4s ease-in forwards;}
@@ -1373,6 +1429,13 @@ body.qk{overflow:hidden;}
 .rkslots .arrow{font-weight:900;font-size:15px;color:var(--ink-soft);}
 .rktip{font-weight:900;font-size:13.5px;color:#fff;text-align:center;
   -webkit-text-stroke:4px var(--edge);paint-order:stroke fill;min-height:18px;}
+/* 20차: 팀 고르기 화면 머리에도 3인 그림 (아빠 요청) — 안내 글 옆에 작게 */
+.rkpick .rkhead{display:flex;align-items:center;justify-content:center;gap:8px;height:60px;flex:0 0 auto;}
+.rkpick .rkhead .trio{height:100%;flex:0 0 auto;}
+.rkpick .rkhead .trio img{height:100%;width:auto;display:block;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));animation:rkFloat 2.6s ease-in-out infinite alternate;}
+.rkpick .rkhead .rktip{flex:1 1 auto;min-width:0;}
+.rkpick .rkhead .rkalt{font-size:13px;-webkit-text-stroke-width:4px;align-items:center;}
 .rkpick .dex{padding:7px;gap:7px;}
 .dexcard .ordtag{
   position:absolute;left:3px;top:3px;font-weight:900;font-size:13px;color:#fff;
@@ -1391,8 +1454,14 @@ body.qk{overflow:hidden;}
   background:var(--cream);border:3px solid var(--edge);border-radius:14px;
   padding:2px 8px 2px 3px;box-shadow:0 3px 0 var(--edge);max-width:52%;
 }
-.rkbadge .f{width:32px;height:32px;flex:0 0 32px;}
-.rkbadge .f svg{width:100%;height:100%;display:block;}
+.rkbadge .f{width:38px;height:38px;flex:0 0 38px;overflow:hidden;border-radius:11px;}
+.rkbadge .f svg, .rkbadge .f img{width:100%;height:100%;object-fit:contain;display:block;}
+/* 20차: 배지는 38px 밖에 안 됩니다. 전신 그림을 그대로 넣으면 뭐가 뭔지 몰라서
+   얼굴 쪽(위)만 확대해서 보여 줍니다 — 로사는 분홍 머리, 로이는 보라 머리, 나옹은 고양이 */
+.rkbadge .f img{transform:scale(2.1);transform-origin:52% 13%;}
+/* 20차: 맞을 때 배지도 같이 흔들립니다 (.hurt 재사용) */
+.rkbadge .f.hurt{animation:hurt .34s ease;}
+.rkbadge .rkalt{font-size:11px;-webkit-text-stroke-width:3px;align-items:center;}
 .rkbadge .t{font-weight:900;font-size:15px;letter-spacing:-.03em;line-height:1.05;}
 .rkbadge .c{font-weight:900;font-size:10.5px;color:var(--ink-soft);line-height:1.05;}
 
@@ -1666,7 +1735,7 @@ body.qk{overflow:hidden;}
   .rkrow .btn{min-height:50px;font-size:16px;}
   .rkrow .btn small{font-size:10px;}
   .rkbadge{top:32px;padding:2px 6px 2px 2px;}
-  .rkbadge .f{width:27px;height:27px;flex-basis:27px;}
+  .rkbadge .f{width:34px;height:34px;flex-basis:34px;}
   .rkbadge .t{font-size:13px;}
   .rkbadge .c{font-size:9.5px;}
   .rkend{gap:5px;padding:9px;}
@@ -1674,8 +1743,12 @@ body.qk{overflow:hidden;}
   .rkend .ttl{font-size:clamp(18px,5.8vw,24px);}
   .rkend .sub{font-size:12.5px;}
   .rkend .prize span{font-size:14px;padding:4px 9px;}
-  .rkcrew > div{width:clamp(66px,22vw,98px);}
-  .rkballoon{width:clamp(108px,36vw,164px);}
+  .rkcrew > div{width:clamp(80px,26vw,104px);}
+  .rkballoon{width:clamp(104px,32vw,146px);}
+  .rktrio{width:clamp(180px,64vw,280px);}
+  .rkbub{font-size:12px;padding:2px 7px;border-width:2.5px;}
+  .rkpick .rkhead{height:42px;}
+  .rkpick .rkhead .rktip{font-size:12px;}
   #rk .rkline{font-size:clamp(22px,7.6vw,38px);-webkit-text-stroke-width:6px;}
   .dexcard .ordtag{width:22px;height:22px;font-size:11px;}
   /* 17차: 짧은 폰에서 글씨 쓰기도 한 화면에 들어오게 */
@@ -2703,95 +2776,36 @@ function kidSvg(){
 }
 
 /* =========================================================
-   15차: 로켓단 — 로사 · 로이 · 나옹
-   그림은 전부 여기서 직접 그립니다 (외부 이미지 없음, kidSvg 와 같은 방식).
-   특징만 잡아도 하준이는 알아봅니다 —
-     로사 = 빨강·자주 긴 머리 / 로이 = 파란 머리 / 옷에 큰 R / 나옹 = 이마 금화
+   ★ 20차: 로켓단 그림을 공식 일러스트로 (아빠 지적)
+     "너 지금 우리 모든걸 실사로 넣고 있는데 로켓단은 또 예전버전으로 너가 만들었더라?"
+   손으로 그린 SVG 얼굴 세 개(rkRosaSvg·rkRoiSvg·rkNyaSvg)를 없애고
+   sprites 로 준비된 공식 그림을 씁니다. 키에 '로켓 ' 접두사가 붙어 있어서
+   포켓몬 스프라이트 키(나옹 등)와 겹치지 않습니다.
+     로켓 로사 · 로켓 로이 · 로켓 나옹 · 로켓 3인(셋이 함께)
+   열기구는 사람이 아니라 탈것이라 SVG 로 남기되, 손그림 얼굴을 빼고
+   R 마크만 있는 깔끔한 열기구로 다시 그렸습니다 (공식 그림 옆에서 튀지 않게).
    ========================================================= */
-const RK_SKIN = '#FFE0BE';
-const RK_SUIT = '#FBFBF7';
-const RK_FUR  = '#F5E7C0';
-const RK_R    = 'font-family="Arial Black,Arial,sans-serif" font-weight="900"';
 
-/* 흰 상의 + 가슴의 큰 R — 로사와 로이가 같이 씁니다 */
-function rkSuit(){
-  return `<path d="M30 64 h40 a10 10 0 0 1 10 10 v34 h-60 v-34 a10 10 0 0 1 10 -10 z"
-      fill="${RK_SUIT}" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
-    <text x="50" y="102" text-anchor="middle" font-size="32" ${RK_R}
-      fill="#E8412F" stroke="${E}" stroke-width="2.4" paint-order="stroke">R</text>`;
+/* 로켓단 그림 한 장 — 스프라이트가 없어도 화면이 깨지지 않게 이름을 대신 보여 줍니다 */
+function rkPic(key,name){
+  const src = SPRITES[key];
+  if(!src) return `<span class="rkalt">${name}</span>`;
+  return `<img src="${src}" alt="${name}" draggable="false">`;
 }
-function rkRosaSvg(){
-  return `<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-label="로사">
-    ${/* 뒤로 길게 부푼 빨강 머리 — 로사를 알아보는 표시 */''}
-    <path d="M50 1 C21 1 9 22 11 48 C12 64 3 88 16 92 C29 96 27 66 29 54
-             C31 28 36 18 50 18 C64 18 69 28 71 54 C73 66 71 96 84 92
-             C97 88 88 64 89 48 C91 22 79 1 50 1 Z"
-      fill="#E2447A" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
-    ${rkSuit()}
-    <circle cx="50" cy="42" r="25" fill="${RK_SKIN}" stroke="${E}" stroke-width="4"/>
-    ${/* 앞머리 — 이마만 덮어서 얼굴이 잘 보이게 */''}
-    <path d="M25 40 C25 21 35 15 50 15 C65 15 75 21 75 40
-             C70 30 61 26 50 26 C39 26 30 30 25 40 Z"
-      fill="#E2447A" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
-    <circle cx="41" cy="46" r="3.8" fill="${E}"/><circle cx="59" cy="46" r="3.8" fill="${E}"/>
-    <path d="M44 55 Q50 60 56 55" fill="none" stroke="${E}" stroke-width="3.2" stroke-linecap="round"/>
-  </svg>`;
-}
-function rkRoiSvg(){
-  return `<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-label="로이">
-    ${rkSuit()}
-    <circle cx="50" cy="42" r="25" fill="${RK_SKIN}" stroke="${E}" stroke-width="4"/>
-    ${/* 파란 머리 — 옆으로 삐친 한 갈래가 로이의 표시 */''}
-    <path d="M74 20 C88 14 96 24 90 34 C84 25 79 23 72 25 Z"
-      fill="#5FC2E8" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M25 42 C24 17 35 9 50 9 C66 9 77 18 76 42
-             C71 31 64 27 54 27 C41 27 31 32 25 42 Z"
-      fill="#5FC2E8" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
-    <circle cx="41" cy="46" r="3.8" fill="${E}"/><circle cx="59" cy="46" r="3.8" fill="${E}"/>
-    <path d="M43 55 Q50 61 57 55" fill="none" stroke="${E}" stroke-width="3.2" stroke-linecap="round"/>
-  </svg>`;
-}
-function rkNyaSvg(){
-  return `<svg viewBox="0 0 100 112" xmlns="http://www.w3.org/2000/svg" aria-label="나옹">
-    <path d="M72 96 C90 96 93 76 84 70" fill="none" stroke="${E}" stroke-width="9" stroke-linecap="round"/>
-    <path d="M72 96 C90 96 93 76 84 70" fill="none" stroke="${RK_FUR}" stroke-width="4" stroke-linecap="round"/>
-    <ellipse cx="50" cy="88" rx="21" ry="19" fill="${RK_FUR}" stroke="${E}" stroke-width="4"/>
-    <path d="M27 42 L20 13 L46 29 Z" fill="${RK_FUR}" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M73 42 L80 13 L54 29 Z" fill="${RK_FUR}" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
-    <ellipse cx="50" cy="51" rx="26" ry="23" fill="${RK_FUR}" stroke="${E}" stroke-width="4"/>
-    ${/* 이마 금화 — 나옹을 알아보는 표시 */''}
-    <ellipse cx="50" cy="36" rx="12" ry="8" fill="#FFC93C" stroke="${E}" stroke-width="3.5"/>
-    <path d="M44 36 h12" stroke="${E}" stroke-width="2.4" stroke-linecap="round"/>
-    <ellipse cx="40" cy="51" rx="5" ry="5.5" fill="#fff" stroke="${E}" stroke-width="3"/>
-    <ellipse cx="60" cy="51" rx="5" ry="5.5" fill="#fff" stroke="${E}" stroke-width="3"/>
-    <circle cx="40" cy="52" r="2.4" fill="${E}"/><circle cx="60" cy="52" r="2.4" fill="${E}"/>
-    <path d="M50 59 l-4 4 h8 z" fill="${E}"/>
-    <path d="M43 65 Q50 71 57 65" fill="none" stroke="${E}" stroke-width="3" stroke-linecap="round"/>
-    <g stroke="${E}" stroke-width="2.8" stroke-linecap="round">
-      <path d="M24 53 H8"/><path d="M25 61 L11 66"/>
-      <path d="M76 53 H92"/><path d="M75 61 L89 66"/>
-    </g>
-  </svg>`;
-}
-/* 나옹 얼굴 열기구 — 원작 그대로 이걸 타고 내려옵니다 */
+
+/* 로켓단 열기구 — 얼굴 없이 R 마크만. 위에서 흔들리며 내려옵니다 */
 function rkBalloonSvg(){
   return `<svg viewBox="0 0 200 206" xmlns="http://www.w3.org/2000/svg" aria-label="로켓단 열기구">
-    <path d="M52 62 L40 14 L88 44 Z" fill="${RK_FUR}" stroke="${E}" stroke-width="5" stroke-linejoin="round"/>
-    <path d="M148 62 L160 14 L112 44 Z" fill="${RK_FUR}" stroke="${E}" stroke-width="5" stroke-linejoin="round"/>
-    <ellipse cx="100" cy="84" rx="72" ry="63" fill="${RK_FUR}" stroke="${E}" stroke-width="5"/>
-    <ellipse cx="100" cy="50" rx="26" ry="17" fill="#FFC93C" stroke="${E}" stroke-width="4.5"/>
-    <path d="M87 50 h26" stroke="${E}" stroke-width="3" stroke-linecap="round"/>
-    <ellipse cx="76" cy="82" rx="10" ry="11" fill="#fff" stroke="${E}" stroke-width="4"/>
-    <ellipse cx="124" cy="82" rx="10" ry="11" fill="#fff" stroke="${E}" stroke-width="4"/>
-    <circle cx="76" cy="84" r="4.5" fill="${E}"/><circle cx="124" cy="84" r="4.5" fill="${E}"/>
-    <path d="M100 98 l-7 8 h14 z" fill="${E}"/>
-    <path d="M88 110 Q100 120 112 110" fill="none" stroke="${E}" stroke-width="4.5" stroke-linecap="round"/>
-    <g stroke="${E}" stroke-width="4" stroke-linecap="round">
-      <path d="M28 84 H5"/><path d="M30 96 L9 104"/>
-      <path d="M172 84 H195"/><path d="M170 96 L191 104"/>
-    </g>
-    <path d="M62 138 L74 166" stroke="${E}" stroke-width="4" stroke-linecap="round"/>
-    <path d="M138 138 L126 166" stroke="${E}" stroke-width="4" stroke-linecap="round"/>
+    <ellipse cx="100" cy="84" rx="72" ry="66" fill="#FBFBF7" stroke="${E}" stroke-width="5"/>
+    <path d="M100 18 C130 18 154 48 154 84 C154 118 130 150 100 150 C118 118 118 50 100 18 Z"
+      fill="#E9E4D4" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M100 18 C70 18 46 48 46 84 C46 118 70 150 100 150 C82 118 82 50 100 18 Z"
+      fill="#fff" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
+    <text x="100" y="106" text-anchor="middle" font-size="66"
+      font-family="Arial Black,Arial,sans-serif" font-weight="900"
+      fill="#E8412F" stroke="${E}" stroke-width="4" paint-order="stroke">R</text>
+    <path d="M62 140 L74 166" stroke="${E}" stroke-width="4" stroke-linecap="round"/>
+    <path d="M138 140 L126 166" stroke="${E}" stroke-width="4" stroke-linecap="round"/>
     <rect x="66" y="164" width="68" height="34" rx="9" fill="#D9A05B" stroke="${E}" stroke-width="5"/>
     <path d="M68 178 H132 M84 166 V196 M100 166 V196 M116 166 V196"
       stroke="${E}" stroke-width="3" opacity=".5" fill="none"/>
@@ -2801,13 +2815,14 @@ function rkBalloonSvg(){
 /* 세 사람 — 순서대로 나오고, 각자 포켓몬을 하나씩 냅니다.
    원작 그대로: 로사 → 아보크 계열 / 로이 → 또도가스 계열 / 나옹은 본인이 직접 */
 const ROCKETS = [
-  {k:'rosa', n:'로사', svg:rkRosaSvg, mon:['아보크','아보'],       line:'로사!'},
-  {k:'roi',  n:'로이', svg:rkRoiSvg,  mon:['또도가스','또가스'],   line:'로이!'},
-  {k:'nya',  n:'나옹', svg:rkNyaSvg,  mon:['알로라 나옹','나옹'],  line:'나옹이라옹!'}
+  {k:'rosa', n:'로사', sp:'로켓 로사', mon:['아보크','아보'],       line:'로사!'},
+  {k:'roi',  n:'로이', sp:'로켓 로이', mon:['또도가스','또가스'],   line:'로이!'},
+  {k:'nya',  n:'나옹', sp:'로켓 나옹', mon:['알로라 나옹','나옹'],  line:'나옹이라옹!'}
 ];
+/* 그 사람 그림 한 장 (20차: 손그림 svg() → 공식 스프라이트) */
 function rkFace(k){
   const r = ROCKETS.find(x=>x.k === k) || ROCKETS[0];
-  return r.svg();
+  return rkPic(r.sp, r.n);
 }
 /* 그 사람이 낼 포켓몬 번호 — 도감에 없으면 뒤 후보로 내려갑니다 */
 function rkMonOf(r){
@@ -2890,21 +2905,89 @@ function shuffle(a){
 }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 
-function makeDistractors(ch,count,level){
-  const d = decomp(ch), out = [], seen = new Set([ch]);
-  let guard = 0;
-  while(out.length < count && guard++ < 200){
-    let cand;
-    if(!d){ cand = pick(['가','나','다','라','마','바','사']); }
-    else if(level === 1){ cand = comp(d.cho, pick(EASY_JUNG), 0); }
-    else {
-      const roll = Math.random();
-      if(roll < 0.45)      cand = comp(d.cho, pick(EASY_JUNG), 0);
-      else if(roll < 0.85) cand = comp(pick(EASY_CHO), d.jung, 0);
-      else                 cand = comp(d.cho, d.jung, d.jong ? 0 : pick([1,4,8,16,17,21]));
-    }
-    if(!seen.has(cand)){ seen.add(cand); out.push(cand); }
+/* =========================================================
+   ★ 20차: "실제로 쓰이는 글자" 집합 (REAL_CH)
+   -----------------------------------------------------------
+   아빠 신고 — "완전 말도 안되는 오타들 예를들면 갏 이런 느낌의 단어들"
+   원인: 예전 distCho 는 초성만 바꾸면서 **원래 글자의 받침을 그대로** 붙였습니다.
+         닭 → 랅 찱 칽 / 볶 → 곢 혺 / 팥 → 핱 챁 처럼 세상에 없는 글자가 보기로 나왔습니다.
+   고침: 오답 보기를 **직접 조립하지 않고**, 게임 안에서 실제로 쓰이는 글자
+         (낱말 990개 + 포켓몬 322마리 이름의 모든 음절) 안에서만 골라 옵니다.
+         이러면 하준이가 보는 모든 글자가 어딘가에서 실제로 쓰이는 글자입니다.
+   조건(초성만 다름 / 모음만 다름 / 받침만 다름)은 그대로 지키고,
+   조건에 맞는 실제 글자가 모자라면 조건을 한 겹씩만 풀어 줍니다 —
+   **보기가 안 모여서 문제가 안 나오는 일은 없습니다.**
+   ========================================================= */
+const REAL_CH  = new Set();     /* 실제로 쓰이는 음절 전부 */
+const RCH      = [];            /* 같은 것을 배열로 (뽑기용) */
+const RC_JJ    = new Map();     /* '중성|종성' → 글자들   (초성만 다른 오답) */
+const RC_CJ    = new Map();     /* '초성|종성' → 글자들   (중성만 다른 오답) */
+const RC_CU    = new Map();     /* '초성|중성' → 글자들   (종성만 다른 오답) */
+const RC_JU    = new Map();     /* '중성'      → 글자들 */
+const RC_OPEN  = [];            /* 받침 없는 실제 글자 */
+const RC_JONG  = [];            /* 받침 있는 실제 글자 */
+function rcAdd(m,k,v){ let a = m.get(k); if(!a){ a = []; m.set(k,a); } a.push(v); }
+function realChAdd(ch){
+  if(REAL_CH.has(ch)) return;
+  const d = decomp(ch);
+  if(!d) return;
+  REAL_CH.add(ch); RCH.push(ch);
+  rcAdd(RC_JJ, d.jung + '|' + d.jong, ch);
+  rcAdd(RC_CJ, d.cho  + '|' + d.jong, ch);
+  rcAdd(RC_CU, d.cho  + '|' + d.jung, ch);
+  rcAdd(RC_JU, '' + d.jung, ch);
+  (d.jong ? RC_JONG : RC_OPEN).push(ch);
+}
+/* 목록에서 조건에 맞는 글자를 count 개까지 담습니다 (이미 담은 것·정답은 건너뜁니다) */
+function rcTake(list,count,seen,out,ok){
+  if(!list || out.length >= count) return out;
+  const r = shuffle(list);
+  for(let i=0;i<r.length && out.length < count;i++){
+    const c = r[i];
+    if(seen.has(c)) continue;
+    if(ok && !ok(c)) continue;
+    seen.add(c); out.push(c);
   }
+  return out;
+}
+/* 받침이 하나뿐이고 흔한 글자 — 6살이 읽기 쉬운 모양입니다.
+   겹받침(곬 엾 얹)이나 쌍받침(있 났)도 실제로 쓰이는 글자이지만 보기로는 뒤로 미룹니다 */
+const JONG_PLAIN = [0,1,4,7,8,16,17,19,21];        /* 없음 ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ */
+function chEasy(c){ const d = decomp(c); return !!d && JONG_PLAIN.indexOf(d.jong) >= 0; }
+/* 읽기 쉬운 글자를 먼저 담고, 그것만으로 모자랄 때만 나머지를 담습니다 */
+function rcTakeEasy(list,count,seen,out,ok){
+  if(!list) return out;
+  rcTake(list, count, seen, out, c => chEasy(c) && (!ok || ok(c)));
+  rcTake(list, count, seen, out, ok);
+  return out;
+}
+
+function makeDistractors(ch,count,level){
+  const d = decomp(ch);
+  const out = [], seen = new Set([ch]);
+  /* 낱자(ㄱ ㅏ …)나 숫자면 쉬운 실제 글자로 */
+  if(!d){ return rcTake(RC_OPEN.length ? RC_OPEN : FALLBACK_CH, count, seen, out); }
+  const sameCho  = c => decomp(c).cho  === d.cho;
+  const sameJung = c => decomp(c).jung === d.jung;
+  const open     = c => decomp(c).jong === 0;
+  /* ① 쉬움 — 자음은 같고 모음만 다른 실제 글자 (받침 없는 것) */
+  const easy1 = (RC_CJ.get(d.cho + '|0') || []).filter(c => !sameJung(c));
+  if(level === 1){
+    rcTake(easy1.filter(c => EASY_JUNG.indexOf(decomp(c).jung) >= 0), count, seen, out);
+    rcTake(easy1, count, seen, out);
+    rcTake(RC_OPEN, count, seen, out);
+    rcTakeEasy(RCH, count, seen, out);
+    return out;
+  }
+  /* ② 보통 — 모음이 다르거나 자음이 다르거나 받침이 다른 실제 글자를 섞습니다 */
+  const dJung = easy1;                                                            /* 모음만 다름 */
+  const dCho  = (RC_JJ.get(d.jung + '|' + d.jong) || []).filter(c => !sameCho(c)); /* 초성만 다름 */
+  const dJong = (RC_CU.get(d.cho + '|' + d.jung) || []).filter(c => c !== ch);     /* 받침만 다름 */
+  const order = shuffle([dJung, dJung, dCho, dJong]);   /* 모음 쪽을 조금 더 자주 */
+  order.forEach(a => rcTakeEasy(a, count, seen, out));
+  /* 그래도 모자라면 — 자음이나 모음 하나라도 같은 실제 글자 → 아무 실제 글자 */
+  rcTakeEasy(RCH.filter(c => sameCho(c) || sameJung(c)), count, seen, out);
+  rcTakeEasy(RCH, count, seen, out);
   return out;
 }
 
@@ -2916,30 +2999,33 @@ const CHO_SAY   = ['기역','쌍기역','니은','디귿','쌍디귿','리을','
                    '쌍시옷','이응','지읒','쌍지읒','치읓','키읔','티읕','피읖','히읗'];
 const FALLBACK_CH = ['가','나','다','라','마','바','소','미','두','노'];
 
-/* 중성만 바꾼 오답 — 자음은 같고 모음만 다릅니다 */
+/* 중성만 바꾼 오답 — 자음은 같고 모음만 다릅니다.
+   20차: 조립하지 않고 REAL_CH(실제로 쓰이는 글자) 안에서만 고릅니다.
+   받침 없는 글자로 돌려줍니다 (H_JONG 이 "받침 없는 오답" 으로 씁니다) */
 function distJung(ch,count){
   const d = decomp(ch);
   if(!d) return makeDistractors(ch,count,1);
   const out = [], seen = new Set([ch]);
-  let g = 0;
-  while(out.length < count && g++ < 200){
-    const c = comp(d.cho, pick(EASY_JUNG), 0);
-    if(!seen.has(c)){ seen.add(c); out.push(c); }
-  }
-  while(out.length < count){ const c = pick(FALLBACK_CH); if(!seen.has(c)){ seen.add(c); out.push(c); } }
+  const same = (RC_CJ.get(d.cho + '|0') || []).filter(c => decomp(c).jung !== d.jung);
+  rcTake(same.filter(c => EASY_JUNG.indexOf(decomp(c).jung) >= 0), count, seen, out);  /* ① 쉬운 모음 먼저 */
+  rcTake(same, count, seen, out);                                                      /* ② 같은 자음, 아무 모음 */
+  rcTake(RC_OPEN, count, seen, out);                                                   /* ③ 받침 없는 실제 글자 */
+  rcTakeEasy(RCH, count, seen, out);                                                   /* ④ 최후 (막히지 않게) */
   return out;
 }
-/* 초성만 바꾼 오답 — 모음·받침은 같고 자음만 다릅니다 */
+/* 초성만 바꾼 오답 — 모음·받침은 같고 자음만 다릅니다.
+   ★ 여기가 '갏' 버그의 원인이었습니다. 예전에는 comp(다른초성, 그모음, 그받침) 으로
+     조립해서 겹받침·드문 받침이 그대로 붙었습니다 (닭 → 랅). 이제는 REAL_CH 에서만 고릅니다.
+   첫소리(초성)는 반드시 정답과 달라야 합니다 — H_CHO 는 "ㄱ 소리로 시작하는 글자" 를 묻습니다 */
 function distCho(ch,count){
   const d = decomp(ch);
   if(!d) return makeDistractors(ch,count,1);
   const out = [], seen = new Set([ch]);
-  let g = 0;
-  while(out.length < count && g++ < 200){
-    const c = comp(pick(EASY_CHO), d.jung, d.jong);
-    if(!seen.has(c)){ seen.add(c); out.push(c); }
-  }
-  while(out.length < count){ const c = pick(FALLBACK_CH); if(!seen.has(c)){ seen.add(c); out.push(c); } }
+  const dif = c => decomp(c).cho !== d.cho;
+  rcTake((RC_JJ.get(d.jung + '|' + d.jong) || []).filter(dif), count, seen, out);      /* ① 모음·받침 같고 초성만 다름 */
+  rcTakeEasy((RC_JU.get('' + d.jung) || []).filter(dif), count, seen, out);            /* ② 모음만 같고 초성 다름 */
+  rcTakeEasy(RCH, count, seen, out, dif);                                              /* ③ 초성만 다른 아무 실제 글자 */
+  rcTake(RCH, count, seen, out);                                                       /* ④ 최후 (막히지 않게) */
   return out;
 }
 /* ---- 10차: 받침 도우미 ----
@@ -2958,21 +3044,38 @@ const JONG_PICK = [1,4,8,16,17,19,21];
 const BAD_CH = ['좃','좆','씹','섹','년','놈','뇬','뻑','뽕','젠','썅'];
 /* 이 글자의 끝소리 ('' 면 받침이 없음) */
 function jongSound(ch){ const d = decomp(ch); return d ? (JONG_SND[d.jong] || '') : ''; }
-/* 받침만 다른 오답 — 끝소리까지 다르게 골라서 "소리로는 같은데 틀렸다" 가 없게 합니다 */
+/* 받침만 다른 오답 — 끝소리까지 다르게 골라서 "소리로는 같은데 틀렸다" 가 없게 합니다.
+   20차: 여기도 REAL_CH 안에서만 고릅니다.
+   ① 초성·중성이 같고 받침만 다른 실제 글자 → ② 모음이 같은 실제 받침 글자 → ③ 아무 받침 글자 */
+function jongOkFor(snd){
+  return c => { const e = decomp(c); return !!e && e.jong > 0 && JONG_SND[e.jong] !== snd && BAD_CH.indexOf(c) < 0; };
+}
+/* '초성·중성은 그대로, 받침만 다른' 실제 글자들 — 받침 채우기(H_JONGPICK) 가 이것만 씁니다.
+   같은 글자를 여러 번 물어보므로 한 번 구한 것은 기억해 둡니다 */
+const JMATE = {};
+function jongMates(ch){
+  if(JMATE[ch]) return JMATE[ch];
+  const d = decomp(ch);
+  if(!d || !d.jong) return (JMATE[ch] = []);
+  const ok = jongOkFor(JONG_SND[d.jong]);
+  return (JMATE[ch] = (RC_CU.get(d.cho + '|' + d.jung) || []).filter(c => c !== ch && ok(c)));
+}
+/* 받침 채우기(H_JONGPICK) 를 낼 수 있는 자리 —
+   초성·중성이 같고 받침만 다른 실제 글자가 두 개 이상 있어야 보기를 제대로 만들 수 있습니다 */
+function jongPickSpots(n){
+  const out = [];
+  n.split('').forEach((c,i)=>{ if(hasJong(c) && jongMates(c).length >= 2) out.push(i); });
+  return out;
+}
 function distJong(ch,count){
   const d = decomp(ch);
   if(!d || !d.jong) return distJung(ch,count);
-  const snd = JONG_SND[d.jong];
+  const ok  = jongOkFor(JONG_SND[d.jong]);
   const out = [], seen = new Set([ch]);
-  shuffle(JONG_PICK.filter(j => JONG_SND[j] !== snd)).forEach(j=>{
-    const c = comp(d.cho, d.jung, j);
-    if(out.length < count && !seen.has(c) && BAD_CH.indexOf(c) < 0){ seen.add(c); out.push(c); }
-  });
-  let g = 0;
-  while(out.length < count && g++ < 60){
-    const c = pick(FALLBACK_CH);
-    if(!seen.has(c)){ seen.add(c); out.push(c); }
-  }
+  rcTakeEasy(jongMates(ch), count, seen, out);                              /* ① 받침만 다름 */
+  rcTakeEasy((RC_JU.get('' + d.jung) || []), count, seen, out, ok);         /* ② 모음 같고 받침 다름 */
+  rcTakeEasy(RC_JONG, count, seen, out, ok);                                /* ③ 받침 있는 아무 실제 글자 */
+  rcTake(RCH, count, seen, out);                                            /* ④ 최후 (막히지 않게) */
   return out;
 }
 function noJong(ch){ const d = decomp(ch); return d ? comp(d.cho,d.jung,0) : ch; }
@@ -5063,6 +5166,12 @@ function bump(sel,cls){
   const el = document.querySelector(sel);
   if(!el) return;
   el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+  /* 20차: 로켓단전에서 상대가 맞으면 왼쪽 위 배지(그 사람 그림)도 같이 흔들립니다.
+     연출만 더하는 것이라 배틀 흐름은 그대로입니다 */
+  if(S.rk && cls === 'hurt' && sel.indexOf('.foe') >= 0){
+    const b = document.querySelector('.rkbadge .f');
+    if(b){ b.classList.remove('hurt'); void b.offsetWidth; b.classList.add('hurt'); }
+  }
 }
 
 /* ---------- 투사체 · 타격 이펙트 ----------
@@ -7238,17 +7347,32 @@ function rkShow(o){
   if(!box){ if(o.done) o.done(); return; }
   RK_DONE = o.done || null;
   box.className = 'on' + (o.bye ? ' bye' : '');
-  const crew = ROCKETS.map(r=>`<div data-k="${r.k}">${r.svg()}</div>`).join('');
+  /* 20차: 셋을 각각 공식 그림으로. 말풍선 자리(b.rkbub)를 미리 넣어 둡니다 */
+  const crew = ROCKETS.map(r=>
+    `<div data-k="${r.k}"><b class="rkbub"></b>${rkPic(r.sp, r.n)}</div>`).join('');
+  /* 20차: 등장할 때만 "셋이 함께 있는 그림" 을 크게 한 번 보여 줍니다 (아빠 요청).
+     화면 위에 얹기만 해서(absolute) 열기구·세 사람 자리를 밀지 않습니다 */
+  const trio = o.trio
+    ? `<div class="rktrio" aria-hidden="true">${rkPic('로켓 3인','로켓단')}</div>` : '';
   box.innerHTML =
     `<div class="rkskip" data-act="rkskip" role="button" tabindex="0">건너뛰기 ⏩</div>
-     <div class="rkstage${o.dropIn ? ' drop-in' : ''}">
+     <div class="rkstage${o.dropIn ? ' drop-in' : ''}${o.trio ? ' intro' : ''}">
        <div class="rkballoon">${rkBalloonSvg()}</div>
        <div class="rkcrew">${crew}</div>
+       ${trio}
      </div>
      <div class="rkline" id="rkline">${o.first || ''}</div>`;
   const lineEl = box.querySelector('#rkline');
   const stage  = box.querySelector('.rkstage');
   const t0 = o.t0 || 0;
+
+  /* 20차: 3인 그림 → 세 사람 줄로 넘어가기.
+     클래스를 타이머로 떼기 때문에, 애니메이션이 안 도는 기기에서도
+     세 사람이 반드시 나타납니다 (화면이 비는 일 없음) */
+  if(o.trio){
+    rkT(()=>{ if(stage) stage.classList.add('trio-out'); }, 1150);
+    rkT(()=>{ if(stage) stage.classList.remove('intro','trio-out'); }, 1600);
+  }
 
   (o.lines || []).forEach((tx,i)=>{
     rkT(()=>{
@@ -7258,7 +7382,11 @@ function rkShow(o){
       lineEl.textContent = tx;
       const who = (o.who && o.who[i]) || '';
       box.querySelectorAll('.rkcrew > div').forEach(d=>{
-        d.classList.toggle('rksay', d.getAttribute('data-k') === who);
+        const me = d.getAttribute('data-k') === who;
+        d.classList.toggle('rksay', me);
+        /* 20차: 말하는 사람 머리 위에 말풍선 — 대사가 누구 것인지 바로 보입니다 */
+        const bub = d.querySelector('.rkbub');
+        if(bub){ bub.textContent = me ? tx : ''; }
       });
       say(tx, {rate:0.92});
       tone(660 + i*90, 0.09, 'triangle', 0.05);
@@ -7311,7 +7439,7 @@ function rkMeet(){
   lock(5000);
   SFX.encounter();
   rkShow({
-    dropIn:true, t0:700, tail:340,
+    dropIn:true, trio:true, t0:1200, tail:340,
     lines:['우리는 로켓단!', '로사!', '로이!', '나옹이라옹!'],
     who:  ['', 'rosa', 'roi', 'nya'],
     done: rkOpenPick
@@ -7334,7 +7462,7 @@ function rkChallenge(){
   lock(5000);
   SFX.encounter();
   rkShow({
-    dropIn:true, t0:700, tail:340,
+    dropIn:true, trio:true, t0:1200, tail:340,
     lines:['우리는 로켓단!', '로사!', '로이!', '나옹이라옹!'],
     who:  ['', 'rosa', 'roi', 'nya'],
     done: rkOpenPick
@@ -7377,7 +7505,10 @@ function viewRkPick(){
   const n = sel.length;
   return `<div class="rkpick">
     <div class="rkslots">${slots}</div>
-    <div class="rktip">${n ? `${n}마리! 1번부터 순서대로 나와요` : '같이 싸울 친구를 눌러 봐!'}</div>
+    <div class="rkhead">
+      <div class="trio" aria-hidden="true">${rkPic('로켓 3인','로켓단')}</div>
+      <div class="rktip">${n ? `${n}마리! 1번부터 순서대로 나와요` : '같이 싸울 친구를 눌러 봐!'}</div>
+    </div>
     <div class="dex">${cards}</div>
     <div class="rkrow">
       <button class="btn btn-blue" data-act="rkrun">🏃 도망갈래<small>잃는 건 없어요</small></button>
@@ -7482,7 +7613,7 @@ function rkFoeOut(k, silent){
 function rkBadgeHtml(){
   const rk = S.rk; if(!rk) return '';
   const r = rkCrewAt(rk.fi);
-  return `<div class="rkbadge"><div class="f">${r.svg()}</div>
+  return `<div class="rkbadge"><div class="f">${rkPic(r.sp, r.n)}</div>
     <div><div class="t">${r.n}</div><div class="c">${rk.fi+1} / ${rk.crew.length}</div></div></div>`;
 }
 /* 몬스터볼 자리에 들어가는 버튼 — 남의 포켓몬이라 볼은 못 던집니다 */
@@ -7999,7 +8130,11 @@ function nameDistract(subj,count,want,avoid){
     });
     pool = shuffle(seen).concat(shuffle(rest));      /* 이미 만난 친구 이름을 앞에 둡니다 */
   } else {
-    pool = shuffle(WORD_ALL.filter(w => w.n !== a && w.emoji !== subj.emoji).map(w => w.n));
+    /* ★ 20차 ②-a: 같은 그림을 쓰는 낱말은 오답으로 쓰지 않습니다.
+       예전에는 이모지 글자가 똑같은 것만 걸렀습니다 —
+       🐶 강아지 / 🐕 개 처럼 "6살 눈에 같은 그림" 도 걸러야 정답이 하나가 됩니다 */
+    const mine = emoKey(subj.emoji);
+    pool = shuffle(WORD_ALL.filter(w => w.n !== a && emoKey(w.emoji) !== mine).map(w => w.n));
   }
   const sameLen  = n => n.length === a.length;
   const nearLen  = n => Math.abs(n.length - a.length) <= 1;
@@ -8038,7 +8173,8 @@ function wordFs(opts){
   return 0.185;
 }
 
-/* 이미 화면에 보이는 글자와 겹치지 않는 오답 */
+/* 이미 화면에 보이는 글자와 겹치지 않는 오답
+   20차: 최후 보루도 REAL_CH(실제로 쓰이는 글자) 안에서 고릅니다 */
 function distExcept(a,count,level,bad){
   const out = [];
   let g = 0;
@@ -8047,11 +8183,8 @@ function distExcept(a,count,level,bad){
       if(out.length < count && c !== a && out.indexOf(c) < 0 && bad.indexOf(c) < 0) out.push(c);
     });
   }
-  let g2 = 0;
-  while(out.length < count && g2++ < 60){
-    const c = pick(FALLBACK_CH);
-    if(c !== a && out.indexOf(c) < 0 && bad.indexOf(c) < 0) out.push(c);
-  }
+  const seen = new Set([a].concat(bad).concat(out));
+  rcTakeEasy(RCH, count, seen, out);
   return out;
 }
 
@@ -8062,17 +8195,17 @@ function distExcept(a,count,level,bad){
    [낱말, 이모지] 짝 — 24개 카테고리, 전부 1~4글자, 중복 없음
    ========================================================= */
 const WORDS = {
-  가족:[['엄마','👩'],['아빠','👨'],['누나','👧'],['형','👦'],['언니','👧'],['오빠','👦'],['동생','👶'],['아기','👶'],['할머니','👵'],['외할머니','👵'],['삼촌','🧑'],['이모','👩'],['고모','👩'],['사촌','🧑'],['가족','👨‍👩‍👧'],['식구','🍚'],['부모','👨‍👩‍👦'],['딸','👧'],['아들','👦'],['손자','👦'],['며느리','👰'],['쌍둥이','👯'],['어른','🧑'],['아이','🧒'],['친척','🧑']],
+  가족:[['엄마','👩'],['아빠','👨'],['누나','👧'],['형','👦'],['언니','👧'],['오빠','👦'],['동생','👶'],['아기','👶'],['할머니','👵'],['외할머니','👵'],['삼촌','🧑'],['이모','👩'],['고모','👩'],['사촌','🧑'],['가족','👨‍👩‍👧'],['식구','👨‍👩‍👧‍👦'],['부모','👨‍👩‍👦'],['딸','👧'],['아들','👦'],['손자','👦'],['며느리','👰'],['쌍둥이','👯'],['어른','🧑'],['아이','🧒'],['친척','🧑']],
 
-  몸:[['머리','🧠'],['얼굴','😀'],['눈','👁'],['코','👃'],['입','👄'],['귀','👂'],['이빨','🦷'],['혀','👅'],['목','🧣'],['어깨','💪'],['팔','💪'],['손','✋'],['손가락','👆'],['손톱','💅'],['발','🦶'],['발가락','🦶'],['발톱','🦶'],['무릎','🦵'],['다리','🦵'],['배','🫃'],['등','🔙'],['허리','🧍'],['엉덩이','🍑'],['가슴','❤'],['뼈','🦴'],['살','🫧'],['피','🩸'],['땀','💦'],['눈물','😢'],['침','💧'],['숨','💨'],['힘','💪'],['키','📏'],['턱','😬'],['볼','😊'],['이마','🙂'],['눈썹','🤨'],['속눈썹','👁'],['콧물','🤧'],['배꼽','🫄'],['겨드랑이','🙆'],['수염','🧔']],
+  몸:[['머리','🧠'],['얼굴','😀'],['눈','👁'],['코','👃'],['입','👄'],['귀','👂'],['이빨','🦷'],['혀','👅'],['목','🗣'],['어깨','💪'],['팔','💪'],['손','✋'],['손가락','👆'],['손톱','💅'],['발','🦶'],['발가락','🦶'],['발톱','🦶'],['무릎','🦵'],['다리','🦵'],['배','🧍'],['등','🙇'],['허리','🧍'],['엉덩이','🍑'],['가슴','❤'],['뼈','🦴'],['살','🥩'],['피','🩸'],['땀','💦'],['눈물','😢'],['침','💧'],['숨','💨'],['힘','💪'],['키','📏'],['턱','😬'],['볼','😊'],['이마','🙂'],['눈썹','🤨'],['속눈썹','👁'],['콧물','🤧'],['배꼽','🫄'],['겨드랑이','🙆'],['수염','🧔']],
 
-  동물:[['강아지','🐶'],['개','🐕'],['고양이','🐱'],['토끼','🐰'],['곰','🐻'],['호랑이','🐯'],['사자','🦁'],['코끼리','🐘'],['원숭이','🐵'],['기린','🦒'],['얼룩말','🦓'],['하마','🦛'],['악어','🐊'],['뱀','🐍'],['거북이','🐢'],['개구리','🐸'],['돼지','🐷'],['소','🐮'],['말','🐴'],['양','🐑'],['염소','🐐'],['닭','🐔'],['병아리','🐤'],['오리','🦆'],['거위','🦢'],['참새','🐦'],['까치','🐦'],['비둘기','🕊'],['부엉이','🦉'],['독수리','🦅'],['펭귄','🐧'],['다람쥐','🐿'],['여우','🦊'],['늑대','🐺'],['사슴','🦌'],['낙타','🐫'],['쥐','🐭'],['두더지','🐀'],['박쥐','🦇'],['왜가리','🐦'],['괭이','🐱'],['망아지','🐴'],['송아지','🐮'],['새끼','🐣']],
+  동물:[['강아지','🐶'],['개','🐕'],['고양이','🐱'],['토끼','🐰'],['곰','🐻'],['호랑이','🐯'],['사자','🦁'],['코끼리','🐘'],['원숭이','🐵'],['기린','🦒'],['얼룩말','🦓'],['하마','🦛'],['악어','🐊'],['뱀','🐍'],['거북이','🐢'],['개구리','🐸'],['돼지','🐷'],['소','🐮'],['말','🐴'],['양','🐑'],['염소','🐐'],['닭','🐔'],['병아리','🐤'],['오리','🦆'],['거위','🦢'],['참새','🐦'],['까치','🐦'],['비둘기','🕊'],['부엉이','🦉'],['독수리','🦅'],['펭귄','🐧'],['다람쥐','🐿'],['여우','🦊'],['늑대','🐺'],['사슴','🦌'],['낙타','🐫'],['쥐','🐭'],['두더지','🦫'],['박쥐','🦇'],['왜가리','🐦'],['괭이','🐱'],['망아지','🐴'],['송아지','🐮'],['새끼','🐣']],
 
   바다생물:[['고래','🐳'],['상어','🦈'],['돌고래','🐬'],['물개','🦭'],['문어','🐙'],['오징어','🦑'],['새우','🦐'],['게','🦀'],['조개','🐚'],['물고기','🐟'],['붕어','🐠'],['금붕어','🐠'],['미역','🌿'],['해파리','🪼'],['불가사리','⭐']],
 
   곤충:[['개미','🐜'],['벌','🐝'],['나비','🦋'],['잠자리','🪰'],['메뚜기','🦗'],['매미','🦗'],['거미','🕷'],['달팽이','🐌'],['지렁이','🪱'],['무당벌레','🐞'],['사마귀','🦗'],['파리','🪰'],['모기','🦟'],['애벌레','🐛'],['귀뚜라미','🦗']],
 
-  음식:[['밥','🍚'],['국','🍲'],['김치','🥬'],['라면','🍜'],['국수','🍜'],['떡','🍡'],['빵','🍞'],['우유','🥛'],['물','💧'],['주스','🧃'],['과자','🍪'],['사탕','🍬'],['초콜릿','🍫'],['케이크','🎂'],['젤리','🍮'],['껌','🫧'],['계란','🥚'],['달걀','🥚'],['고기','🍖'],['생선','🐟'],['김밥','🍙'],['만두','🥟'],['피자','🍕'],['치킨','🍗'],['햄버거','🍔'],['감자','🥔'],['고구마','🍠'],['옥수수','🌽'],['콩','🫘'],['두부','⬜'],['된장','🥣'],['간장','🍶'],['소금','🧂'],['설탕','🍬'],['기름','🫗'],['꿀','🍯'],['잼','🍓'],['버터','🧈'],['치즈','🧀'],['죽','🥣'],['미역국','🍲'],['찌개','🍲'],['볶음밥','🍛'],['반찬','🥗'],['젓가락','🥢'],['숟가락','🥄'],['국물','🍜'],['밥상','🍽'],['간식','🍪'],['아침밥','🍳'],['점심','🍱'],['저녁','🌆'],['쌀','🌾'],['팥','🫘'],['잣','🌰'],['밤','🌰'],['호떡','🥞'],['붕어빵','🐟'],['떡볶이','🌶'],['짜장면','🍜'],['짬뽕','🍲'],['쫄면','🍜'],['순대','🌭'],['김','🍙'],['나물','🥬'],['맛','😋'],['쓴맛','😖'],['숯불','🔥'],['젖','🍼'],['빙수','🍧'],['웩','🤢']],
+  음식:[['밥','🍚'],['국','🍲'],['김치','🥬'],['라면','🍜'],['국수','🍜'],['떡','🍡'],['빵','🍞'],['우유','🥛'],['물','💧'],['주스','🧃'],['과자','🍪'],['사탕','🍬'],['초콜릿','🍫'],['케이크','🎂'],['젤리','🍮'],['껌','🫧'],['계란','🥚'],['달걀','🥚'],['고기','🍖'],['생선','🐟'],['김밥','🍙'],['만두','🥟'],['피자','🍕'],['치킨','🍗'],['햄버거','🍔'],['감자','🥔'],['고구마','🍠'],['옥수수','🌽'],['콩','🫘'],['두부','⬜'],['된장','🥣'],['간장','🍶'],['소금','🧂'],['설탕','🍬'],['기름','🫗'],['꿀','🍯'],['잼','🍓'],['버터','🧈'],['치즈','🧀'],['죽','🥣'],['미역국','🍲'],['찌개','🍲'],['볶음밥','🍛'],['반찬','🥗'],['젓가락','🥢'],['숟가락','🥄'],['국물','🍜'],['밥상','🍽'],['간식','🍪'],['아침밥','🍳'],['점심','🍱'],['저녁','🌆'],['쌀','🌾'],['팥','🫘'],['잣','🌲'],['밤','🌰'],['호떡','🥞'],['붕어빵','🐟'],['떡볶이','🌶'],['짜장면','🍜'],['짬뽕','🍲'],['쫄면','🍜'],['순대','🌭'],['김','🍙'],['나물','🥬'],['맛','😋'],['쓴맛','😖'],['숯불','🔥'],['젖','🍼'],['빙수','🍧'],['웩','🤢']],
 
   채소:[['상추','🥬'],['오이','🥒'],['당근','🥕'],['무','🥬'],['배추','🥬'],['양파','🧅'],['마늘','🧄'],['파','🌱'],['버섯','🍄'],['시금치','🥬'],['토마토','🍅'],['호박','🎃'],['가지','🍆'],['브로콜리','🥦'],['완두콩','🫛'],['고추','🌶'],['깻잎','🌿'],['칡','🌿']],
 
@@ -8111,7 +8244,68 @@ const WORDS = {
   기타:[['꿈','💭'],['생각','💭'],['마음','💗'],['정말','❗'],['거짓말','🤥'],['비밀','🤐'],['약속','🤝'],['선물','🎁'],['편지','💌'],['사진','📷'],['소리','🔊'],['냄새','👃'],['이야기','📖'],['옛날','🏯'],['요즘','📆'],['혼자','🧍'],['같이','👫'],['먼저','1️⃣'],['나중','⏳'],['빚','💸'],['빻다','🥣'],['찧다','🥣'],['횃불','🔥'],['쐐기','📐'],['낯','😐'],['숯','🖤'],['닻','⚓'],['돛','⛵'],['낫','🌾'],['갓','👒'],['못','🔩'],['닳다','🥿'],['훑다','🌾'],['훑어','🌾'],['권투','🥊'],['튀김','🍤'],['취미','🎨'],['최고','🥇'],['괴물','👹'],['뇌','🧠'],['쇠','⛓'],['회','🍣'],['화분','🪴'],['왕','👑'],['관','👑'],['봐','👀'],['좌우','↔'],['과일','🍎'],['왕관','👑'],['참기름','🫗'],['계곡물','💧'],['예','🙆'],['차례','🔢'],['세계','🌏'],['시계','⏰'],['세수','🚿'],['세배','🙇'],['페인트','🎨'],['메모','📝'],['헤딩','⚽'],['데리다','🤝'],['제비','🐦'],['체조','🤸'],['테이프','📼'],['레일','🛤'],['베다','🔪'],['새다','💧'],['재채기','🤧'],['냇가','🏞'],['댁','🏠'],['맨손','✋'],['희다','⚪'],['의견','💬']]
 };
 
-/* 평탄화 — 문제 소재로 바로 쓰는 모양 {n, emoji, cat, isMon:false} */
+/* =========================================================
+   ★ 20차 ②: 그림(이모지) 문제에 쓸 수 있는 낱말 고르기
+   -----------------------------------------------------------
+   아빠 신고 — "그림보고 단어고르는데 그림이랑 매칭안되는게 있고"
+   H_NAME(그림 보고 낱말 고르기) 은 낱말을 소리로 알려 주지 않습니다.
+   그래서 그림이 그 낱말 **하나만** 가리켜야 합니다.
+   이모지로는 표현이 안 되는 낱말이 많습니다 — '왜' '언제' '어떻게' '꼬르륵' '훑다'.
+   이건 이모지 잘못이 아니라 그림 문제에 쓰면 안 되는 낱말입니다.
+   ⚠️ 낱말 990개는 하나도 지우지 않습니다. 그림 문제에서만 빠지고,
+      글자 읽기(첫 글자·받침·조립)·쓰기 문제에는 전부 그대로 나옵니다.
+   ========================================================= */
+
+/* 그림으로 낼 수 있는 묶음 — 눈에 보이는 것들입니다.
+   빠진 묶음(동작·느낌·인사말·소리)은 통째로 그림 문제에서 뺍니다 */
+const PIC_CATS = ['가족','몸','동물','바다생물','곤충','음식','채소','과일','색깔','자연',
+                  '날씨시간','탈것','집안물건','학용품','옷','장소','놀이','직업','셈','기타'];
+/* 묶음은 맞지만 그림이 그 낱말을 못 나타내는 것들 — 하나하나 직접 보고 골랐습니다.
+   (없는 이모지를 억지로 붙인 것, 글자가 그려진 이모지, 추상어) */
+const PIC_NO = [
+  '며느리',                                     /* 👰 는 신부입니다 */
+  '이마','눈썹','배꼽','땀','배','등','목','살', /* 몸 — 맞는 이모지가 아예 없습니다 */
+  '두부','저녁','반찬','웩','간장','볶음밥',      /* 음식 — ⬜ 🌆 🥗 🤢 🍶 🍛 은 그 음식이 아닙니다 */
+  '자두','모과',                                 /* 🫐 는 블루베리, 🍐 는 배입니다 */
+  '무늬','회색',                                 /* 🔶 🩶 은 모양·하트입니다 */
+  '땅','이끼',                                   /* 🌍 는 지구, 🟩 은 네모입니다 */
+  '추석',                                        /* 🌕 는 보름달입니다 */
+  '바퀴','핸들',                                 /* ⚙ 는 톱니, 🎡 는 관람차입니다 */
+  '넋','테이프',                                 /* 👻 는 유령, 📼 는 비디오테이프입니다 */
+  '이름','도화지',                               /* 📛 는 이름표(글자), 📃 는 종이와 같습니다 */
+  '왼쪽','골목',                                 /* ⬅ 는 화살표입니다 */
+  '제기',                                        /* 🏸 는 배드민턴입니다 */
+  '삯','몫',                                     /* 💵 🍰 — 뜻이 추상적입니다 */
+  '반','마리',                                   /* ½ 는 글자, 🐾 는 발자국입니다 */
+  '마음','정말','거짓말','소리','같이','빚','낯','세계','쇠','잣',
+  /* 20차 검수 추가 — 그림 문제로 남아 있던 것 중 그림이 그 낱말이 아닌 것 */
+  '식구','부모',                                 /* 가족 그림과 같아서 하나만 정답이 아닙니다 */
+  '껌','젤리','점심','호떡','순대','회',          /* 🫧 거품 🍮 푸딩 🍱 도시락 🥞 팬케이크 🌭 핫도그 🍣 초밥 */
+  '두더지',                                      /* 🦫 는 비버입니다 */
+  '샘','설날','한복','절','갓',                  /* ⛲ 분수 🎎 일본 인형 👘 기모노 🛕 힌두 사원 👒 밀짚모자 */
+  '계단','못','구슬',                            /* 🪜 사다리 🔩 볼트 🔮 수정구슬 */
+  '극장','우체국','약국','운동선수','둘째'       /* 🎬 영화 📮 우체통 💊 알약 🏅 🥈 메달 */
+];
+/* 6살 눈에 같은 그림으로 보이는 이모지 묶음 —
+   오답으로 같이 내면 "둘 다 맞잖아!" 가 됩니다 (🐶 강아지 / 🐕 개) */
+const EMO_KIN_SRC = [
+  '🐶 🐕', '🐱 🐈', '🐮 🐄', '🐴 🐎', '🐭 🐀 🐹', '🐰 🐇', '🐦 🕊', '🐤 🐣 🐥',
+  '🐟 🐠 🐡', '🐝 🪰 🦟', '🐛 🪱', '🦆 🦢', '🐑 🐐',
+  '🧒 👦 👧 👶', '🧑 👨 👩 👵 👴', '👨‍👩‍👧 👨‍👩‍👦 👨‍👩‍👧‍👦',
+  '🍚 🍙', '🍽 🍴', '🍜 🍝 🍲', '🥚 🍳', '🥔 🍠', '🍎 🍏 🍐', '🌰 🥜 🫘',
+  '🥬 🥗', '🍬 🍭', '🧢 👒',
+  '💧 💦', '☀ 🌞 🌤', '☁ 🌥 🌫', '🧊 ❄ ⛄', '🌙 🌕 🌑',
+  '⚪ ⬜', '⚫ ⬛', '🔴 🟥', '🟡 🟨', '🟢 🟩', '🔵 🟦', '🟣 🟪', '🟤 🟫', '🟠 🟧',
+  '✏ 🖍 🖊 ✍ 📝', '📄 📃', '📕 📚 📖 📓', '👕 👚 👔',
+  '🚗 🚕 🚙', '🌸 🌺 🌷 🌼', '🌳 🌲 🌴', '🌱 🌿 🍃', '🦶 🦵',
+  '📅 📆 🗓', '⬆ ⬇ ➡ ⬅ ↔', '😀 🙂 😊 😄', '🏠 🏡 🏘', '🎵 🎤'
+];
+const EMO_KIN = {};
+EMO_KIN_SRC.forEach((g,i)=>{ g.split(' ').forEach(e=>{ if(e) EMO_KIN[e.replace(/\uFE0F/g,'')] = '#' + i; }); });
+/* 이 이모지의 "그림 정체" — 같은 묶음이면 같은 값이 나옵니다 */
+function emoKey(e){ const s = String(e == null ? '' : e).replace(/\uFE0F/g,''); return EMO_KIN[s] || s; }
+
+/* 평탄화 — 문제 소재로 바로 쓰는 모양 {n, emoji, cat, isMon:false, pic} */
 const WORD_ALL = [];
 Object.keys(WORDS).forEach(cat=>{
   WORDS[cat].forEach(p=>{
@@ -8119,9 +8313,32 @@ Object.keys(WORDS).forEach(cat=>{
     WORD_ALL.push({ n:p[0], emoji:p[1], cat:cat, isMon:false, lv:koLevel(p[0]), tags:tagsOf(p[0]) });
   });
 });
+/* 그림 문제에 쓸 수 있나 (pic) — 네 가지를 다 만족해야 합니다
+   ① 눈에 보이는 묶음   ② '~다' 로 끝나는 동작·상태어가 아님
+   ③ 위 PIC_NO 에 없음  ④ 그 이모지를 쓰는 낱말이 자기 하나뿐 */
+(function markPic(){
+  const cnt = {};
+  WORD_ALL.forEach(w=>{ cnt[w.emoji] = (cnt[w.emoji] || 0) + 1; });
+  WORD_ALL.forEach(w=>{
+    w.pic = PIC_CATS.indexOf(w.cat) >= 0
+         && !/다$/.test(w.n)
+         && PIC_NO.indexOf(w.n) < 0
+         && cnt[w.emoji] === 1;
+  });
+})();
 /* 단계마다 낱말이 몇 개인지 — 비었으면 커리큘럼이 이웃 단계로 자동으로 넘어갑니다 */
 const WORD_BY_LV = [[],[],[],[],[],[],[]];
 WORD_ALL.forEach(w=>{ WORD_BY_LV[w.lv].push(w); });
+
+/* ★ 20차: 여기서 REAL_CH(실제로 쓰이는 글자) 를 채웁니다.
+   낱말이 다 만들어진 다음이어야 하므로 이 자리입니다.
+   이제부터 모든 오답 보기는 이 집합 안에서만 나옵니다 (위쪽 distCho / distJung / distJong 참고) */
+MONS.forEach(m=>{
+  m.n.split('').forEach(realChAdd);
+  if(m.mega && m.mega.n) m.mega.n.split('').forEach(realChAdd);
+});
+WORD_ALL.forEach(w=>{ w.n.split('').forEach(realChAdd); });
+FALLBACK_CH.forEach(realChAdd);          /* 최후 보루도 실제 글자입니다 */
 
 /* 야생 포켓몬을 소재 모양으로 감쌉니다 (기존 build(wm) 과 오리 타이핑 호환) */
 function monSubject(wm){
@@ -8206,7 +8423,10 @@ const QUIZ_TYPES = [
    못 읽어서 갇히는 일은 없습니다 — 두 번 틀리면 기존 규칙대로 정답이 반짝입니다.
    맞힌 뒤에는 goodSay 로 이름을 읽어 줘서 "이렇게 읽는 거였구나" 를 확인시켜 줍니다.
    w:3.4 — 일반 출제에서 이 유형이 한글 문제의 주가 되게 하는 가중치입니다 */
-{ id:'H_NAME', kind:'ko', diff:2, w:3.4, ok:()=>true,
+/* 20차 ②-b: 낱말 소재는 "그림이 그 낱말 하나만 가리키는" 것만 씁니다 (w.pic).
+   포켓몬은 공식 일러스트라 언제나 됩니다.
+   ok 는 야생 포켓몬(MONS 항목)으로도 불리므로 isMon 이 false 일 때만 pic 을 봅니다 */
+{ id:'H_NAME', kind:'ko', diff:2, w:3.4, ok:s=>!s || s.isMon !== false || s.pic === true,
   build(s){
     const want = CUR_WANT;
     const mon = s.isMon !== false;
@@ -8338,17 +8558,18 @@ const QUIZ_TYPES = [
 /* 받침 골라 완성하기 — "사 ?" 처럼 받침 자리를 비워 두고 고르게 합니다.
    보기는 초성·중성이 같고 받침만 다릅니다. 끝소리까지 서로 달라서
    "소리는 같은데 틀렸다" 는 억울한 일이 생기지 않습니다 */
+/* 20차: 이 문제는 보기가 **받침만** 달라야 합니다 (jongPickSpots 참고).
+   화면에 "사 ?" 를 띄우고 보기에 '문' 이 나오면 말이 안 됩니다 */
 { id:'H_JONGPICK', kind:'ko', diff:4,
-  ok:s=>s.n.split('').some(hasJong),
+  ok:s=>!!(s && s.n) && jongPickSpots(s.n).length > 0,
   build(s){
     const cs = s.n.split('');
-    const spots = [];
-    cs.forEach((c,i)=>{ if(hasJong(c)) spots.push(i); });
+    const spots = jongPickSpots(s.n);
     const hole = pick(spots);
     const a = cs[hole];
     return { head:'jong', headData:{chars:cs, hole:hole, bare:noJong(a)},
       ask:'어떤 받침이 들어갈까?', cols:3, render:'text',
-      options:shuffle([a].concat(distJong(a,2))), answer:a, judge:'equal',
+      options:shuffle([a].concat(shuffle(jongMates(a)).slice(0,2))), answer:a, judge:'equal',
       speak(){ say(s.n,{rate:0.7}); setTimeout(()=>say('받침을 넣어서 완성해 봐',{rate:0.7}), 1000); } };
   } },
 
