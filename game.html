@@ -132,6 +132,18 @@ body{
   opacity:.45;cursor:pointer;padding:0;
 }
 .setgear:active{transform:translateY(2px);opacity:.8;}
+/* 21차 A1: ✏️ 태블릿 모드 토글 — 톱니바퀴 맞은편 구석. 켜지면 노랗게 "켜짐" */
+.tabtog{
+  position:absolute;left:5px;top:5px;min-height:44px;padding:2px 8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;
+  font-family:var(--font);font-weight:900;font-size:12px;color:var(--ink);letter-spacing:-.04em;
+  background:rgba(255,255,255,.55);border:3px solid var(--edge);border-radius:14px;
+  opacity:.6;cursor:pointer;
+}
+.tabtog b{font-size:11px;font-weight:900;color:var(--ink-soft);}
+.tabtog.on{background:var(--sun);opacity:1;box-shadow:0 3px 0 var(--edge);}
+.tabtog.on b{color:var(--ball);}
+.tabtog:active{transform:translateY(2px);}
 .setwrap{
   flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;gap:9px;
@@ -1786,6 +1798,48 @@ body.qk{overflow:hidden;}
   .setgear{width:44px;min-height:44px;font-size:17px;}
   .plate.coin{min-width:42px;min-height:42px;font-size:14px;}
   .splitrow.wrap{gap:6px;}
+}
+/* 21차 A4: 어른 설정 — 연습 중 글자 옆 작은 숫자(틀린 횟수) */
+.setjamo span small{font-size:.62em;color:var(--ball);margin-left:1px;vertical-align:super;}
+.setjamo span.lv0{background:#FFE9E4;}
+.setjamo span.lv1{background:#FFF6D6;}
+
+/* ============================================================
+   21차 A3: 태블릿 모드 (갤럭시탭 S10+ · S펜) — 전부 body.tab 아래에만 둡니다.
+   폰(태블릿 모드 꺼짐)은 이 블록이 하나도 안 걸려서 그대로입니다.
+   ============================================================ */
+body.tab #app.wrscr{max-width:1100px;}
+body.tab .wrsheet{max-width:1040px;padding:12px;}
+body.tab .wrwrap{gap:10px;}
+body.tab .wrwrap > .wrpaper{order:10;}          /* 세로 화면: 버튼을 캔버스 위로 — 손바닥이 아래 버튼을 누르지 않게 */
+body.tab .wrpaper{border-width:6px;border-radius:26px;}
+body.tab .wrpaper .hint{font-size:21px;bottom:8px;}
+body.tab .wrpaper .cheer{font-size:56px;}
+body.tab .wrhead{min-height:64px;gap:12px;padding:4px 16px;}
+body.tab .wrhead .ch{font-size:44px;min-width:64px;}
+body.tab .wrhead .t1{font-size:21px;}
+body.tab .wrhead .t2{font-size:15px;}
+body.tab .wrhead .em{font-size:34px;}
+body.tab .wrdots i{width:16px;height:16px;}
+body.tab .wrmode .btn{min-height:52px;font-size:18px;}
+body.tab .wrrow .btn{min-height:60px;font-size:17px;}
+body.tab .wrrow .btn .e{font-size:24px;}
+body.tab .wrbanner{font-size:21px;min-height:30px;}
+body.tab .wrprize span{font-size:14px;padding:3px 8px;}
+/* 가로 화면: 왼쪽에 글자·버튼 줄(290px), 오른쪽에 큰 캔버스 */
+@media (orientation:landscape){
+  body.tab .wrwrap{
+    display:grid;grid-template-columns:290px auto;
+    grid-template-rows:repeat(6, min-content) 1fr;
+    column-gap:20px;row-gap:12px;align-content:center;justify-content:center;align-items:start;
+  }
+  body.tab .wrwrap > *:not(.wrpaper){grid-column:1;width:290px;}
+  body.tab .wrwrap > .wrpaper{grid-column:2;grid-row:1 / -1;align-self:center;}
+  body.tab .wrrow{flex-direction:column;}
+  body.tab .wrprize{justify-content:flex-start;}
+  body.tab .wrbanner{white-space:normal;word-break:keep-all;text-align:left;justify-content:flex-start;}
+  body.tab .wrhead{flex-wrap:wrap;}
+  body.tab .wrhead .t1{white-space:normal;}
 }
 </style>
 
@@ -3531,7 +3585,9 @@ const S = {
      rkEnd   결과 화면 {win, stars, items[]}
      rkStep  마지막 로켓단 이후 몇 걸음 걸었나 (너무 자주 나오지 않게) */
   rk:null, rkPick:null, rkEnd:null, rkStep:0,
-  rkWin:0                // 지금까지 로켓단을 몇 번 이겼나 (이건 저장합니다 — 자랑거리)
+  rkWin:0,               // 지금까지 로켓단을 몇 번 이겼나 (이건 저장합니다 — 자랑거리)
+  /* 21차 A4: 글자(음절)마다 숙련도 {lv:0~2, ok, miss, s, t} — 저장합니다 */
+  wrm:{}
 };
 const RK_MIN_DEX  = 8;    /* 도감 8마리부터 로켓단이 나타납니다 */
 const RK_TEAM_MAX = 3;    /* 팀은 세 마리까지 */
@@ -3556,7 +3612,9 @@ function save(){
              /* 11차: 커리큘럼 단계 · 약점 기억 */
              learn:S.learn,
              /* 15차: 로켓단을 몇 번 이겼나. 이 값이 없는 옛 저장도 그대로 열립니다 */
-             rkWin:S.rkWin};
+             rkWin:S.rkWin,
+             /* 21차 A4: 글자 숙련도 */
+             wrm:S.wrm};
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(d)); }catch(e){ memoryStore = d; }
 }
 function load(){
@@ -3606,6 +3664,8 @@ function load(){
   /* 15차: 로켓단 — 배틀 자체는 저장하지 않고, 이긴 횟수만 남깁니다 */
   S.rkWin = (typeof d.rkWin === 'number' && isFinite(d.rkWin) && d.rkWin > 0) ? Math.floor(d.rkWin) : 0;
   S.rk = null; S.rkPick = null; S.rkEnd = null; S.rkStep = 0;
+  /* 21차 A4: 글자 숙련도 — 이상한 값은 조용히 버립니다 */
+  S.wrm = saneWrm(d.wrm);
   /* 6차: 쓰러짐(ko)은 S.mons 안에 같이 저장됩니다.
      체력이 이상하게 저장돼 있어도 아이가 갇히지 않게 여기서 바로잡습니다 */
   S.swapping = false; S.reviveTarget = null; S.reviveGot = 0;
@@ -3636,6 +3696,7 @@ function wipe(){
   S.stars = 0; S.lastStars = 0; S.evoWas = null; S.evoing = false;
   S.swapping = false; S.reviveTarget = null; S.reviveGot = 0;
   S.rk = null; S.rkPick = null; S.rkEnd = null; S.rkStep = 0; S.rkWin = 0;
+  S.wrm = {};
 }
 
 /* =========================================================
@@ -4103,6 +4164,29 @@ function setOf(){
   if(!S.learn.set) S.learn.set = freshSet();
   return S.learn.set;
 }
+/* =========================================================
+   21차 A1: 기기별 설정 — 게임 저장(SAVE_KEY)과 **따로** 둡니다.
+   21-C 에서 기록을 다른 기기로 옮겨도 태블릿 모드가 폰으로 따라가면 안 되기 때문입니다.
+     tab : 태블릿 모드 (S펜 쓰기 · 큰 캔버스 · 숙련도별 가이드). 화면 크기로 자동 판단하지 않습니다
+     cw  : 잡을 때마다 글자 쓰기. null 이면 "태블릿 모드를 따라감" (태블릿이면 켬)
+   ========================================================= */
+const DEV_KEY = 'hajun-device';
+const DEV = {tab:false, cw:null};
+function devLoad(){
+  try{
+    const d = JSON.parse(localStorage.getItem(DEV_KEY) || 'null');
+    if(d && typeof d === 'object'){
+      DEV.tab = d.tab === true;
+      DEV.cw = (d.cw === 0 || d.cw === 1) ? d.cw : null;
+    }
+  }catch(e){}
+}
+function devSave(){ try{ localStorage.setItem(DEV_KEY, JSON.stringify({tab:DEV.tab, cw:DEV.cw})); }catch(e){} }
+function tabOn(){ return DEV.tab === true; }
+function cwOn(){ return DEV.cw == null ? tabOn() : DEV.cw === 1; }
+function devApply(){ try{ document.body.classList.toggle('tab', tabOn()); }catch(e){} }
+devLoad();
+
 function battleMul(){ return SET_BATTLE[setOf().battle] || SET_BATTLE[1]; }
 function wantAdj(){ return setOf().want; }
 function weakShare(){ return (SET_WEAK[setOf().weak] || SET_WEAK[1]).p; }
@@ -4314,6 +4398,7 @@ function render(){
   voiceBtn.classList.toggle('off', !S.voice);
   /* 필드에 진화 칸이 붙는 동안에는 지도를 조금 줄여서 스크롤이 안 생기게 */
   appEl.classList.toggle('evoslot', S.screen === 'field' && S.partner != null && evoNext() != null);
+  appEl.classList.toggle('wrscr', S.screen === 'write');   /* 21차: 태블릿에서만 쓰기 화면을 넓힙니다 (CSS 가 body.tab 아래에만 있음) */
 
   const V = {
     title:  ['하준아 포켓몬 잡으러 가자!', viewTitle],
@@ -4352,6 +4437,9 @@ function viewTitle(){
     <p class="sub">읽고, 만나고, 잡아요</p>
     ${/* 18차: 어른 설정 — 아이 동선(▶ 이어서)에서 벗어난 구석. 눌러도 덧셈 문제를 지나야 열립니다 */''}
     <button class="setgear" data-act="settings" aria-label="어른 설정">⚙️</button>
+    ${/* 21차 A1: 태블릿 모드 — 맞은편 구석. 켜졌는지 한눈에 보이게 노란색 + "켜짐" */''}
+    <button class="tabtog${tabOn() ? ' on' : ''}" data-act="tabtog" aria-pressed="${tabOn()}"
+      aria-label="태블릿 모드">✏️ 태블릿<b>${tabOn() ? '켜짐' : '꺼짐'}</b></button>
   </div>
   ${has ? `
   <div class="start-row">
@@ -4799,6 +4887,27 @@ function segHtml(kind, list, cur, cols){
 }
 const SET_STAGE_OPTS = [{v:0,t:'자동'},{v:1,t:'1'},{v:2,t:'2'},{v:3,t:'3'},{v:4,t:'4'},{v:5,t:'5'},{v:6,t:'6'}];
 
+/* 21차 A1 · A4: 태블릿 모드 · 잡을 때 글자 쓰기 (이 기기에만 저장) + 다 배운 글자 / 연습 중 글자 */
+function setWriteCard(){
+  const all = Object.keys(S.wrm || {}).map(ch => Object.assign({ch:ch}, S.wrm[ch]));
+  const done = all.filter(r => r.lv >= 2).sort((a,b)=> (b.t||0) - (a.t||0));
+  const prac = all.filter(r => r.lv < 2).sort((a,b)=> (b.miss - a.miss) || (a.lv - b.lv) || ((b.t||0) - (a.t||0)));
+  const chips = (list, prac) => list.slice(0, 48).map(r =>
+    `<span class="${prac ? `lv${r.lv}` : ''}" title="${r.ok}번 성공 · ${r.miss}번 틀림">${r.ch}${prac && r.miss ? `<small>${r.miss}</small>` : ''}</span>`).join('');
+  return `<div class="setcard">
+      <div class="sethd">✏️ 태블릿 · 글씨 (이 기기에만 저장)</div>
+      <div class="setlab">📱 태블릿 모드<small>S펜으로 크게 쓰기 · 손바닥은 무시 · 글자마다 가이드를 줄여 갑니다</small></div>
+      ${segHtml('tab', [{v:1,t:'켜기'},{v:0,t:'끄기'}], tabOn() ? 1 : 0, 2)}
+      <div class="setlab">⚪ 잡을 때마다 글자 쓰기<small>퀴즈를 맞히면 볼을 던지기 전에 포켓몬 이름의 한 글자를 씁니다. 다 쓰면 반드시 잡힙니다${DEV.cw == null ? ' (지금: 태블릿 모드를 따라감)' : ''}</small></div>
+      ${segHtml('cw', [{v:1,t:'켜기'},{v:0,t:'끄기'}], cwOn() ? 1 : 0, 2)}
+      <div class="setline">써 본 글자 <span class="r">${all.length}자 · 다 배움 ${done.length}자</span></div>
+      <div class="setlab">🏅 다 배운 글자<small>혼자서 도움 없이 두 번 쓴 글자</small></div>
+      ${done.length ? `<div class="setjamo">${chips(done, false)}</div>` : `<div class="setnote">아직 없어요</div>`}
+      <div class="setlab">✏️ 연습 중 글자<small>자주 틀린 순 · 작은 숫자는 틀린 횟수</small></div>
+      ${prac.length ? `<div class="setjamo">${chips(prac, true)}</div>` : `<div class="setnote">아직 없어요</div>`}
+    </div>`;
+}
+
 function viewSet(){
   if(!S.learn) S.learn = freshLearn();
   const L = S.learn, st = setOf();
@@ -4857,6 +4966,7 @@ function viewSet(){
       <div class="setnote">⚠️ 어떻게 맞춰도 두 번 연달아 헤매면 저절로 제일 쉬운 문제가 나옵니다.
       틀려도 체력이 줄거나 잃는 것은 없습니다.</div>
     </div>
+    ${setWriteCard()}
   </div>
   <div class="setrow">
     <button class="btn btn-white" data-act="setreset">↩️ 자동으로</button>
@@ -9131,6 +9241,8 @@ function quizDone(){
   if(q && q.mode === 'revive'){ reviveGood(); return; }
   /* 10차: 메가·필살기 게이트 — 맞히면 그 행동이 발동합니다 */
   if(q && (q.purpose === 'mega' || q.purpose === 'ult' || q.purpose === 'boost')){ runAction(q.purpose); return; }
+  /* 21차 A5: 잡을 때마다 글자 쓰기 — 볼을 던지기 직전에 한 글자 */
+  if(cwWant(q)){ cwOpen(); return; }
   doCatch();
 }
 
@@ -9150,6 +9262,7 @@ function escapeChance(){
   const w = S.wild;
   if(!w) return 0;
   if(w.escapes >= CATCH_GUARANTEE) return 0;      /* 두 번 나왔다 — 이번엔 반드시 잡힙니다 */
+  if(w.sure) return 0;                            /* 21차 A5: 글자를 다 썼다 — 반드시 잡힙니다 */
   const tough = foeTough(w.mi);                   /* 0~8 — 잉어킹 0에 가깝고 전설은 8 */
   const hpLeft = w.max ? Math.max(0, w.hp) / w.max : 1;
   let p = 0.012 + tough * 0.030;                  /* 센 놈일수록 잘 빠져나옵니다 */
@@ -9565,9 +9678,13 @@ function glyphStrokes(ch){
   }
   const cls = jungClass(JUNG_L[d.jung]);
   const B = wrBoxes(cls, d.jong);
-  wrPut(CHO_L[d.cho],  B.cho,  out);
-  wrPut(JUNG_L[d.jung], B.jung, out);
-  if(d.jong) wrPut(JONG_L[d.jong], B.jong, out);
+  /* 21차 A3: 획마다 어느 칸(초·중·종)에 속하는지 꼬리표를 붙입니다 — 태블릿에서 "지금 쓸 칸" 만 밝힙니다 */
+  const tag = (part, from) => { for(let i=from;i<out.length;i++){ out[i].part = part; out[i].box = B[part]; } };
+  let n0 = out.length;
+  wrPut(CHO_L[d.cho],  B.cho,  out);  tag('cho', n0);  n0 = out.length;
+  wrPut(JUNG_L[d.jung], B.jung, out); tag('jung', n0); n0 = out.length;
+  if(d.jong){ wrPut(JONG_L[d.jong], B.jong, out); tag('jong', n0); }
+  out.boxes = B;
   return out;
 }
 /* 그 글자를 쓸 수 있나 — 획 데이터가 하나라도 나오면 씁니다 */
@@ -9653,7 +9770,10 @@ function judgeStroke(raw, t, size){
    17차 ③  캔버스 · 손가락 입력 · 3단 안전망
    ========================================================= */
 const WR = {cv:null, ctx:null, size:280, tmpl:[], drawn:[], cur:[],
-            drawing:false, ghost:null, cheer:0, token:0, raf:0};
+            drawing:false, ghost:null, cheer:0, token:0, raf:0,
+            /* 21차: pid 지금 따라가는 포인터 · penSeen 펜이 들어왔나(펜 잠금) · demo 시범 · fb 틀림 알림
+               hint 초록 시작점 · auto 유령 손이 그리는 중 · lastAct 마지막 입력(멈춤 재기) */
+            pid:null, ptype:'', penSeen:false, demo:null, fb:null, hint:null, auto:0, autoTok:0, lastAct:0};
 
 const WR_INK  = '#26331F';   /* 다 쓴 획 */
 const WR_NOW  = '#57BADF';   /* 지금 쓸 획 (안내선) */
@@ -9675,6 +9795,114 @@ function wrLive(){ return !!S.wrb || S.screen === 'write'; }
 /* ---------- 무엇을 쓸까 ---------- */
 let WR_RECENT = [];
 function wrNote(ch){ WR_RECENT.unshift(ch); if(WR_RECENT.length > 8) WR_RECENT.length = 8; }
+
+/* =========================================================
+   21차 A4: 글자(음절)마다 숙련도 — S.wrm[ch] = {lv, ok, miss, s, t}
+     lv 0  처음·최근 틀림 → (태블릿) 시범 → 흐린 글자 위에 따라 쓰기
+     lv 1  따라 쓰기 성공 → (태블릿) 가이드 없는 빈 칸. 4초 멈추면 시작점·화살표만 살짝
+     lv 2  혼자(빈 칸에서 도움 없이) 2번 성공 → 다 배운 글자
+     ok   깔끔하게(틀림 없이) 끝낸 횟수   miss 틀린 적이 있던 횟수
+     s    빈 칸에서 도움 없이 연달아 성공한 횟수 (lv1 → lv2 기준)   t 마지막으로 쓴 때
+   혼자 쓰다 틀리면 조용히 lv 0 — 아이에게는 아무 말도, 아무 소리도 없습니다.
+   폰(태블릿 모드 꺼짐)은 언제나 따라 쓰기라서 lv 0 → 1 까지만 올라갑니다.
+   ========================================================= */
+const WRM_SOLO = 2;
+function saneWrm(d){
+  const out = {};
+  if(!d || typeof d !== 'object') return out;
+  const num = v => (typeof v === 'number' && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+  Object.keys(d).forEach(ch=>{
+    const r = d[ch];
+    if(!r || typeof r !== 'object' || ch.length !== 1 || !decomp(ch)) return;
+    out[ch] = {lv:Math.min(2, num(r.lv)), ok:num(r.ok), miss:num(r.miss), s:num(r.s), t:num(r.t)};
+  });
+  return out;
+}
+function wrmOf(ch){ const r = S.wrm && S.wrm[ch]; return r ? r.lv : 0; }
+/* 한 글자를 다 쓴 결과로 숙련도를 옮깁니다 (순수 함수 — node 로 시험합니다).
+   o = {guide:'trace'|'blank', miss:틀린 획이 있었나, help:힌트·보여줘를 받았나,
+        auto:유령 손이 대신 그어 준 획이 있나(세 번 막힘 · 🤝 같이 쓰기)} */
+function wrmApply(rec, o, now){
+  const r = rec ? Object.assign({lv:0, ok:0, miss:0, s:0, t:0}, rec) : {lv:0, ok:0, miss:0, s:0, t:0};
+  r.t = now || Date.now();
+  if(o.miss) r.miss++;
+  if(o.miss || o.auto){
+    if(o.guide === 'blank'){ r.lv = 0; r.s = 0; }          /* 혼자 쓰다 틀림·막힘 → 다시 시범부터 (조용히) */
+    return r;
+  }
+  r.ok++;
+  if(o.guide === 'trace'){
+    if(r.lv === 0){ r.lv = 1; r.s = 0; }
+    return r;
+  }
+  if(!o.help){
+    r.s++;
+    if(r.lv >= 1 && r.s >= WRM_SOLO) r.lv = 2;
+  }
+  return r;
+}
+/* ★ 글자 하나를 끝까지 썼을 때 **한 번만** 불립니다 (연습 화면 · 배틀 쓰기 · 잡을 때 쓰기 모두).
+   21-B(도장)는 여기에 붙이면 됩니다:
+     info.clean   도움 없이(시범·힌트·보여줘·틀림 없이) 빈 칸에서 완벽 → 도장 2개 자리
+     info.perfect 틀림 없이 끝냄 (가이드는 있었을 수 있음)
+     info.purpose 'practice' | 'ult' | 'catch' | 'cw' */
+const WR_DONE_HOOKS = [];
+function wrLetterDone(w){
+  if(!w || w.recorded) return null;
+  w.recorded = true;
+  const guide = w.guide || 'trace';
+  const miss = !w.clean;
+  const auto = !!w.forced;
+  const help = !!w.helped || auto;
+  const info = {ch:w.ch, kind:w.kind, guide:guide, miss:miss, help:help,
+                auto:auto, perfect:(!miss && !auto), clean:(guide === 'blank' && !miss && !help),
+                purpose:w.bat ? w.purpose : 'practice'};
+  if(w.kind === 'syl' && decomp(w.ch)){
+    if(!S.wrm) S.wrm = {};
+    info.before = wrmOf(w.ch);
+    S.wrm[w.ch] = wrmApply(S.wrm[w.ch], {guide:guide, miss:miss, help:help, auto:auto});
+    info.after = S.wrm[w.ch].lv;
+  }
+  WR_DONE_HOOKS.forEach(f=>{ try{ f(info); }catch(e){} });
+  return info;
+}
+
+/* 21차 A5: 잡을 때 쓸 글자 — 잡는 포켓몬 이름에서 한 글자.
+   lv 0·1(안 써 본 글자 포함)을 먼저, 최근에 쓴 글자는 피합니다.
+   5번에 1번쯤은 이름에 없는 글자(받침 글자 등)를 낱말 990개에서 섞어 모든 글자를 골고루 */
+const CW_OTHER = 0.2;
+function cwRank(ch){ return (wrmOf(ch) < 2 ? 0 : 2) + (WR_RECENT.indexOf(ch) >= 0 ? 1 : 0); }
+function cwBest(list){
+  if(!list.length) return null;
+  let best = 9; list.forEach(c=>{ best = Math.min(best, cwRank(c)); });
+  return pick(list.filter(c => cwRank(c) === best));
+}
+function cwOtherPick(name, rnd){
+  const rr = rnd || Math.random;
+  const pool = WORD_ALL.length ? WORD_ALL : [];
+  let fall = null;
+  for(let k=0;k<60;k++){
+    const w = pool[Math.floor(rr()*pool.length)];
+    if(!w) continue;
+    const cs = w.n.split('').filter(c => decomp(c) && String(name || '').indexOf(c) < 0 && canWrite(c));
+    if(!cs.length) continue;
+    const good = cs.filter(c => cwRank(c) === 0);
+    if(good.length) return {ch:pick(good), word:w.n, emoji:w.emoji, fromName:false};
+    if(!fall) fall = {ch:pick(cs), word:w.n, emoji:w.emoji, fromName:false};
+  }
+  return fall;
+}
+function cwPick(name, rnd){
+  const rr = rnd || Math.random;
+  const nm = String(name || '');
+  const own = nm.split('').filter((c,i,a) => decomp(c) && a.indexOf(c) === i && canWrite(c));
+  if(!own.length || rr() < CW_OTHER){
+    const o = cwOtherPick(nm, rr);
+    if(o) return o;
+  }
+  if(own.length) return {ch:cwBest(own), word:nm, emoji:'', fromName:true};
+  return {ch:'가', word:'가방', emoji:'🎒', fromName:false};      /* 이름도 낱말도 없을 때 (거의 안 옵니다) */
+}
 
 /* 19차 C: 어떤 자모를 이미 한 번 써 봤나 (이번에 켠 동안만 기억합니다).
    같은 자모로 계속 워밍업하면 결국 낱자만 쓰게 되므로 한 번이면 충분합니다 */
@@ -9744,7 +9972,22 @@ function wrNewTarget(){
   wrNote(w.ch);
   WR.tmpl = glyphStrokes(w.ch); WR.tmpl.glyph = w.ch;
   WR.drawn = []; WR.cur = []; WR.ghost = null;
+  wrPrep(w);
   return w;
+}
+/* 21차 A4: 새 글자를 시작할 때마다 — 이번에 어떤 가이드로 쓸지 정합니다.
+   태블릿 모드가 아니면 언제나 'trace'(지금까지의 방식) 이고 화면도 그대로입니다 */
+function wrGuideOf(w){
+  if(!tabOn() || !w || w.kind !== 'syl' || !decomp(w.ch)) return 'trace';
+  return wrmOf(w.ch) >= 1 ? 'blank' : 'trace';
+}
+function wrPrep(w){
+  w.guide = wrGuideOf(w);
+  w.helped = false; w.recorded = false; w.forced = false; w.stuck = 0;
+  /* lv 0 이면 시범부터 (약 2초). 펜을 대는 순간 끝납니다 */
+  WR.demo = (tabOn() && w.kind === 'syl' && w.guide === 'trace' && wrmOf(w.ch) === 0) ? {t0:0} : null;
+  WR.fb = null; WR.hint = null; WR.auto = 0;
+  WR.lastAct = (typeof performance !== 'undefined') ? performance.now() : 0;
 }
 /* 화면과 획 데이터가 어긋나지 않게 (되돌아오기·다시 그리기 대비) */
 function wrSync(){
@@ -9753,6 +9996,7 @@ function wrSync(){
     WR.tmpl = glyphStrokes(w.ch); WR.tmpl.glyph = w.ch;
     WR.drawn = []; WR.cur = []; WR.ghost = null;
     w.si = 0; w.fail = 0; w.done = false; w.clean = true;
+    wrPrep(w);
   }
   return w;
 }
@@ -9867,16 +10111,56 @@ function starPop(n){
   return got;
 }
 
-function wrbOpen(purpose){
-  const t = wrbTarget();
+function wrbOpen(purpose, tgt){
+  const t = tgt || wrbTarget();
   S.wrb = {bat:true, purpose:purpose, ch:t.ch, kind:t.kind, word:t.word, emoji:t.emoji,
            si:0, fail:0, done:false, clean:true, forced:false, tip:''};
+  if(t.mon) S.wrb.mon = t.mon;
   WR.tmpl = glyphStrokes(t.ch); WR.tmpl.glyph = t.ch;
   WR.drawn = []; WR.cur = []; WR.ghost = null;
+  wrPrep(S.wrb);
   lock(0);
   SFX.open(); render();
-  say(purpose === 'ult' ? `필살기! ${t.ch}, 손가락으로 써 봐!` : `${t.ch}, 손가락으로 써 보자!`,
+  if(purpose === 'cw'){ say(t.say || `${t.ch}, 써 볼까?`, {rate:0.82}); return; }
+  say(purpose === 'ult' ? `필살기! ${t.ch}, ${wrTool()}으로 써 봐!` : `${t.ch}, ${wrTool()}으로 써 보자!`,
       {rate:0.82});
+}
+/* 21차: 태블릿 모드면 "펜", 아니면 지금까지처럼 "손가락" (둘 다 받침이 있어 '으로') */
+function wrTool(){ return tabOn() ? '펜' : '손가락'; }
+
+/* =========================================================
+   21차 A5: 잡을 때마다 한 글자 — 퀴즈를 맞히고 볼을 던지기 직전에 덮입니다.
+   ★ 다 쓰면 볼이 날아가서 **반드시** 잡힙니다 (S.wild.sure).
+   ★ 갇힘 0: 세 번 막히면 유령 손이 대신 그려 주고, 🤝 같이 쓰기 버튼은 언제나 한 획을 같이 그어 줍니다.
+     어떤 길로 덮개가 닫혀도(wrbOut) 손해 없이 그대로 잡힙니다.
+   ========================================================= */
+function cwWant(q){
+  if(!cwOn() || !S.wild || S.rk) return false;
+  if(q && (q.mode === 'revive' || q.purpose)) return false;
+  if(S.wild.cwDone) return false;               /* 이 포켓몬은 이미 한 글자 썼다 (볼에서 나왔다가 다시 던질 때) */
+  return true;
+}
+function cwOpen(){
+  const m = MONS[S.wild.mi];
+  const t = cwPick(m.n);
+  S.wild.cwDone = true;
+  S.quiz = null;
+  S.screen = 'battle'; S.turn = 'me'; S.acting = false;
+  const eul = josa(m.n,['을','를']);
+  const tg = {ch:t.ch, kind:'syl', word:t.word, emoji:t.emoji, mon:m.n};
+  tg.say = t.fromName ? `${m.n}${eul} 잡자! ${t.ch}, 써 볼까?`
+                      : `${m.n}${eul} 잡자! ${t.word}의 ${t.ch}, 써 볼까?`;
+  wrNote(t.ch);
+  wrbOpen('cw', tg);
+}
+/* 🤝 같이 쓰기 — 지금 획을 유령 손이 그어 주고 넘어갑니다 (쓰기를 건너뛰지는 않습니다) */
+function wrHelpStroke(){
+  const w = wrState();
+  if(!w || w.done || WR.auto) return;
+  w.helped = true;
+  w.tip = '같이 그어 보자! ✍️';
+  wrAutoStroke();
+  wrDots();
 }
 
 function wrbPanel(){
@@ -9887,12 +10171,19 @@ function wrbPanel(){
     `<i class="${i < w.si ? 'done' : (i === w.si && !w.done ? 'now' : '')}"></i>`).join('');
   const t1 = (w.kind === 'syl' && w.word) ? `「${w.word}」 의 ${w.ch}` : '한글 낱자를 써 보자!';
   const ult = (w.purpose === 'ult');
-  const banner = ult ? '💥 글자를 쓰면 필살기가 나간다!' : '✏️ 글자를 쓰면 잡을 수 있어!';
+  const cw = (w.purpose === 'cw');            /* 21차 A5: 잡을 때마다 한 글자 */
+  const banner = ult ? '💥 글자를 쓰면 필살기가 나간다!'
+               : cw  ? '✏️ 다 쓰면 볼을 던져서 꼭 잡아!' : '✏️ 글자를 쓰면 잡을 수 있어!';
   const prize = ult
     ? `<span class="hot">한 번에 ⚡2배 ⭐+3</span><span>도와주면 1.5배</span><span>못 써도 발동</span>`
+    : cw
+    ? `<span class="hot">다 쓰면 꼭 잡혀!</span><span>한 번에 ⭐+3</span><span>같이 써도 ⭐+1</span>`
     : `<span class="hot">한 번에 ⭐+3</span><span>도와주면 ⭐+2</span><span>못 써도 던져</span>`;
+  /* 21차: 잡을 때 쓰기에는 나가는 버튼 대신 🤝 같이 쓰기 — 언제나 끝까지 갈 수 있고, 끝나면 반드시 잡힙니다 */
   const outBtn = ult
     ? `<button class="btn btn-white" data-act="wrbout"><span class="e">🚪</span>나가기</button>`
+    : cw
+    ? `<button class="btn btn-yellow" data-act="wrhelp"><span class="e">🤝</span>같이 쓰기</button>`
     : `<button class="btn btn-white" data-act="wrbout"><span class="e">🔙</span>다른 문제</button>`;
   const skipBtn = ult
     ? `<button class="btn btn-yellow" data-act="wrbskip"><span class="e">⚡</span>그냥 쏘기</button>` : '';
@@ -9940,6 +10231,8 @@ function wrbDone(){
   if(S.learn) S.learn.q = (S.learn.q || 0) + 1;
   save();
   const mine = w;
+  /* 21차 A5: 잡을 때 쓰기를 끝냈다 — 이번 볼은 반드시 잡힙니다 */
+  if(w.purpose === 'cw' && S.wild) S.wild.sure = true;
   setTimeout(()=>{
     if(S.wrb !== mine) return;                 /* 그 사이 나갔으면 아무 일도 안 합니다 */
     S.wrb = null;
@@ -9949,6 +10242,7 @@ function wrbDone(){
 }
 /* 쓰기로 낸 포획 문제를 맞혔다 — 곧바로 볼을 던집니다 */
 function wrbToCatch(){
+  WR.auto = 0; WR.drawing = false; WR.pid = null;
   S.ultBoost = 0;
   if(!S.wild){ S.screen = 'field'; SFX.open(); render(); return; }
   S.screen = 'battle'; S.turn = 'me'; S.acting = false;
@@ -9971,7 +10265,13 @@ function wrbOut(){
   if(!w) return;
   S.wrb = null;
   S.ultBoost = 0;
-  WR.ghost = null; WR.cur = []; WR.drawing = false;
+  WR.ghost = null; WR.cur = []; WR.drawing = false; WR.pid = null; WR.auto = 0;
+  /* 21차 A5: 잡을 때 쓰기는 어떻게 닫혀도 손해 없이 그대로 잡힙니다 */
+  if(w.purpose === 'cw'){
+    if(S.wild) S.wild.sure = true;
+    wrbToCatch();
+    return;
+  }
   if(w.purpose === 'catch' && S.wild){
     S.screen = 'battle'; S.turn = 'me'; S.acting = false;
     lock(0); SFX.open(); render();
@@ -9992,6 +10292,7 @@ function wrbOut(){
    (정사각을 유지해야 글자가 안 찌그러집니다) */
 const WR_MAX = 400;   /* 한 변 최대 px — 이보다 커지면 손이 안 닿습니다 */
 const WR_MIN = 150;   /* 한 변 최소 px — 320×568 에서도 이 아래로는 안 내려갑니다 */
+const WR_TAB_SIDE = 290;   /* 21차: 태블릿 가로 화면의 왼쪽 버튼 줄 폭 (CSS body.tab .wrwrap 과 같은 값) */
 function wrFitPaper(){
   const paper = document.querySelector('.wrpaper');
   if(!paper || !paper.parentElement) return 0;
@@ -10010,6 +10311,23 @@ function wrFitPaper(){
   const availH = wrap.clientHeight - used - gap*Math.max(0, kids-1)
                - (parseFloat(cs.paddingTop)||0) - (parseFloat(cs.paddingBottom)||0);
   const availW = wrap.clientWidth - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0);
+  /* 21차 A3: 태블릿 — 짧은 변의 80% 까지 크게. 가로 화면이면 버튼들이 왼쪽 줄로 비켜서 세로를 다 씁니다 */
+  if(tabOn()){
+    const tabMax = Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.8);
+    let s2;
+    if(cs.display === 'grid'){
+      const colGap = parseFloat(cs.columnGap) || 0;
+      const fullH = wrap.clientHeight - (parseFloat(cs.paddingTop)||0) - (parseFloat(cs.paddingBottom)||0);
+      s2 = Math.min(availW - WR_TAB_SIDE - colGap, fullH, tabMax);
+    }else{
+      s2 = Math.min(availW, availH, tabMax);
+    }
+    if(!(s2 > 0)) s2 = WR_MIN;
+    s2 = Math.max(WR_MIN, Math.floor(s2));
+    paper.style.width = s2 + 'px';
+    paper.style.height = s2 + 'px';
+    return s2;
+  }
   let side = Math.min(availW, availH, WR_MAX);
   if(!(side > 0)) side = WR_MIN;
   side = Math.max(WR_MIN, Math.floor(side));
@@ -10045,24 +10363,53 @@ function wrMount(){
     return [(e.clientX-b.left) * (k/(b.width||k)),
             (e.clientY-b.top)  * (k/(b.height||k))];
   };
+  /* 21차 A2: 손바닥을 대고 써도 획이 안 끊기게 —
+     · 한 획 도중에는 **처음 잡은 pointerId 하나만** 따라갑니다. 다른 포인터의 down/move/up/leave/cancel 은 무시
+       (예전에는 다른 손가락의 pointerleave·cancel 이 긋던 획을 끊을 수 있었습니다)
+     · 태블릿 모드에서 펜이 한 번이라도 들어오면 그 뒤로는 touch 포인터를 캔버스에서 무시 (펜 잠금)
+     · 펜 버튼(지우개·옆 버튼)을 누른 채 댄 것과 호버(누르지 않고 움직임)는 무시
+     태블릿 모드가 아니면 손가락은 지금처럼 그대로 씁니다 (한 손가락만 따라가는 것만 같음) */
+  const take = (e, p0) => {
+    const last = WR.cur[WR.cur.length-1];
+    if(!last || wrDist(p0,last) >= 2.5) WR.cur.push(p0);
+  };
   const down = e => {
-    if(w.done) return;
-    /* 유령 획이 도는 중에도 바로 그릴 수 있게 — 기다리게 하면 6살은 답답합니다 */
+    const pen = e.pointerType === 'pen';
+    if(pen && tabOn()) WR.penSeen = true;
+    if(tabOn() && WR.penSeen && e.pointerType === 'touch'){ e.preventDefault(); return; }   /* 손바닥 */
+    if(e.button > 0) return;                     /* 펜 옆 버튼 · 지우개 · 마우스 오른쪽 */
+    if(WR.drawing){
+      if(e.pointerId === WR.pid) return;
+      /* 손바닥이 먼저 닿아 획이 시작된 뒤에 펜이 왔다 → 손바닥 획은 조용히 버리고 펜으로 */
+      /* 단, 먼저 잡은 포인터가 한참(0.8초) 아무 소식이 없으면 놓친 것으로 보고 새로 시작합니다 (갇힘 0) */
+      const stale = performance.now() - (WR.lastAct || 0) > 800;
+      if(!(pen && tabOn() && WR.ptype === 'touch') && !stale){ e.preventDefault(); return; }
+    }
+    if(w.done || WR.auto) return;
+    /* 유령 획·시범이 도는 중에도 바로 그릴 수 있게 — 기다리게 하면 6살은 답답합니다 */
     if(WR.ghost) WR.ghost = null;
+    if(WR.demo){ WR.demo = null; wrDots(); }
     e.preventDefault();
-    WR.drawing = true; WR.cur = [pt(e)];
+    WR.drawing = true; WR.pid = e.pointerId; WR.ptype = e.pointerType || 'mouse';
+    WR.cur = [pt(e)];
+    WR.lastAct = performance.now();
     try{ cv.setPointerCapture(e.pointerId); }catch(err){}
   };
   const move = e => {
-    if(!WR.drawing) return;
+    if(!WR.drawing || e.pointerId !== WR.pid) return;
     e.preventDefault();
-    const p = pt(e), last = WR.cur[WR.cur.length-1];
-    if(!last || wrDist(p,last) >= 2.5) WR.cur.push(p);
+    /* 펜은 한 프레임에 점이 여러 개 옵니다 — 모아 받으면 선이 매끄럽습니다 */
+    let list = null;
+    try{ list = (typeof e.getCoalescedEvents === 'function') ? e.getCoalescedEvents() : null; }catch(err){ list = null; }
+    if(list && list.length) list.forEach(ce => take(ce, pt(ce)));
+    else take(e, pt(e));
+    WR.lastAct = performance.now();
   };
   const up = e => {
-    if(!WR.drawing) return;
-    WR.drawing = false;
+    if(!WR.drawing || e.pointerId !== WR.pid) return;
+    WR.drawing = false; WR.pid = null;
     const got = WR.cur; WR.cur = [];
+    WR.lastAct = performance.now();
     wrEndStroke(got);
   };
   cv.addEventListener('pointerdown', down);
@@ -10108,10 +10455,64 @@ window.addEventListener('resize', ()=>{
 function wrEndStroke(raw){
   const w = wrState();
   const t = WR.tmpl[w.si];
-  if(!t || w.done) return;
+  if(!t || w.done || WR.auto) return;
+  const tp = wrScaled(t);
+  const res = judgeStroke(raw, tp, WR.size);
+  /* 21차 A4: 태블릿에서는 왜 틀렸는지(순서 · 방향)를 더 자세히 봅니다. 폰은 지금 그대로 */
+  if(tabOn()){ wrAfterJudgeTab(res === 'ok' || res === 'tiny' ? res : wrWhy(raw, res, w), raw); return; }
+  wrAfterJudge(res, raw);
+}
+function wrScaled(t){
   const tp = t.map(p=>[p[0]*WR.size, p[1]*WR.size]);
   tp.cell = t.cell;                       /* 칸 크기(관대함 기준)를 같이 넘깁니다 */
-  wrAfterJudge(judgeStroke(raw, tp, WR.size), raw);
+  return tp;
+}
+/* 21차 A4: 틀린 종류 — 'order'(다른 획을 먼저 그음) · 'rev'(거꾸로 그음) · 그 밖은 judgeStroke 결과 그대로 */
+function wrWhy(raw, res, w){
+  for(let j=w.si+1;j<WR.tmpl.length;j++){
+    if(judgeStroke(raw, wrScaled(WR.tmpl[j]), WR.size) === 'ok') return 'order';
+  }
+  const t = WR.tmpl[w.si];
+  if(t && !wrClosed(t) && judgeStroke(raw.slice().reverse(), wrScaled(t), WR.size) === 'ok') return 'rev';
+  return res;
+}
+/* 21차 A4: 태블릿 판정 처리 — 틀린 종류마다 다르게 알려 주고, 같은 획에서 세 번 막히면
+   유령 손이 그 획을 그려 주고 넘어갑니다 (막힘 없음). 벌·감점 문구는 없습니다 */
+function wrAfterJudgeTab(res, raw){
+  const w = wrState();
+  if(res === 'tiny'){ w.tip = `${wrTool()}으로 쭉 그어 봐!`; wrDots(); return; }
+  if(res === 'ok'){ wrPass(raw, false); return; }
+  w.fail++; w.clean = false; w.stuck = (w.stuck || 0) + 1;
+  const now = performance.now();
+  WR.fb = {kind:res, t0:now, raw:raw.slice()};
+  if(res === 'order'){
+    w.tip = '이거 먼저! 👉';
+  }else{
+    WR.hint = {si:w.si};                       /* 초록 시작점 + 화살표 — 다음 획을 그을 때까지 남습니다 */
+    w.tip = (res === 'rev' || res === 'start') ? '여기서 시작! 🟢' : '여기서 시작해서 이쪽으로! 🟢';
+  }
+  tone(300,0.1,'sine',0.04);
+  if(w.stuck >= 3){ w.tip = '같이 그려 보자! ✍️'; wrAutoStroke(); }
+  else if(w.stuck === 2){ wrGhost(1200); }
+  wrDots();
+}
+/* 유령 손이 지금 획을 그려 주고 통과 — 그리는 동안(약 1초)만 기다립니다 */
+function wrAutoStroke(){
+  const w = wrState();
+  if(!w || w.done || WR.auto) return;
+  const my = ++WR.autoTok;
+  WR.auto = my;
+  const si = w.si, ch = w.ch;
+  WR.ghost = {t0: performance.now(), ms: 1000};
+  tone(520,0.12,'triangle',0.05);
+  setTimeout(()=>{
+    if(WR.auto !== my) return;
+    WR.auto = 0; WR.ghost = null;
+    const w2 = wrState();
+    if(!w2 || w2 !== w || w2.done || w2.si !== si || w2.ch !== ch) return;
+    w2.tip = '같이 그렸다! 잘했어! 🎉';
+    wrPass(null, true);
+  }, 1100);
 }
 /* 판정 결과 처리 — 실패해도 **절대 갇히지 않게** 3단으로 도와줍니다 */
 function wrAfterJudge(res, raw){
@@ -10143,6 +10544,8 @@ function wrPass(raw, auto){
   if(auto) w.forced = true;            /* 19차: 세 번 만에 같이 그려 준 획이 하나라도 있으면 표시 */
   WR.drawn.push({pts: (auto || !mine) ? t.slice() : mine, auto:!!auto});
   w.si++; w.fail = 0;
+  w.stuck = 0; WR.hint = null;                    /* 21차: 다음 획은 새로 셉니다 */
+  WR.lastAct = performance.now();
   if(!auto) w.tip = pick(['좋아!','잘했어!','바로 그거야!','멋지다!']);
   tone(auto ? 660 : 780, 0.1, 'triangle', 0.05);
   if(w.si >= WR.tmpl.length) wrDone();
@@ -10152,6 +10555,8 @@ function wrPass(raw, auto){
 function wrDone(){
   const w = wrState();
   w.done = true;
+  WR.auto = 0; WR.hint = null; WR.demo = null;
+  wrLetterDone(w);                     /* 21차: 숙련도 기록 (21-B 도장도 여기에 붙습니다) */
   /* 19차 A-1: 배틀 위 덮개면 여기서 갈라집니다 (필살기 발동 · 포획 문제) */
   if(w.bat){ wrbDone(); return; }
   const got = gainStars((w.kind === 'syl' ? 2 : 1) + (w.clean ? 1 : 0));
@@ -10187,6 +10592,12 @@ function wrDots(){
 function wrTipDefault(){
   const w = wrState();
   if(w.done) return '다 썼다! 🎉';
+  /* 21차: 태블릿 — 시범 중 · 혼자 쓰기(빈 칸) 문구 */
+  if(tabOn()){
+    if(WR.demo) return '잘 봐! 펜을 대면 바로 쓸 수 있어 👀';
+    if(w.guide === 'blank' && !(w.stuck >= 2)) return `혼자 써 볼까? ${w.si+1}번 획 ✏️`;
+    return `${w.si+1}번 획을 펜으로 그어 봐!`;
+  }
   return `${w.si+1}번 획을 손가락으로 그어 봐!`;
 }
 
@@ -10247,12 +10658,159 @@ function wrBadge(ctx, p, k, n, kind, r){
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(String(n), x, y+0.5);
 }
+/* =========================================================
+   21차 A3 · A4: 태블릿 모드 전용 그리기 (폰에서는 한 번도 불리지 않습니다)
+   ========================================================= */
+const WR_STALL_MS = 4000;      /* 빈 칸에서 이만큼 멈추면 시작점·화살표만 살짝 */
+function wrDemoMs(n){ return Math.max(1400, Math.min(2600, (n || 1) * 450)); }
+/* 매 프레임 — 시범 끝내기 · 멈춤(막힘) 재기 */
+function wrTabTick(w, now){
+  if(WR.demo){
+    if(!WR.demo.t0) WR.demo.t0 = now;
+    if(w.done || now - WR.demo.t0 > wrDemoMs(WR.tmpl.length) + 400){
+      WR.demo = null; WR.lastAct = now; wrDots();
+    }
+    return;
+  }
+  if(w.guide !== 'blank' || w.done || WR.drawing || WR.auto || WR.ghost) return;
+  if(now - (WR.lastAct || now) < WR_STALL_MS) return;
+  WR.lastAct = now;
+  w.stuck = (w.stuck || 0) + 1;
+  w.helped = true;                              /* 힌트를 받았다 — 21-B 도장 1개 자리 (벌 아님) */
+  WR.hint = {si:w.si};
+  w.tip = '여기서 시작해 볼까? 🟢';
+  if(w.stuck >= 3){ w.tip = '같이 그려 보자! ✍️'; wrAutoStroke(); }
+  wrDots();
+}
+/* 깍두기 공책 — 십자 점선 + 지금 쓸 칸(초·중·종)만 밝게, 나머지 칸은 흐리게 */
+function wrTabPaper(ctx, k, w){
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#B9C9D3'; ctx.lineWidth = 2.5; ctx.setLineDash([0.5, 10]);
+  ctx.beginPath();
+  ctx.moveTo(k/2,8); ctx.lineTo(k/2,k-8);
+  ctx.moveTo(8,k/2); ctx.lineTo(k-8,k/2);
+  ctx.stroke();
+  ctx.restore();
+  const B = WR.tmpl.boxes;
+  if(!B || w.done || WR.demo) return;
+  const cur = WR.tmpl[w.si] && WR.tmpl[w.si].part;
+  const pad = k*0.012;
+  const rect = b => [b[0]*k + pad, b[1]*k + pad, (b[2]-b[0])*k - pad*2, (b[3]-b[1])*k - pad*2];
+  const rr = (x,y,ww,hh,r) => {
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+ww-r,y); ctx.quadraticCurveTo(x+ww,y,x+ww,y+r);
+    ctx.lineTo(x+ww,y+hh-r); ctx.quadraticCurveTo(x+ww,y+hh,x+ww-r,y+hh);
+    ctx.lineTo(x+r,y+hh); ctx.quadraticCurveTo(x,y+hh,x,y+hh-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+  };
+  ctx.save();
+  ['cho','jung','jong'].forEach(part=>{
+    if(!B[part] || part === cur) return;
+    const r = rect(B[part]);
+    rr(r[0], r[1], r[2], r[3], k*0.03);
+    ctx.setLineDash([6,8]); ctx.lineWidth = 2; ctx.strokeStyle = '#E4EBEF'; ctx.stroke();
+  });
+  if(cur && B[cur]){
+    const r = rect(B[cur]);
+    rr(r[0], r[1], r[2], r[3], k*0.03);
+    ctx.fillStyle = 'rgba(255,214,90,0.16)'; ctx.fill();
+    ctx.setLineDash([]); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,190,40,0.85)'; ctx.stroke();
+  }
+  ctx.restore();
+}
+/* 유령 손 — 펜 끝이 (x,y) 에 오게 */
+function wrHand(ctx, x, y, bw){
+  const s = Math.round(bw*2.6);
+  ctx.save();
+  ctx.globalAlpha = 0.95;
+  ctx.font = `${s}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  ctx.fillText('✍️', x - s*0.12, y + s*0.22);
+  ctx.restore();
+}
+/* 시범 · 틀림 알림 · 초록 시작점 */
+function wrTabOver(ctx, k, w, now, bw){
+  /* 시범 — 획이 하나씩 그려집니다 (약 2초). 펜을 대면 바로 끝납니다 */
+  if(WR.demo && WR.demo.t0){
+    const n = WR.tmpl.length, per = wrDemoMs(n) / n, el = now - WR.demo.t0;
+    for(let i=0;i<n;i++){
+      const f = Math.max(0, Math.min(1, (el - i*per) / per));
+      if(f <= 0) break;
+      const seg = wrPartial(WR.tmpl[i], f);
+      if(seg.length < 2) continue;
+      ctx.save();
+      ctx.strokeStyle = '#F2679B'; ctx.globalAlpha = 0.85; ctx.lineWidth = bw;
+      wrPath(ctx, seg, k); ctx.stroke();
+      ctx.restore();
+      if(f < 1){ const hd = seg[seg.length-1]; wrHand(ctx, hd[0]*k, hd[1]*k, bw); }
+    }
+  }
+  /* 틀림 알림 — 쓴 획을 잠깐 빨갛게 → 사라짐. 순서 틀림이면 맞는 획이 깜빡 "이거 먼저!" */
+  if(WR.fb){
+    const age = now - WR.fb.t0;
+    if(age > 1600){ WR.fb = null; }
+    else{
+      const raw = WR.fb.raw;
+      if(age < 900 && raw && raw.length > 1){
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, 1 - age/900);
+        ctx.strokeStyle = '#E8412F'; ctx.lineWidth = bw;
+        ctx.beginPath(); ctx.moveTo(raw[0][0], raw[0][1]);
+        for(let i=1;i<raw.length;i++) ctx.lineTo(raw[i][0], raw[i][1]);
+        ctx.stroke();
+        ctx.restore();
+      }
+      if(WR.fb.kind === 'order' && !w.done && WR.tmpl[w.si]){
+        const t = WR.tmpl[w.si];
+        ctx.save();
+        ctx.globalAlpha = 0.35 + 0.6*(0.5 + 0.5*Math.sin(age/80));
+        ctx.strokeStyle = '#FFC93C'; ctx.lineWidth = bw*1.5;
+        wrPath(ctx, t, k); ctx.stroke();
+        ctx.restore();
+        wrArrow(ctx, t, k, '#F0A800');
+      }
+    }
+  }
+  /* 초록 시작점 + 화살표 — "여기서 시작!" (빈 칸이면 이것만 살짝 보입니다) */
+  if(WR.hint && WR.hint.si === w.si && !w.done && WR.tmpl[w.si]){
+    const t = WR.tmpl[w.si];
+    const pu = 0.5 + 0.5*Math.sin(now/220);
+    if(!wrClosed(t)){
+      const seg = wrPartial(t, 0.42);
+      if(seg.length > 1){
+        ctx.save();
+        ctx.globalAlpha = 0.75; ctx.strokeStyle = '#3DBE5A'; ctx.lineWidth = bw*0.55;
+        ctx.setLineDash([bw*0.6, bw*0.5]);
+        wrPath(ctx, seg, k); ctx.stroke();
+        ctx.restore();
+        wrArrow(ctx, seg, k, '#3DBE5A');
+      }
+    }
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(t[0][0]*k, t[0][1]*k, Math.max(9, k*0.03) + pu*Math.max(4, k*0.015), 0, Math.PI*2);
+    ctx.fillStyle = '#3DBE5A'; ctx.globalAlpha = 0.9; ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.stroke();
+    ctx.restore();
+  }
+}
+
 function wrPaint(){
   const ctx = WR.ctx, k = WR.size, w = wrState();
   if(!ctx) return;
   const now = performance.now();
   ctx.clearRect(0,0,k,k);
+  /* 21차: 태블릿 모드에서만 달라집니다. 폰(TB=false)은 한 줄도 바뀌지 않게 갈라 놓았습니다 */
+  const TB = tabOn();
+  if(TB) wrTabTick(w, now);
+  /* blank(lv1·2) 이면 밑그림·안내선·번호를 숨깁니다. 두 번 막히면 다시 보여 줍니다 */
+  const showGuide = !TB || (w.guide !== 'blank') || (w.stuck >= 2);
+  const demo = TB ? WR.demo : null;
 
+  if(TB){
+    wrTabPaper(ctx, k, w);
+  }else{
   /* 네모칸 안내선 (아주 흐리게) */
   ctx.save();
   ctx.strokeStyle = '#EEF3F6'; ctx.lineWidth = 2; ctx.setLineDash([7,7]);
@@ -10261,13 +10819,14 @@ function wrPaint(){
   ctx.moveTo(6,k/2); ctx.lineTo(k-6,k/2);
   ctx.stroke();
   ctx.restore();
+  }
 
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
   const bw = Math.max(9, k*0.05);       /* 획 굵기 */
 
   /* ① 아직 안 쓴 획 — 흐린 밑그림 */
   ctx.setLineDash([]);
-  for(let i=w.si+1;i<WR.tmpl.length;i++){
+  if(showGuide) for(let i=w.si+1;i<WR.tmpl.length;i++){
     ctx.strokeStyle = WR_SOFT; ctx.lineWidth = bw*0.8;
     wrPath(ctx, WR.tmpl[i], k); ctx.stroke();
   }
@@ -10284,6 +10843,7 @@ function wrPaint(){
   if(!w.done && w.si < WR.tmpl.length){
     const t = WR.tmpl[w.si];
     const strong = w.fail >= 1;                       /* 1회 실패하면 더 또렷하게 */
+    if(showGuide && !demo){
     ctx.save();
     ctx.setLineDash([bw*0.9, bw*0.85]);
     ctx.strokeStyle = strong ? '#3FA8D6' : WR_NOW;
@@ -10302,6 +10862,7 @@ function wrPaint(){
     ctx.fillStyle = strong ? '#FFC93C' : '#BFE9FA';
     ctx.fill();
     ctx.restore();
+    }
 
     /* 유령 획 — 템플릿이 스스로 그려지는 걸 보여 줍니다 (2회 실패 · 보여줘 버튼) */
     if(WR.ghost){
@@ -10316,6 +10877,7 @@ function wrPaint(){
         ctx.beginPath(); ctx.arc(h[0]*k, h[1]*k, bw*0.62, 0, Math.PI*2);
         ctx.fillStyle = '#fff'; ctx.fill();
         ctx.lineWidth = 3; ctx.strokeStyle = '#F2679B'; ctx.stroke();
+        if(TB) wrHand(ctx, h[0]*k, h[1]*k, bw);      /* 21차: 유령 손 */
       }
     }
   }
@@ -10331,6 +10893,8 @@ function wrPaint(){
 
   /* ⑤ 획 번호 — ① 어디서 시작해 어디로.
      ㅅ ㅈ ㅊ 처럼 시작점이 같은 획은 번호가 겹치므로 자기 획 위로 조금 밀어 줍니다 */
+  if(TB) wrTabOver(ctx, k, w, now, bw);
+  if(!showGuide || demo) return;
   const br = Math.max(10, k*0.048);
   const placed = [];
   for(let i=0;i<WR.tmpl.length;i++){
@@ -10495,7 +11059,15 @@ function act(a){
                    { const w = wrState(); say(w.kind === 'num' ? `숫자 ${w.ch}` : w.ch, {rate:0.8}); }
                    break;
     /* 보여줘 — 실패로 세지 않습니다. 언제든 몇 번이든 볼 수 있습니다 */
-    case 'wrshow': { const w = wrState(); if(!w.done){ w.tip = '이렇게 그리는 거야! 👀'; wrGhost(1200); wrDots(); } break; }
+    case 'wrshow': { const w = wrState(); if(!w.done){ w.helped = true; w.tip = '이렇게 그리는 거야! 👀'; wrGhost(1200); wrDots(); } break; }
+    /* 21차 A5: 🤝 같이 쓰기 — 지금 획을 유령 손이 그어 줍니다. 연출 중에도 언제나 눌립니다 (갇힘 0) */
+    case 'wrhelp': wrHelpStroke(); break;
+    /* 21차 A1: ✏️ 태블릿 모드 — 시작 화면 토글 (기기별 설정, 게임 저장과 따로) */
+    case 'tabtog':
+      DEV.tab = !DEV.tab; devSave(); devApply();
+      SFX.open(); render();
+      say(DEV.tab ? '태블릿 모드를 켰어! 펜으로 써 보자!' : '태블릿 모드를 껐어!');
+      break;
     /* 18차 A: 어른 설정 — 시작 화면 구석 ⚙️ 에서만 들어옵니다.
        덧셈 문제(adultGate)를 못 풀면 화면이 아예 열리지 않습니다 */
     case 'settings':
@@ -10506,6 +11078,9 @@ function act(a){
       const q = String(arg || '').split(':');
       const key = q[0], v = parseInt(q[1],10);
       if(!isFinite(v)) break;
+      /* 21차 A1: 기기별 설정 — 게임 저장이 아니라 hajun-device 에 둡니다 */
+      if(key === 'tab' && (v === 0 || v === 1)){ DEV.tab = v === 1; devSave(); devApply(); SFX.open(); render(); break; }
+      if(key === 'cw'  && (v === 0 || v === 1)){ DEV.cw = v; devSave(); SFX.open(); render(); break; }
       const st = setOf();
       if(key === 'ko'   && v >= 0 && v <= STAGE_MAX) st.koStage = v;
       else if(key === 'num' && v >= 0 && v <= STAGE_MAX) st.numStage = v;
@@ -10581,6 +11156,7 @@ document.addEventListener('gesturestart', e=>e.preventDefault());
    ========================================================= */
 
 if(!S.learn) S.learn = freshLearn();      /* 11차: 저장이 없어도 커리큘럼은 언제나 준비돼 있습니다 */
+devApply();                                 /* 21차 A1: 태블릿 모드면 body.tab */
 if(load()){
   S.maxHp = pMaxHp();
   /* 12차: 체력이 이어지므로 이어서 시작할 때도 그대로 씁니다. 최대치만 넘지 않게 다듬습니다 */
