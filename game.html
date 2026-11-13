@@ -1979,6 +1979,48 @@ body.tab #stampfx .sfx-big{width:84px;height:84px;flex-basis:84px;}
 body.tab #stampfx .sfx-txt{font-size:22px;}
 body.tab #stampfx .sfx-row{grid-template-columns:repeat(10,20px);}
 body.tab #stampfx .sfx-row i{width:20px;height:20px;}
+
+/* ============================================================
+   21차 D: 태블릿 모드면 게임 전체를 크게 — 폰 화면을 그대로 비례 확대합니다.
+   tabFit() 이 화면 크기로 --tz(배율)를 재서 body.tz 를 붙입니다(배율이 1 이하면 안 붙음).
+   · CSS zoom: 삼성 인터넷·크롬은 확대된 채로 글자·SVG 가 선명하고, 누르는 자리(clientX)와
+     getBoundingClientRect 가 같은 눈금이라 터치·밀기가 어긋나지 않습니다.
+   · 쓰기 화면(#app.wrscr)과 배틀 위 쓰기 판(#modal.wrb)은 21-A 에서 이미 태블릿 크기라
+     확대하지 않습니다(두 번 커지지 않게, 펜 좌표도 21-A 그대로).
+   · zoom 안에서는 vh·vw 가 배율만큼 커지므로 vh 를 쓰는 규칙만 /var(--tz) 로 되돌립니다.
+     (vw 를 쓰는 규칙은 모두 min()/clamp() 상한이 걸려 있어 520px 폭 폰과 같은 값이 됩니다)
+   폰(태블릿 모드 꺼짐)은 body.tz 가 절대 안 붙어서 이 블록이 하나도 안 걸립니다.
+   ============================================================ */
+body.tz #app:not(.wrscr), body.tz #modal:not(.wrb), body.tz #evo, body.tz #rk, body.tz #fx, body.tz .rktwinkle{zoom:var(--tz);}
+body.tz #app:not(.wrscr){height:calc(100vh / var(--tz));height:calc(100dvh / var(--tz));}
+body.tz .xfqr{width:min(100%,340px,calc(48vh / var(--tz)));}
+body.tz .xfcam{max-height:calc(46vh / var(--tz));}
+body.tz .quiz{--tile:clamp(48px, min((var(--cw) - 20px - (var(--cols) - 1) * var(--gap)) / var(--cols), calc(17vh / var(--tz))), 150px);}
+@supports (height:100dvh){
+  body.tz .quiz{--tile:clamp(48px, min((var(--cw) - 20px - (var(--cols) - 1) * var(--gap)) / var(--cols), calc(20dvh / var(--tz))), 150px);}
+}
+body.tz .koart{width:min(calc(40vh / var(--tz)),150px);height:min(calc(40vh / var(--tz)),150px);}
+@media (max-height:780px){
+  body.tz #map{width:min(100%,calc(42dvh / var(--tz)));}
+  body.tz #app.evoslot #map{width:min(100%,calc(34dvh / var(--tz)));}
+  body.tz .koart{width:min(calc(30vh / var(--tz)),112px);height:min(calc(30vh / var(--tz)),112px);}
+}
+/* 가로 화면의 맵: 세로에 맞춰 확대하면 양옆이 남으니, 지도를 왼쪽에 크게(세로 가득) 두고
+   친구·지역·방향 버튼은 오른쪽 줄로 옮깁니다. 지도 칸 수(9×9)와 움직임은 그대로입니다 */
+body.tzl #app.fldscr{max-width:none;}
+body.tzl #app.fldscr #screen{
+  --mapS:min(calc(100dvh / var(--tz) - 90px), calc(100vw / var(--tz) - 412px));
+  display:grid;grid-template-columns:var(--mapS) minmax(0,380px);
+  grid-template-rows:repeat(5,auto) 1fr;column-gap:16px;justify-content:center;align-content:stretch;
+}
+body.tzl #app.fldscr #screen > *{grid-column:2;min-width:0;}
+body.tzl #app.fldscr #map{grid-column:1;grid-row:1 / -1;width:var(--mapS);margin:0;align-self:center;}
+body.tzl #app.fldscr .dpad{grid-row:6;align-self:end;}
+body.tzl #app.fldscr .dpad .btn{min-height:76px;font-size:32px;}
+body.tzl #app.fldscr .dpad .dexbtn,body.tzl #app.fldscr .dpad .homebtn{font-size:17px;}
+body.tzl #app.fldscr .regbar .btn,body.tzl #app.fldscr .regbar .pos{min-height:50px;font-size:15px;}
+body.tzl #app.fldscr .gateface{font-size:26px;}
+body.tzl #app.fldscr .drop{font-size:28px;}
 </style>
 
 <div id="app">
@@ -4359,20 +4401,49 @@ function setOf(){
      cw  : 잡을 때마다 글자 쓰기. null 이면 "태블릿 모드를 따라감" (태블릿이면 켬)
    ========================================================= */
 const DEV_KEY = 'hajun-device';
-const DEV = {tab:false, cw:null};
+const DEV = {tab:false, cw:null, demo:0};   /* 21차 D: demo = 시범 속도 0 천천히 · 1 보통 · 2 빠르게 */
 function devLoad(){
   try{
     const d = JSON.parse(localStorage.getItem(DEV_KEY) || 'null');
     if(d && typeof d === 'object'){
       DEV.tab = d.tab === true;
       DEV.cw = (d.cw === 0 || d.cw === 1) ? d.cw : null;
+      DEV.demo = (d.demo === 1 || d.demo === 2) ? d.demo : 0;
     }
   }catch(e){}
 }
-function devSave(){ try{ localStorage.setItem(DEV_KEY, JSON.stringify({tab:DEV.tab, cw:DEV.cw})); }catch(e){} }
+function devSave(){ try{ localStorage.setItem(DEV_KEY, JSON.stringify({tab:DEV.tab, cw:DEV.cw, demo:DEV.demo})); }catch(e){} }
 function tabOn(){ return DEV.tab === true; }
 function cwOn(){ return DEV.cw == null ? tabOn() : DEV.cw === 1; }
-function devApply(){ try{ document.body.classList.toggle('tab', tabOn()); }catch(e){} }
+function devApply(){ try{ document.body.classList.toggle('tab', tabOn()); }catch(e){} tabFit(); }
+/* 21차 D: 태블릿 모드면 게임 전체를 화면에 맞춰 비례 확대합니다 (CSS 는 body.tz 아래).
+   배율 = min(가로/520, 세로/TZ_H) — 세로 화면은 폭에 맞춰(770×1232 → 1.48배, 폰 520×832 처럼),
+   가로 화면은 높이에 맞춰(1232×770 → 약 1.28배, 폰 960×600 처럼) 커집니다. 1 이하면 확대 안 함.
+   폰(태블릿 모드 꺼짐)은 아무것도 붙지 않습니다 */
+const TZ_W = 520, TZ_H = 600;
+let TZ = 1, TZ_KEY = '';
+function tabFit(){
+  try{
+    const b = document.body, w = window.innerWidth || 0, h = window.innerHeight || 0;
+    const key = (tabOn() ? 1 : 0) + ':' + w + 'x' + h;
+    if(key === TZ_KEY) return;                   /* 바뀐 게 없으면 아무것도 안 건드립니다 */
+    TZ_KEY = key;
+    let z = 1;
+    if(tabOn() && w > 0 && h > 0) z = Math.min(w / TZ_W, h / TZ_H);
+    z = z > 1.01 ? Math.round(z * 1000) / 1000 : 1;
+    TZ = z;
+    b.classList.toggle('tz', z > 1);
+    b.classList.toggle('tzl', z > 1 && w > h);
+    if(z > 1) document.documentElement.style.setProperty('--tz', String(z));
+    else document.documentElement.style.removeProperty('--tz');
+  }catch(e){ TZ = 1; }
+}
+/* 확대된 #fx 안에 놓을 자리 — getBoundingClientRect 는 화면 눈금이라 배율로 나눠 줍니다 */
+function fxScale(){ return (TZ > 1 && document.body && document.body.classList.contains('tz')) ? TZ : 1; }
+window.addEventListener('resize', ()=>{ if(tabOn() || TZ !== 1) tabFit(); });
+window.addEventListener('orientationchange', ()=>{ setTimeout(tabFit, 60); setTimeout(tabFit, 400); });
+/* 돌렸는데 resize 가 늦게 오는 경우까지 — 태블릿 모드일 때만 가끔 크기를 다시 봅니다 (바뀐 게 없으면 바로 끝) */
+setInterval(()=>{ if(tabOn() || TZ !== 1) tabFit(); }, 700);
 devLoad();
 
 function battleMul(){ return SET_BATTLE[setOf().battle] || SET_BATTLE[1]; }
@@ -4580,12 +4651,14 @@ const starNum  = document.getElementById('starNum');
 const starChip = document.getElementById('starChip');
 
 function render(){
+  tabFit();          /* 21차 D: 화면을 그릴 때마다 배율 확인 (바뀐 게 없으면 바로 끝) */
   dexCount.textContent = `${S.dex.length} / ${MONS.length}`;
   starNum.textContent = String(S.stars);
   voiceBtn.textContent = S.voice ? '🔊' : '🔇';
   voiceBtn.classList.toggle('off', !S.voice);
   /* 필드에 진화 칸이 붙는 동안에는 지도를 조금 줄여서 스크롤이 안 생기게 */
   appEl.classList.toggle('evoslot', S.screen === 'field' && S.partner != null && evoNext() != null);
+  appEl.classList.toggle('fldscr', S.screen === 'field');   /* 21차 D: 태블릿 가로 화면에서만 지도를 왼쪽에 크게 (CSS body.tzl) */
   appEl.classList.toggle('wrscr', S.screen === 'write');   /* 21차: 태블릿에서만 쓰기 화면을 넓힙니다 (CSS 가 body.tab 아래에만 있음) */
 
   const V = {
@@ -5094,6 +5167,8 @@ function setWriteCard(){
       ${segHtml('tab', [{v:1,t:'켜기'},{v:0,t:'끄기'}], tabOn() ? 1 : 0, 2)}
       <div class="setlab">⚪ 잡을 때마다 글자 쓰기<small>퀴즈를 맞히면 볼을 던지기 전에 포켓몬 이름의 한 글자를 씁니다. 다 쓰면 반드시 잡힙니다${DEV.cw == null ? ' (지금: 태블릿 모드를 따라감)' : ''}</small></div>
       ${segHtml('cw', [{v:1,t:'켜기'},{v:0,t:'끄기'}], cwOn() ? 1 : 0, 2)}
+      <div class="setlab">👀 시범 속도<small>처음 쓰는 글자를 손이 먼저 그려 보일 때의 빠르기 · 👀 보여줘 도 같은 빠르기</small></div>
+      ${segHtml('demo', [{v:0,t:'천천히'},{v:1,t:'보통'},{v:2,t:'빠르게'}], DEV.demo, 3)}
       <div class="setline">써 본 글자 <span class="r">${all.length}자 · 다 배움 ${done.length}자</span></div>
       <div class="setlab">🏅 다 배운 글자<small>혼자서 도움 없이 두 번 쓴 글자</small></div>
       ${done.length ? `<div class="setjamo">${chips(done, false)}</div>` : `<div class="setnote">아직 없어요</div>`}
@@ -5998,7 +6073,8 @@ function centerOf(sel){
   if(!el) return null;
   const r = el.getBoundingClientRect();
   if(!r.width && !r.height) return null;
-  return {x:r.left + r.width/2, y:r.top + r.height/2};
+  const k = fxScale();                         /* 21차 D: #fx 도 같은 배율로 확대돼 있습니다 */
+  return {x:(r.left + r.width/2) / k, y:(r.top + r.height/2) / k};
 }
 function fxAt(x,y,cls,text,life){
   const box = document.getElementById('fx');
@@ -11368,11 +11444,53 @@ function wrBadge(ctx, p, k, n, kind, r){
    ========================================================= */
 const WR_STALL_MS = 4000;      /* 빈 칸에서 이만큼 멈추면 시작점·화살표만 살짝 */
 function wrDemoMs(n){ return Math.max(1400, Math.min(2600, (n || 1) * 450)); }
+/* 21차 D: 시범을 획마다 천천히 — 아빠 "처음 보여주는 가이드가 너무 빠른 것 같아".
+   획 하나를 min~max ms 동안(획이 길수록 오래) 그리고, 획 사이에 gap ms 쉬고, 첫 획 전에 lead ms 기다립니다.
+   빠르게(2)는 예전 속도 그대로(전체 1.4~2.6초를 획 수로 나눔). 펜을 대면 언제든 바로 끝납니다 */
+const WR_DEMO_SPD = [
+  {lead:500, min:900, max:1200, gap:400},     /* 0 천천히 (기본) */
+  {lead:300, min:500, max:700,  gap:250},     /* 1 보통 — 획당 약 0.6초 */
+  null                                        /* 2 빠르게 — 예전 그대로 */
+];
+function wrStrokeLen(t){
+  let L = 0;
+  for(let i=1;i<t.length;i++) L += Math.hypot(t[i][0]-t[i-1][0], t[i][1]-t[i-1][1]);
+  return L;
+}
+/* from 번째 획부터 끝까지의 시간표 — [{i, s(시작 ms), d(그리는 ms)}], end(끝 ms) */
+function wrDemoPlan(from){
+  const n = WR.tmpl.length, sp = WR_DEMO_SPD[DEV.demo] || null;
+  const plan = [];
+  let t = sp ? sp.lead : 0;
+  for(let i=Math.max(0, from || 0);i<n;i++){
+    const d = sp ? Math.round(sp.min + (sp.max - sp.min) * Math.min(1, wrStrokeLen(WR.tmpl[i]) / 0.6))
+                 : wrDemoMs(n) / n;
+    plan.push({i:i, s:t, d:d});
+    t += d + (sp ? sp.gap : 0);
+  }
+  if(sp && plan.length) t -= sp.gap;
+  return {plan:plan, end:t};
+}
+function wrDemoOf(){
+  const D = WR.demo;
+  if(!D) return null;
+  if(!D.plan) D.plan = wrDemoPlan(D.from);
+  return D.plan;
+}
+/* 시범이 지금 그리는(또는 곧 그릴) 획 번호 — 그 획의 칸(초·중·종)을 밝힙니다 */
+function wrDemoCur(now){
+  const P = wrDemoOf();
+  if(!P || !WR.demo.t0) return P && P.plan.length ? P.plan[0].i : -1;
+  const el = now - WR.demo.t0;
+  for(const p of P.plan){ if(el < p.s + p.d) return p.i; }
+  return P.plan.length ? P.plan[P.plan.length-1].i : -1;
+}
 /* 매 프레임 — 시범 끝내기 · 멈춤(막힘) 재기 */
 function wrTabTick(w, now){
   if(WR.demo){
     if(!WR.demo.t0) WR.demo.t0 = now;
-    if(w.done || now - WR.demo.t0 > wrDemoMs(WR.tmpl.length) + 400){
+    const P = wrDemoOf();
+    if(w.done || !P || now - WR.demo.t0 > P.end + 400){
       WR.demo = null; WR.lastAct = now; wrDots();
     }
     return;
@@ -11398,8 +11516,10 @@ function wrTabPaper(ctx, k, w){
   ctx.stroke();
   ctx.restore();
   const B = WR.tmpl.boxes;
-  if(!B || w.done || WR.demo) return;
-  const cur = WR.tmpl[w.si] && WR.tmpl[w.si].part;
+  if(!B || w.done) return;
+  /* 21차 D: 시범 중에는 시범이 그리는 획의 칸을 밝힙니다 */
+  const ci = WR.demo ? wrDemoCur(performance.now()) : w.si;
+  const cur = WR.tmpl[ci] && WR.tmpl[ci].part;
   const pad = k*0.012;
   const rect = b => [b[0]*k + pad, b[1]*k + pad, (b[2]-b[0])*k - pad*2, (b[3]-b[1])*k - pad*2];
   const rr = (x,y,ww,hh,r) => {
@@ -11438,18 +11558,24 @@ function wrHand(ctx, x, y, bw){
 function wrTabOver(ctx, k, w, now, bw){
   /* 시범 — 획이 하나씩 그려집니다 (약 2초). 펜을 대면 바로 끝납니다 */
   if(WR.demo && WR.demo.t0){
-    const n = WR.tmpl.length, per = wrDemoMs(n) / n, el = now - WR.demo.t0;
-    for(let i=0;i<n;i++){
-      const f = Math.max(0, Math.min(1, (el - i*per) / per));
-      if(f <= 0) break;
-      const seg = wrPartial(WR.tmpl[i], f);
+    const P = wrDemoOf(), el = now - WR.demo.t0;
+    let handAt = null;
+    for(const p of (P ? P.plan : [])){
+      const f = Math.max(0, Math.min(1, (el - p.s) / p.d));
+      if(f <= 0){
+        /* 쉬는 동안에는 손이 다음 획 시작점에서 기다립니다 */
+        if(!handAt){ const t0 = WR.tmpl[p.i][0]; handAt = [t0[0], t0[1]]; }
+        break;
+      }
+      const seg = wrPartial(WR.tmpl[p.i], f);
       if(seg.length < 2) continue;
       ctx.save();
       ctx.strokeStyle = '#F2679B'; ctx.globalAlpha = 0.85; ctx.lineWidth = bw;
       wrPath(ctx, seg, k); ctx.stroke();
       ctx.restore();
-      if(f < 1){ const hd = seg[seg.length-1]; wrHand(ctx, hd[0]*k, hd[1]*k, bw); }
+      if(f < 1){ handAt = seg[seg.length-1]; }
     }
+    if(handAt) wrHand(ctx, handAt[0]*k, handAt[1]*k, bw);
   }
   /* 틀림 알림 — 쓴 획을 잠깐 빨갛게 → 사라짐. 순서 틀림이면 맞는 획이 깜빡 "이거 먼저!" */
   if(WR.fb){
@@ -11765,7 +11891,10 @@ function act(a){
                    { const w = wrState(); say(w.kind === 'num' ? `숫자 ${w.ch}` : w.ch, {rate:0.8}); }
                    break;
     /* 보여줘 — 실패로 세지 않습니다. 언제든 몇 번이든 볼 수 있습니다 */
-    case 'wrshow': { const w = wrState(); if(!w.done){ w.helped = true; w.tip = '이렇게 그리는 거야! 👀'; wrGhost(1200); wrDots(); } break; }
+    case 'wrshow': { const w = wrState(); if(!w.done){ w.helped = true;
+      /* 21차 D: 태블릿은 지금 쓸 획부터 끝까지 시범을 다시 — 고른 시범 속도 그대로. 펜을 대면 바로 끝 */
+      if(tabOn() && !WR.auto && !WR.drawing && WR.tmpl[w.si]){ WR.ghost = null; WR.hint = null; WR.demo = {t0:0, from:w.si}; w.tip = ''; tone(520,0.12,'triangle',0.05); wrDots(); }
+      else{ w.tip = '이렇게 그리는 거야! 👀'; wrGhost(1200); wrDots(); } } break; }
     /* 21차 A5: 🤝 같이 쓰기 — 지금 획을 유령 손이 그어 줍니다. 연출 중에도 언제나 눌립니다 (갇힘 0) */
     case 'wrhelp': wrHelpStroke(); break;
     /* 21차 A1: ✏️ 태블릿 모드 — 시작 화면 토글 (기기별 설정, 게임 저장과 따로) */
@@ -11787,6 +11916,7 @@ function act(a){
       /* 21차 A1: 기기별 설정 — 게임 저장이 아니라 hajun-device 에 둡니다 */
       if(key === 'tab' && (v === 0 || v === 1)){ DEV.tab = v === 1; devSave(); devApply(); SFX.open(); render(); break; }
       if(key === 'cw'  && (v === 0 || v === 1)){ DEV.cw = v; devSave(); SFX.open(); render(); break; }
+      if(key === 'demo' && (v === 0 || v === 1 || v === 2)){ DEV.demo = v; devSave(); SFX.open(); render(); break; }   /* 21차 D */
       const st = setOf();
       if(key === 'ko'   && v >= 0 && v <= STAGE_MAX) st.koStage = v;
       else if(key === 'num' && v >= 0 && v <= STAGE_MAX) st.numStage = v;
