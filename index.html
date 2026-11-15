@@ -10310,7 +10310,9 @@ function confetti(){
 function wrCircle(cx,cy,r,n){
   const out = [];
   for(let i=0;i<=(n||16);i++){
-    const a = -Math.PI/2 + i*Math.PI*2/(n||16);
+    /* 동그라미는 맨 위에서 시작해 **왼쪽으로(시계 반대 방향)** 돕니다 — 학교에서 배우는 방향.
+       (예전에는 오른쪽으로 돌아서 시범·안내선이 반대로 보였습니다 — 아빠 지적) */
+    const a = -Math.PI/2 - i*Math.PI*2/(n||16);
     out.push([cx + r*Math.cos(a), cy + r*Math.sin(a)]);
   }
   return out;
@@ -10514,6 +10516,12 @@ function wrRadius(p){
   for(let i=0;i<p.length;i++) s += wrDist(p[i],c);
   return s/p.length;
 }
+/* 넓이에 부호가 붙습니다 — 부호로 도는 방향(시계/반시계)을 압니다 */
+function wrArea(p){
+  let s = 0;
+  for(let i=0;i<p.length;i++){ const q = p[(i+1)%p.length]; s += p[i][0]*q[1] - q[0]*p[i][1]; }
+  return s/2;
+}
 /* 시작과 끝이 거의 같은 획 = 동그라미 무리 (ㅇ ㅎ 0 8) */
 function wrClosed(t){
   const r = wrRadius(t);
@@ -10549,6 +10557,12 @@ function judgeStroke(raw, t, size){
     if(wrLen(u) < wrLen(t)*0.45) return 'end';
     const ur = wrRadius(u);
     if(wrDist(u[0], u[u.length-1]) > Math.max(ur*0.9, wrTol(t,size,R_END)*0.55)) return 'end';
+    /* 태블릿(펜) 연습에서는 도는 방향도 봅니다 — 오른쪽으로 돌면 "여기서 시작!" 안내.
+       폰(손가락)은 예전처럼 방향을 묻지 않습니다 */
+    if(typeof tabOn === 'function' && tabOn()){
+      const ua = wrArea(u), ta = wrArea(t);
+      if(Math.abs(ua) > Math.abs(ta)*0.25 && ua*ta < 0) return 'dir';
+    }
     return 'ok';
   }
 
@@ -11320,7 +11334,10 @@ function wrAfterJudge(res, raw){
 
   w.fail++; w.clean = false;
   if(w.fail === 1){
-    w.tip = res === 'dir' ? '이쪽 방향으로 그어 볼까? 💫' : '이쪽에서 시작해 볼까? 💫';
+    const tc = WR.tmpl[w.si];
+    w.tip = res === 'dir'
+      ? (tc && wrClosed(tc) ? '위에서 왼쪽으로 빙글 돌려 볼까? 💫' : '이쪽 방향으로 그어 볼까? 💫')
+      : '이쪽에서 시작해 볼까? 💫';
     tone(300,0.1,'sine',0.04);
     wrDots();
   }else if(w.fail === 2){
@@ -11624,7 +11641,8 @@ function wrTabOver(ctx, k, w, now, bw){
   if(WR.hint && WR.hint.si === w.si && !w.done && WR.tmpl[w.si]){
     const t = WR.tmpl[w.si];
     const pu = 0.5 + 0.5*Math.sin(now/220);
-    if(!wrClosed(t)){
+    /* 동그라미도 앞부분 화살표를 보여 줍니다 — 어느 쪽으로 도는지가 중요합니다 */
+    {
       const seg = wrPartial(t, 0.42);
       if(seg.length > 1){
         ctx.save();
