@@ -240,11 +240,13 @@ body.tab .xfqr{width:min(100%,440px,60vh);}
 .r-grass .t2{background:var(--grass-mid);}
 .r-grass .t3{background:var(--sky-deep);}
 /* 💧 물가 */
-#map.r-water{background:#2E7FC4;}
+/* 22차: 얕은 물(걸을 수 있음 · 포켓몬이 나옴)과 깊은 물(못 들어감)이 한눈에 다르게 —
+   얕은 물은 밝은 하늘색 + 흰 물결, 깊은 물은 짙은 남색 + 가장자리 그늘 */
+#map.r-water{background:#174F94;}
 .r-water .t0,.r-water .t4{background:#F7E4AE;}
-.r-water .t1{background:#7FCDEC;}
+.r-water .t1{background:#A4E4F5;}
 .r-water .t2{background:#AEBAC4;}
-.r-water .t3{background:#2E7FC4;}
+.r-water .t3{background:#174F94;box-shadow:inset 0 0 0 2px rgba(6,24,60,.35);}
 /* 🕳 동굴 */
 #map.r-cave{background:#3C3450;}
 .r-cave .t0,.r-cave .t4{background:#8E8299;}
@@ -870,8 +872,9 @@ body.tab .xfqr{width:min(100%,440px,60vh);}
 .acts .btn .em{font-size:23px;}
 /* 10차: 필살기가 들어와서 네 칸이 됐습니다. 한 칸이 좁아지니 글씨를 조금 줄입니다
    (360px 폰에서 한 칸 약 77px — 손가락 닿는 넓이 44px 은 넉넉히 넘습니다) */
-.acts.four{grid-template-columns:repeat(4,1fr);gap:6px;}
-.acts.four .btn{font-size:13px;padding:7px 2px;letter-spacing:-.07em;}
+/* 22차: 네 칸 — 🏃 도망은 덜 쓰니 조금 좁게, 나머지 셋을 넓게. 글자는 한 줄로(잘리거나 접히지 않게) */
+.acts.four{grid-template-columns:1fr 1fr 1fr .84fr;gap:6px;}
+.acts.four .btn{font-size:14px;padding:7px 2px;letter-spacing:-.07em;min-width:0;white-space:nowrap;}
 .acts.four .btn .em{font-size:20px;}
 /* 10차: 필살기 버튼 — 눌러도 되는 때만 빨갛게 반짝입니다 */
 .btn-ult{background:linear-gradient(100deg,#FF8A2B,#E8412F);color:#fff;}
@@ -1239,6 +1242,21 @@ body.tab .xfqr{width:min(100%,440px,60vh);}
 @keyframes evoSil{0%,100%{opacity:1;}50%{opacity:.4;}}
 @keyframes evoFill{from{transform:scale(1);}to{transform:scale(1.16);}}
 @keyframes evoPop{from{transform:scale(.34);opacity:.15;}to{transform:scale(1);opacity:1;}}
+
+/* 22차: "🔥 산꼭대기" 가 좁은 폰(360px)에서 두 줄로 접히던 것 — 필드(지역 이름)에서만 제목을 한 줄로 두고,
+   도감 수가 커지면(322 / 322 · 별 세 자리) 오른쪽 숫자 칸을 조금 좁힙니다.
+   다른 화면의 긴 제목("하준아 포켓몬 잡으러 가자!")은 예전처럼 두 줄로 접혀도 됩니다 */
+body #app.fldscr #topbar .title{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;}
+@media (max-width:400px){
+  body #topbar{gap:6px;}
+  body .count{gap:3px;font-size:16px;padding:4px 6px;letter-spacing:-.04em;}
+  body .count .star-chip{padding-left:4px;}
+}
+@media (max-width:340px){
+  body #topbar{gap:5px;padding-left:7px;padding-right:7px;}
+  body #topbar .title{font-size:13px;letter-spacing:-.06em;}
+  body .count{gap:2px;font-size:14px;padding:3px 5px;}
+}
 
 /* 5차: 별 · 진화 버튼 */
 .star-chip{
@@ -1712,8 +1730,8 @@ body.qk{overflow:hidden;}
   .acts .btn .em{font-size:20px;}
   /* 10차: 짧은 폰에서 네 칸 · 그냥 싸울래 버튼도 같이 줄입니다 */
   .acts.four{gap:5px;}
-  .acts.four .btn{font-size:11px;padding:5px 2px;}
-  .acts.four .btn .em{font-size:17px;}
+  .acts.four .btn{font-size:13px;padding:5px 1px;}   /* 22차: 11px → 13px (360px 폭에서 너무 작았습니다) */
+  .acts.four .btn .em{font-size:19px;}
   .qback{min-height:48px;font-size:17px;}
   .moves{gap:6px;}
   .moves .btn{min-height:48px;padding:5px 3px;border-radius:14px;}
@@ -3119,7 +3137,7 @@ const TILE_ART = {
   water:{
   1:`${SVG0}<g fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" opacity=".9"><path d="M5 15 q5 -5 10 0 t10 0 t10 0"/><path d="M5 27 q5 -5 10 0 t10 0 t10 0"/></g><circle cx="31" cy="34" r="2.6" fill="#FFFFFF" opacity=".8"/></svg>`,
   2:`${SVG0}<path d="M6 34 L14 14 L22 34 Z" fill="#9AA7B0" stroke="${E}" stroke-width="2.6" stroke-linejoin="round"/><path d="M18 35 L27 20 L36 35 Z" fill="#C3CED6" stroke="${E}" stroke-width="2.6" stroke-linejoin="round"/></svg>`,
-  3:`${SVG0}<g fill="none" stroke="#8FD8F2" stroke-width="3" stroke-linecap="round"><path d="M5 13 q5 -4 10 0 t10 0 t10 0"/><path d="M5 22 q5 -4 10 0 t10 0 t10 0"/><path d="M5 31 q5 -4 10 0 t10 0 t10 0"/></g></svg>`,
+  3:`${SVG0}<g fill="none" stroke="#4C8FD6" stroke-width="2.6" stroke-linecap="round"><path d="M5 13 q5 -4 10 0 t10 0 t10 0"/><path d="M5 22 q5 -4 10 0 t10 0 t10 0"/><path d="M5 31 q5 -4 10 0 t10 0 t10 0"/></g></svg>`,
   4:`${SVG0}<path d="M20 32 q-13 0 -13 -10 q0 -9 13 -9 q13 0 13 9 q0 10 -13 10 Z" fill="#FFC4DE" stroke="${E}" stroke-width="2.4"/><g fill="none" stroke="${E}" stroke-width="1.8" stroke-linecap="round"><path d="M20 32 L12 17"/><path d="M20 32 L20 14"/><path d="M20 32 L28 17"/></g></svg>`
   },
   /* 🕳 동굴 — 이끼 · 바위벽 · 깊은 구덩이 · 반짝이는 수정 */
@@ -4684,6 +4702,7 @@ function render(){
   }[S.screen];
   topTitle.textContent = V[0];
   screenEl.innerHTML = V[1]();
+  fxClipTop();                          /* 22차: 배틀에서만 이펙트가 상단바를 덮지 않게 */
   if(S.screen === 'field') placePlayer();
   if(S.screen === 'write') wrMount();   /* 17차: 캔버스는 화면을 다시 그릴 때마다 붙입니다 */
   if(S.screen === 'set') xfMount();     /* 21차 C: 카메라 영상 다시 붙이기 */
@@ -6378,9 +6397,25 @@ function fxCharge(x, ms, color){
   return el;
 }
 
+/* 22차: 배틀 중에는 이펙트 층(#fx)을 상단바 아래에서만 보이게 자릅니다 —
+   필살기 고리·파편이 크게 퍼지면서 상단바(도감 수 · 별 · 소리 버튼)를 덮던 것을 막습니다.
+   다른 화면에서는 자르지 않습니다 */
+function fxClipTop(){
+  const fx = document.getElementById('fx');
+  if(!fx) return;
+  const tb = document.getElementById('topbar');
+  if(S.screen === 'battle' && tb){
+    const r = tb.getBoundingClientRect();
+    const top = Math.max(0, Math.round(r.bottom / fxScale()));
+    fx.style.clipPath = r.height > 0 ? `inset(${top}px 0 0 0)` : '';
+  }else if(fx.style.clipPath){
+    fx.style.clipPath = '';
+  }
+}
 function fireMove(fromSel,toSel,mv,big){
   const a = centerOf(fromSel), b = centerOf(toSel);
   if(!a || !b) return;
+  fxClipTop();
   const dx = Math.round(b.x - a.x), dy = Math.round(b.y - a.y);
   const len = Math.max(60, Math.round(Math.sqrt(dx*dx + dy*dy)));
   const ang = Math.round(Math.atan2(dy,dx) * 180 / Math.PI);
@@ -9523,10 +9558,11 @@ const QUIZ_TYPES = [
       speak(){ say(`레벨 ${sino(a)}에서 ${sino(b)} 올라가면 몇 레벨일까?`,{rate:0.75}); } };
   } },
 
-/* 뺄셈 — a 를 먼저 뽑고 b 는 a 이하로만 뽑아서 답이 음수가 될 수 없습니다 */
+/* 뺄셈 — a 를 먼저 뽑고 b 는 a 보다 작게만 뽑아서 답이 음수도 0 도 될 수 없습니다
+   (22차: 예전에는 b = a 가 나와 "3 - 3 = 0" 이 섞였습니다 — 6살에게 0 은 아직 어려운 답) */
 { id:'N_SUB', kind:'num', diff:3, ns:4, ok:()=>true,
   build(){
-    const a = rint(2,numCap()), b = rint(1,a), ans = a-b;
+    const a = rint(2,numCap()), b = rint(1,a-1), ans = a-b;
     return { head:'expr', headData:`${a} <span class="op">-</span> ${b} <span class="op">=</span> <span class="op">❓</span>`,
       ask:'빼면 몇일까?', cols:3, render:'num',
       options:shuffle([ans].concat(numDistract(ans,2,9))), answer:ans, judge:'equalNum',
@@ -10487,6 +10523,8 @@ const R_END   = 0.32;   /* 칸 크기 대비 끝점 허용 반경 */
 const DIR_MIN = 0.30;   /* 방향 cos — 약 72도까지 허용 */
 const R_MIN   = 0.13;   /* 캔버스 대비 최소 허용 반경 (칸이 작아도 이만큼은 봐 줍니다) */
 const R_MAX   = 0.32;   /* 캔버스 대비 최대 허용 반경 */
+const R_LEN   = 0.24;   /* 22차: 획 길이 대비 시작·끝 허용 (긴 획) */
+const R_SAVE  = 1.7;    /* 22차: "가장 닮은 획" 이면 허용 반경을 이만큼 늘려 봐 줍니다 */
 
 function wrDist(a,b){ const dx=a[0]-b[0], dy=a[1]-b[1]; return Math.sqrt(dx*dx+dy*dy); }
 function wrLen(p){ let s=0; for(let i=1;i<p.length;i++) s += wrDist(p[i-1],p[i]); return s; }
@@ -10530,16 +10568,20 @@ function wrSmooth(p){
 /* ★ 한 획 판정. 'ok' | 'start' | 'end' | 'dir' | 'tiny' */
 function judgeStroke(raw, t, size){
   const u = wrSmooth(raw);
-  if(u.length < 2 || wrLen(u) < 12) return 'tiny';      /* 톡 친 것 — 실패로 세지 않습니다 */
+  /* 22차 A: 받침 ㅊ·ㅎ 꼭지처럼 **원래 짧은 획**은 짧게 그어도 '톡' 이 아닙니다.
+     (예전에는 12px 밑이면 무조건 '톡' — 폰 받침칸에서는 꼭지 획이 13px 안팎이라 맞게 써도 계속 다시 쓰라고 했습니다) */
+  const tlen = wrLen(t);
+  if(u.length < 2 || wrLen(u) < Math.max(3, Math.min(12, tlen*0.35))) return 'tiny';      /* 톡 친 것 — 실패로 세지 않습니다 */
 
   if(wrClosed(t)){
     /* 동그라미 — **방향도 시작 위치도 묻지 않습니다.**
        "그 자리에 · 충분히 크게 · 닫히게" 돌았으면 통과 */
     const tc = wrMid(t), uc = wrMid(u);
     if(wrDist(uc, tc) > wrTol(t, size, R_START)) return 'start';
-    if(wrLen(u) < wrLen(t)*0.45) return 'end';
+    if(wrLen(u) < tlen*0.45) return 'end';
     const ur = wrRadius(u);
-    if(wrDist(u[0], u[u.length-1]) > Math.max(ur*0.9, wrTol(t,size,R_END)*0.55)) return 'end';
+    /* 22차 A: 끝이 조금 덜 닫혀도(작은 받침 동그라미는 손이 먼저 떨어집니다) 봐 줍니다 */
+    if(wrDist(u[0], u[u.length-1]) > Math.max(ur*1.15, wrTol(t,size,R_END)*0.7)) return 'end';
     /* 태블릿(펜) 연습에서는 도는 방향도 봅니다 — 오른쪽으로 돌면 "여기서 시작!" 안내.
        폰(손가락)은 예전처럼 방향을 묻지 않습니다 */
     if(typeof tabOn === 'function' && tabOn()){
@@ -10550,15 +10592,89 @@ function judgeStroke(raw, t, size){
   }
 
   const t0 = t[0], t1 = t[t.length-1], u0 = u[0], u1 = u[u.length-1];
-  if(wrDist(u0, t0) > wrTol(t, size, R_START)) return 'start';
-  if(wrDist(u1, t1) > wrTol(t, size, R_END))   return 'end';
+  /* 22차 A: 긴 획(ㅡ ㅣ)은 칸 크기만이 아니라 **획 길이에 비례해서도** 봐 줍니다 — 길게 긋다 보면 끝이 많이 밀립니다 */
+  const lenTol = Math.min(size*R_MAX, tlen*R_LEN);
+  if(wrDist(u0, t0) > Math.max(wrTol(t, size, R_START), lenTol)) return 'start';
+  if(wrDist(u1, t1) > Math.max(wrTol(t, size, R_END), lenTol))   return 'end';
   const tx = t1[0]-t0[0], ty = t1[1]-t0[1], tl = Math.hypot(tx,ty);
   const ux = u1[0]-u0[0], uy = u1[1]-u0[1], ul = Math.hypot(ux,uy);
   if(tl < 1) return 'ok';                               /* 아주 짧은 획은 방향을 묻지 않습니다 */
-  /* 곧은 획 자리에 동그라미를 그리면 시작·끝이 한 점이라 방향이 없습니다 → 잡아 줍니다 */
-  if(ul < Math.max(6, tl*0.25)) return 'dir';
-  if((tx*ux + ty*uy)/(tl*ul) < DIR_MIN) return 'dir';
+  /* 곧은 획 자리에 동그라미를 그리면 시작·끝이 한 점이라 방향이 없습니다 → 잡아 줍니다
+     (22차: 원래 짧은 획은 6px 하한을 줄입니다 — 받침 꼭지) */
+  if(ul < Math.max(Math.min(6, tl*0.4), tl*0.25)) return 'dir';
+  /* 22차 A: 원래 아주 짧은 획(ㅊ·ㅎ 꼭지, 받침 ㅛ 의 작은 기둥)은 비스듬히 찍어도 됩니다 — 거꾸로(아래→위)만 아니면 */
+  const dmin = tl < (t.cell || 0.5)*size*0.3 ? -0.3 : DIR_MIN;
+  if((tx*ux + ty*uy)/(tl*ul) < dmin) return 'dir';
   return 'ok';
+}
+
+/* =========================================================
+   22차 A  받침 판정 강화 — 남은 획들과 **견주어** 봅니다
+   ---------------------------------------------------------
+   judgeStroke 는 "지금 획" 하나만 봅니다. 받침칸처럼 작으면
+     · 허용 반경이 칸보다 커서, 다음 획을 먼저 그어도 통과해 버리고 (순서를 못 잡음)
+     · 반대로 조금만 삐뚤어도 칸 밖이라 틀렸다고 합니다 (거짓 오답)
+   그래서 그은 선을 이 글자의 다른 획들과도 견줘 봅니다 (모양 점수는 판정 근거가 아니라 "어느 획이 더 닮았나" 비교에만).
+     ① 아슬아슬하게 빗나갔어도, 방향이 맞고 **지금 획이 모든 획 가운데 가장 닮았으면** → 통과
+     ② 지금 획으로도 통과하지만 **다음 획들 중 하나와 훨씬 더 닮았으면** → 순서 틀림('order')
+   ========================================================= */
+function wrResample(p, n){
+  const L = wrLen(p);
+  if(p.length < 2 || L <= 0) return Array.from({length:n}, ()=>p[0].slice());
+  const out = [p[0].slice()];
+  let seg = 1, acc = 0;
+  for(let k=1;k<n-1;k++){
+    const want = L*k/(n-1);
+    while(seg < p.length-1 && acc + wrDist(p[seg-1],p[seg]) < want){ acc += wrDist(p[seg-1],p[seg]); seg++; }
+    const d = wrDist(p[seg-1],p[seg]) || 1, f = Math.max(0, Math.min(1, (want-acc)/d));
+    out.push([p[seg-1][0]+(p[seg][0]-p[seg-1][0])*f, p[seg-1][1]+(p[seg][1]-p[seg-1][1])*f]);
+  }
+  out.push(p[p.length-1].slice());
+  return out;
+}
+/* 닮음 점수(작을수록 닮음, 픽셀). 곧은 획은 길 따라 12점씩 맞대어 본 평균 거리 — 방향이 반대면 커집니다.
+   동그라미는 가운데 거리 + 크기 차이 (도는 방향·시작 위치는 보지 않습니다) */
+function wrCost(u, t){
+  if(wrClosed(t)) return wrDist(wrMid(u), wrMid(t)) + Math.abs(wrRadius(u) - wrRadius(t))*0.5;
+  const a = wrResample(u, 12), b = wrResample(t, 12);
+  const ma = wrMid(a), mb = wrMid(b);
+  let s = 0, k = 0;
+  for(let i=0;i<12;i++){
+    s += wrDist(a[i], b[i]);
+    k += wrDist([a[i][0]-ma[0], a[i][1]-ma[1]], [b[i][0]-mb[0], b[i][1]-mb[1]]);
+  }
+  /* 자리(s)는 반만, 모양(k — 각자 가운데로 옮겨 놓고 견줌)은 온전히. ㄹ 처럼 획들이 붙어 있는 작은 받침에서
+     "ㄱ자 획" 과 "ㅡ 획" 을 자리보다 모양으로 가려냅니다 */
+  return (s*0.5 + k)/12;
+}
+/* ★ 게임이 실제로 쓰는 판정 — 지금 쓸 획 si 기준. 'ok' | 'order' | judgeStroke 결과 */
+function wrJudgeAt(raw, si){
+  const T = WR.tmpl, t = T[si], size = WR.size;
+  if(!t) return 'ok';
+  const tp = wrScaled(t);
+  const res = judgeStroke(raw, tp, size);
+  if(res === 'tiny' || T.length < 2) return res;
+  const u = wrSmooth(raw);
+  const c0 = wrCost(u, tp);
+  if(res === 'ok'){
+    /* ② 순서 — 다음 획 자리로도 통과하고, 그쪽이 확실히(0.6배 밑으로) 더 닮았을 때만. 지금 획에 꽤 가까우면 묻지 않습니다 */
+    const near = wrTol(tp, size, R_START)*0.2;
+    if(c0 <= near) return 'ok';
+    for(let j=si+1;j<T.length;j++){
+      const tj = wrScaled(T[j]);
+      if(wrCost(u, tj) < c0*0.6 && judgeStroke(raw, tj, size) === 'ok') return 'order';
+    }
+    return 'ok';
+  }
+  if(res !== 'start' && res !== 'end') return res;           /* 방향 틀림은 그대로 잡습니다 */
+  /* ① 살려 주기 — 다른 어떤 획(앞 획 다시 긋기 포함)보다 지금 획이 확실히 더 닮았나 */
+  for(let j=0;j<T.length;j++){
+    if(j === si) continue;
+    if(wrCost(u, wrScaled(T[j])) < c0*1.3) return res;
+  }
+  /* 늘린 반경(R_SAVE 배)으로 다시 봅니다. 방향 검사는 judgeStroke 와 똑같이 */
+  const big = tp.map(p=>p.slice()); big.cell = (t.cell || 0.5)*R_SAVE;
+  return judgeStroke(raw, big, size) === 'ok' ? 'ok' : res;
 }
 
 /* =========================================================
@@ -11251,10 +11367,10 @@ function wrEndStroke(raw){
   const w = wrState();
   const t = WR.tmpl[w.si];
   if(!t || w.done || WR.auto) return;
-  const tp = wrScaled(t);
-  const res = judgeStroke(raw, tp, WR.size);
+  /* 22차 A: 다른 획들과 견주는 판정(wrJudgeAt) — 받침칸에서 거짓 오답을 줄이고 순서 틀림을 더 잘 잡습니다 */
+  const res = wrJudgeAt(raw, w.si);
   /* 21차 A4: 태블릿에서는 왜 틀렸는지(순서 · 방향)를 더 자세히 봅니다. 폰은 지금 그대로 */
-  if(tabOn()){ wrAfterJudgeTab(res === 'ok' || res === 'tiny' ? res : wrWhy(raw, res, w), raw); return; }
+  if(tabOn()){ wrAfterJudgeTab(res === 'ok' || res === 'tiny' || res === 'order' ? res : wrWhy(raw, res, w), raw); return; }
   wrAfterJudge(res, raw);
 }
 function wrScaled(t){
@@ -11318,7 +11434,8 @@ function wrAfterJudge(res, raw){
   w.fail++; w.clean = false;
   if(w.fail === 1){
     const tc = WR.tmpl[w.si];
-    w.tip = res === 'dir'
+    w.tip = res === 'order' ? '파란 줄부터 먼저 그어 볼까? 💫'
+      : res === 'dir'
       ? (tc && wrClosed(tc) ? '위에서 왼쪽으로 빙글 돌려 볼까? 💫' : '이쪽 방향으로 그어 볼까? 💫')
       : '이쪽에서 시작해 볼까? 💫';
     tone(300,0.1,'sine',0.04);
