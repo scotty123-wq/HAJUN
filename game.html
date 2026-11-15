@@ -1836,6 +1836,14 @@ body.qk{overflow:hidden;}
 .setjamo span small{font-size:.62em;color:var(--ball);margin-left:1px;vertical-align:super;}
 .setjamo span.lv0{background:#FFE9E4;}
 .setjamo span.lv1{background:#FFF6D6;}
+/* 22-B: 연습 중 글자 — 가이드 단계 G0~G3 */
+.setjamo span.g0{background:#FFE9E4;}
+.setjamo span.g1{background:#FFF1DA;}
+.setjamo span.g2{background:#FFF8D6;}
+.setjamo span.g3{background:#EAF7DF;}
+.setjamo span[class^="g"] small{color:var(--ink-soft);}
+.setjl span{display:inline-block;white-space:nowrap;margin-right:7px;}
+.setjl b{font-size:.85em;color:var(--ink);margin-left:1px;}
 
 /* ============================================================
    21차 A3: 태블릿 모드 (갤럭시탭 S10+ · S펜) — 전부 body.tab 아래에만 둡니다.
@@ -3823,8 +3831,8 @@ const S = {
      rkStep  마지막 로켓단 이후 몇 걸음 걸었나 (너무 자주 나오지 않게) */
   rk:null, rkPick:null, rkEnd:null, rkStep:0,
   rkWin:0,               // 지금까지 로켓단을 몇 번 이겼나 (이건 저장합니다 — 자랑거리)
-  /* 21차 A4: 글자(음절)마다 숙련도 {lv:0~2, ok, miss, s, t} — 저장합니다 */
-  wrm:{},
+  /* 21차 A4 · 22-B: 글자(음절)마다 숙련도 {lv:0~4, ok, miss, s, t} · 자모 숙련도 {lv:0~4, ok, miss, t} — 저장합니다 */
+  wrm:{}, wrj:{},
   /* 21차 B: 도장 · 코스튬 — 저장합니다. stampOpen·cosBox·closet·boxAuto 는 창 상태라 저장하지 않습니다 */
   stamp:0, cos:null, stampOpen:false, cosBox:null, closet:null, boxAuto:false
 };
@@ -3853,7 +3861,9 @@ function save(){
              /* 15차: 로켓단을 몇 번 이겼나. 이 값이 없는 옛 저장도 그대로 열립니다 */
              rkWin:S.rkWin,
              /* 21차 A4: 글자 숙련도 */
-             wrm:S.wrm,
+             wrm:S.wrm, wrmv:WRM_VER,
+             /* 22-B: 자모 숙련도 */
+             wrj:S.wrj,
              /* 21차 B: 도장 · 코스튬 */
              stamp:S.stamp, cos:S.cos};
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(d)); }catch(e){ memoryStore = d; }
@@ -3907,6 +3917,9 @@ function load(){
   S.rk = null; S.rkPick = null; S.rkEnd = null; S.rkStep = 0;
   /* 21차 A4: 글자 숙련도 — 이상한 값은 조용히 버립니다 */
   S.wrm = saneWrm(d.wrm);
+  /* 22-B: 21차 옛 단계(0~2)는 새 단계(G0~다 배움)로 옮기고, 자모 기록이 없으면 음절 기록에서 채웁니다 */
+  if(d.wrmv !== WRM_VER) wrmMigrate(S.wrm);
+  S.wrj = d.wrj ? saneWrj(d.wrj) : wrjSeed(S.wrm);
   /* 21차 B: 도장(줄지 않음) · 코스튬 */
   S.stamp = saneStamp(d.stamp);
   S.cos = saneCos(d.cos, S.stamp);
@@ -3941,7 +3954,7 @@ function wipe(){
   S.stars = 0; S.lastStars = 0; S.evoWas = null; S.evoing = false;
   S.swapping = false; S.reviveTarget = null; S.reviveGot = 0;
   S.rk = null; S.rkPick = null; S.rkEnd = null; S.rkStep = 0; S.rkWin = 0;
-  S.wrm = {};
+  S.wrm = {}; S.wrj = {};
   /* 21차 B: 도장과 얻은 옷은 새로 시작해도 남깁니다 (도장은 절대 줄지 않음). 포켓몬별 장식만 비웁니다 */
   if(S.cos) S.cos.mon = {};
   S.stampOpen = false; S.cosBox = null; S.closet = null;
@@ -5176,10 +5189,13 @@ const SET_STAGE_OPTS = [{v:0,t:'자동'},{v:1,t:'1'},{v:2,t:'2'},{v:3,t:'3'},{v:
 /* 21차 A1 · A4: 태블릿 모드 · 잡을 때 글자 쓰기 (이 기기에만 저장) + 다 배운 글자 / 연습 중 글자 */
 function setWriteCard(){
   const all = Object.keys(S.wrm || {}).map(ch => Object.assign({ch:ch}, S.wrm[ch]));
-  const done = all.filter(r => r.lv >= 2).sort((a,b)=> (b.t||0) - (a.t||0));
-  const prac = all.filter(r => r.lv < 2).sort((a,b)=> (b.miss - a.miss) || (a.lv - b.lv) || ((b.t||0) - (a.t||0)));
+  const done = all.filter(r => r.lv >= WRM_TOP).sort((a,b)=> (b.t||0) - (a.t||0));
+  const prac = all.filter(r => r.lv < WRM_TOP).sort((a,b)=> (b.miss - a.miss) || (a.lv - b.lv) || ((b.t||0) - (a.t||0)));
+  /* 22-B: 연습 중 글자에는 가이드 단계(G0~G3)를 작게 — 틀린 횟수는 눌러 보면(title) 나옵니다 */
   const chips = (list, prac) => list.slice(0, 48).map(r =>
-    `<span class="${prac ? `lv${r.lv}` : ''}" title="${r.ok}번 성공 · ${r.miss}번 틀림">${r.ch}${prac && r.miss ? `<small>${r.miss}</small>` : ''}</span>`).join('');
+    `<span class="${prac ? `g${r.lv}` : ''}" title="${prac ? `G${r.lv} · ` : ''}${r.ok}번 성공 · ${r.miss}번 틀림">${r.ch}${prac ? `<small>G${r.lv}</small>` : ''}</span>`).join('');
+  /* 22-B: 자모별 숙련도 한 줄 (0 처음 ~ 4 다 배움) */
+  const jl = JAMO24.filter(j => S.wrj && S.wrj[j]).map(j => `<span>${j}<b>${S.wrj[j].lv}</b></span>`).join(' ');
   return `<div class="setcard">
       <div class="sethd">✏️ 태블릿 · 글씨 (이 기기에만 저장)</div>
       <div class="setlab">📱 태블릿 모드<small>S펜으로 크게 쓰기 · 손바닥은 무시 · 글자마다 가이드를 줄여 갑니다</small></div>
@@ -5189,10 +5205,12 @@ function setWriteCard(){
       <div class="setlab">👀 시범 속도<small>처음 쓰는 글자를 손이 먼저 그려 보일 때의 빠르기 · 👀 보여줘 도 같은 빠르기</small></div>
       ${segHtml('demo', [{v:0,t:'천천히'},{v:1,t:'보통'},{v:2,t:'빠르게'}], DEV.demo, 3)}
       <div class="setline">써 본 글자 <span class="r">${all.length}자 · 다 배움 ${done.length}자</span></div>
-      <div class="setlab">🏅 다 배운 글자<small>혼자서 도움 없이 두 번 쓴 글자</small></div>
+      <div class="setlab">🏅 다 배운 글자<small>가이드 없이 빈 칸에서도 도움 없이 쓴 글자 · 가끔 복습으로 나옵니다</small></div>
       ${done.length ? `<div class="setjamo">${chips(done, false)}</div>` : `<div class="setnote">아직 없어요</div>`}
-      <div class="setlab">✏️ 연습 중 글자<small>자주 틀린 순 · 작은 숫자는 틀린 횟수</small></div>
+      <div class="setlab">✏️ 연습 중 글자<small>자주 틀린 순 · G0 시범+진한 가이드 → G1 흐린 가이드 → G2 시작 부분만 → G3 빈 칸</small></div>
       ${prac.length ? `<div class="setjamo">${chips(prac, true)}</div>` : `<div class="setnote">아직 없어요</div>`}
+      <div class="setlab">🔤 자모 숙련도<small>0 처음 ~ 4 다 배움 · 처음 보는 글자는 이걸로 출발 단계를 정합니다</small></div>
+      <div class="setnote setjl">${jl || '아직 없어요'}</div>
     </div>`;
 }
 
@@ -10469,6 +10487,7 @@ function wrPut(j, b, out){
     /* 이 획이 들어 있는 칸의 크기 — 판정을 얼마나 관대하게 할지 정합니다.
        낱자 하나면 칸이 크니 아주 관대하고, 음절 안의 작은 칸이면 그만큼 줄어듭니다 */
     a.cell = Math.sqrt(Math.abs((b[2]-b[0])*(b[3]-b[1]))) || 0.5;
+    a.jm = j;                             /* 22-B: 이 획이 어느 자모 조각인지 (자모 숙련도) */
     out.push(a);
   });
   return out;
@@ -10708,16 +10727,22 @@ let WR_RECENT = [];
 function wrNote(ch){ WR_RECENT.unshift(ch); if(WR_RECENT.length > 8) WR_RECENT.length = 8; }
 
 /* =========================================================
-   21차 A4: 글자(음절)마다 숙련도 — S.wrm[ch] = {lv, ok, miss, s, t}
-     lv 0  처음·최근 틀림 → (태블릿) 시범 → 흐린 글자 위에 따라 쓰기
-     lv 1  따라 쓰기 성공 → (태블릿) 가이드 없는 빈 칸. 4초 멈추면 시작점·화살표만 살짝
-     lv 2  혼자(빈 칸에서 도움 없이) 2번 성공 → 다 배운 글자
-     ok   깔끔하게(틀림 없이) 끝낸 횟수   miss 틀린 적이 있던 횟수
-     s    빈 칸에서 도움 없이 연달아 성공한 횟수 (lv1 → lv2 기준)   t 마지막으로 쓴 때
-   혼자 쓰다 틀리면 조용히 lv 0 — 아이에게는 아무 말도, 아무 소리도 없습니다.
-   폰(태블릿 모드 꺼짐)은 언제나 따라 쓰기라서 lv 0 → 1 까지만 올라갑니다.
+   22-B: 가이드를 점점 없애기 — 글자(음절)마다 숙련도 S.wrm[ch] = {lv, ok, miss, s, t}
+     lv 0  G0  시범(손이 먼저 그려 보임) → 진한 가이드 위에 따라 쓰기
+     lv 1  G1  시범 없이 흐린 가이드 (불투명도 약 35%)
+     lv 2  G2  지금 쓸 획의 시작점 · 첫 부분만 살짝 (나머지는 빈 칸)
+     lv 3  G3  빈 칸. 4초 멈추면 시작점 + 화살표만 살짝
+     lv 4  다 배운 글자 — 빈 칸으로 쓰고, 가끔 복습으로만 나옵니다
+     ok   틀림·대신 그리기 없이 끝낸 횟수   miss 틀린 적이 있던 횟수
+     s    도움 없이 연달아 깨끗하게 쓴 횟수   t 마지막으로 쓴 때
+   깨끗하게(틀림·힌트·보여줘 없이) 쓰면 한 단계 위로, 틀리거나 대신 그려 주면 **한 단계만** 아래로.
+   단계가 바뀌어도 아이에게는 아무 말도, 아무 소리도 없습니다 (벌처럼 보이면 안 됩니다).
+   폰과 태블릿이 같은 숙련도 · 같은 단계를 씁니다 (21차에는 폰이 늘 따라 쓰기였음).
+   옛 저장(21차: lv 0~2)은 load 에서 0→G0 · 1→G2 · 2→다 배움 으로 옮깁니다 (wrmv 2).
    ========================================================= */
-const WRM_SOLO = 2;
+const WRM_TOP = 4;           /* 다 배운 글자 */
+const WRM_VER = 2;           /* 저장의 wrm 형식 — 21차 옛 형식에는 이 값이 없습니다 */
+const WRM_SOLO = 2;          /* (옛 이름 — 다른 곳에서 안 씁니다) */
 function saneWrm(d){
   const out = {};
   if(!d || typeof d !== 'object') return out;
@@ -10725,38 +10750,110 @@ function saneWrm(d){
   Object.keys(d).forEach(ch=>{
     const r = d[ch];
     if(!r || typeof r !== 'object' || ch.length !== 1 || !decomp(ch)) return;
-    out[ch] = {lv:Math.min(2, num(r.lv)), ok:num(r.ok), miss:num(r.miss), s:num(r.s), t:num(r.t)};
+    out[ch] = {lv:Math.min(WRM_TOP, num(r.lv)), ok:num(r.ok), miss:num(r.miss), s:num(r.s), t:num(r.t)};
   });
   return out;
 }
+/* 21차 옛 단계(0 따라 쓰기 · 1 빈 칸 차례 · 2 다 배움) → 22-B 단계 */
+function wrmMigrate(m){
+  const map = [0, 2, WRM_TOP];
+  Object.keys(m).forEach(ch=>{ m[ch].lv = map[Math.min(2, m[ch].lv)]; });
+  return m;
+}
 function wrmOf(ch){ const r = S.wrm && S.wrm[ch]; return r ? r.lv : 0; }
 /* 한 글자를 다 쓴 결과로 숙련도를 옮깁니다 (순수 함수 — node 로 시험합니다).
-   o = {guide:'trace'|'blank', miss:틀린 획이 있었나, help:힌트·보여줘를 받았나,
-        auto:유령 손이 대신 그어 준 획이 있나(세 번 막힘 · 🤝 같이 쓰기)} */
+   o = {miss:틀린 획이 있었나, help:힌트·보여줘를 받았나,
+        auto:유령 손이 대신 그어 준 획이 있나(세 번 막힘 · 🤝 같이 쓰기),
+        start:처음 쓰는 글자일 때 출발 단계(자모 숙련도로 정함)} */
 function wrmApply(rec, o, now){
-  const r = rec ? Object.assign({lv:0, ok:0, miss:0, s:0, t:0}, rec) : {lv:0, ok:0, miss:0, s:0, t:0};
+  const st = Math.max(0, Math.min(WRM_TOP, (o && o.start) | 0));
+  const r = rec ? Object.assign({lv:0, ok:0, miss:0, s:0, t:0}, rec) : {lv:st, ok:0, miss:0, s:0, t:0};
   r.t = now || Date.now();
   if(o.miss) r.miss++;
   if(o.miss || o.auto){
-    if(o.guide === 'blank'){ r.lv = 0; r.s = 0; }          /* 혼자 쓰다 틀림·막힘 → 다시 시범부터 (조용히) */
+    r.lv = Math.max(0, r.lv - 1); r.s = 0;            /* 한 단계만 아래로 (조용히) */
     return r;
   }
   r.ok++;
-  if(o.guide === 'trace'){
-    if(r.lv === 0){ r.lv = 1; r.s = 0; }
-    return r;
-  }
-  if(!o.help){
-    r.s++;
-    if(r.lv >= 1 && r.s >= WRM_SOLO) r.lv = 2;
-  }
+  if(o.help){ r.s = 0; return r; }                    /* 도움을 받았으면 그 자리 그대로 */
+  r.s++;
+  r.lv = Math.min(WRM_TOP, r.lv + 1);
   return r;
 }
+
+/* ---------- 22-B: 자모 숙련도 S.wrj[자모] = {lv 0~4, ok, miss, t} ----------
+   음절을 다 쓸 때 그 안의 자모(겹자모는 조각까지: ㄲ→ㄱ, ㅘ→ㅗ·ㅏ, ㄳ→ㄱ·ㅅ)도 같이 기록합니다.
+   그 자모의 획에서 틀렸거나 대신 그려 줬으면 한 단계 아래, 깨끗하면(도움 없음) 한 단계 위.
+   처음 보는 음절은 이걸로 출발 단계를 정합니다 — 구성 자모 숙련도의 최솟값(최대 G2).
+   획마다도: 익숙한 자모의 획은 흐리게, 처음인 자모의 획은 진하게 (wrStepsOf) */
+const WRJ_START_MAX = 2;
+function saneWrj(d){
+  const out = {};
+  if(!d || typeof d !== 'object') return out;
+  const num = v => (typeof v === 'number' && isFinite(v) && v > 0) ? Math.floor(v) : 0;
+  Object.keys(d).forEach(j=>{
+    const r = d[j];
+    if(!r || typeof r !== 'object' || JAMO24.indexOf(j) < 0) return;
+    out[j] = {lv:Math.min(WRM_TOP, num(r.lv)), ok:num(r.ok), miss:num(r.miss), t:num(r.t)};
+  });
+  return out;
+}
+/* 옛 저장에 자모 기록이 없으면 음절 기록에서 대충 채웁니다 (값싼 옮기기) */
+function wrjSeed(m){
+  const out = {};
+  Object.keys(m || {}).forEach(ch=>{
+    const r = m[ch];
+    wrPieces(ch).forEach(j=>{
+      const o = out[j] || (out[j] = {lv:0, ok:0, miss:0, t:0});
+      o.lv = Math.max(o.lv, Math.min(3, r.lv)); o.ok += r.ok; o.miss += r.miss; o.t = Math.max(o.t, r.t);
+    });
+  });
+  return out;
+}
+function wrjOf(j){ const r = S.wrj && S.wrj[j]; return r ? r.lv : 0; }
+/* 그 글자에 든 자모 조각 (획 순서대로, 겹치지 않게) — 획마다 jm 꼬리표가 붙어 있습니다 */
+function wrPieces(ch){
+  let gs = [];
+  try{ gs = glyphStrokes(ch); }catch(e){}
+  const out = [];
+  gs.forEach(s=>{ if(s.jm && out.indexOf(s.jm) < 0) out.push(s.jm); });
+  return out;
+}
+function wrjApply(rec, bad, help, now){
+  const r = rec ? Object.assign({lv:0, ok:0, miss:0, t:0}, rec) : {lv:0, ok:0, miss:0, t:0};
+  r.t = now || Date.now();
+  if(bad){ r.miss++; r.lv = Math.max(0, r.lv - 1); return r; }
+  r.ok++;
+  if(!help) r.lv = Math.min(WRM_TOP, r.lv + 1);
+  return r;
+}
+/* 처음 쓰는 음절의 출발 단계 — 모르는 자모가 하나라도 있으면 G0 */
+function wrStartOf(ch){
+  const ps = wrPieces(ch);
+  if(!ps.length) return 0;
+  let m = WRJ_START_MAX;
+  ps.forEach(j=>{ m = Math.min(m, wrjOf(j)); });
+  return m;
+}
+/* 이번에 보여 줄 단계 — {step:글자 단계, steps:[획마다 단계]}
+   써 본 글자는 그 글자의 단계 그대로(모든 획 같음).
+   처음 보는 글자는 획마다 그 획 자모의 숙련도(최대 G2), 글자 단계는 그 최솟값입니다 */
+function wrStepsOf(ch, kind){
+  let gs = [];
+  try{ gs = glyphStrokes(ch); }catch(e){}
+  if(kind !== 'syl' || !decomp(ch)) return {step:0, steps:gs.map(()=>0)};
+  const rec = S.wrm && S.wrm[ch];
+  if(rec) return {step:rec.lv, steps:gs.map(()=>rec.lv)};
+  const steps = gs.map(s => Math.min(WRJ_START_MAX, s.jm ? wrjOf(s.jm) : 0));
+  return {step:steps.length ? Math.min.apply(null, steps) : 0, steps:steps};
+}
+
 /* ★ 글자 하나를 끝까지 썼을 때 **한 번만** 불립니다 (연습 화면 · 배틀 쓰기 · 잡을 때 쓰기 모두).
-   21-B(도장)는 여기에 붙이면 됩니다:
-     info.clean   도움 없이(시범·힌트·보여줘·틀림 없이) 빈 칸에서 완벽 → 도장 2개 자리
+   21-B(도장)는 여기에 붙입니다:
+     info.clean   도움 없이(시범·힌트·보여줘·틀림 없이) 빈 칸(G3 이상)에서 완벽 → 도장 2개 자리
      info.perfect 틀림 없이 끝냄 (가이드는 있었을 수 있음)
-     info.purpose 'practice' | 'ult' | 'catch' | 'cw' */
+     info.purpose 'practice' | 'ult' | 'catch' | 'cw'
+     info.step    이번에 쓴 단계(0~4)  info.before · info.after  숙련도 단계 */
 const WR_DONE_HOOKS = [];
 function wrLetterDone(w){
   if(!w || w.recorded) return null;
@@ -10767,22 +10864,73 @@ function wrLetterDone(w){
   const help = !!w.helped || auto;
   const info = {ch:w.ch, kind:w.kind, guide:guide, miss:miss, help:help,
                 auto:auto, perfect:(!miss && !auto), clean:(guide === 'blank' && !miss && !help),
-                purpose:w.bat ? w.purpose : 'practice'};
+                purpose:w.bat ? w.purpose : 'practice', step:(w.step | 0)};
+  const now = Date.now();
   if(w.kind === 'syl' && decomp(w.ch)){
     if(!S.wrm) S.wrm = {};
-    info.before = wrmOf(w.ch);
-    S.wrm[w.ch] = wrmApply(S.wrm[w.ch], {guide:guide, miss:miss, help:help, auto:auto});
+    const start = (w.start != null) ? w.start : wrStartOf(w.ch);
+    info.before = S.wrm[w.ch] ? S.wrm[w.ch].lv : start;
+    S.wrm[w.ch] = wrmApply(S.wrm[w.ch], {miss:miss, help:help, auto:auto, start:start}, now);
     info.after = S.wrm[w.ch].lv;
+  }
+  /* 자모 숙련도 — 음절이든 낱자 워밍업이든. 숫자는 빼고요 */
+  if((w.kind === 'syl' && decomp(w.ch)) || (w.kind === 'jamo' && JAMO24.indexOf(w.ch) >= 0) ||
+     (w.kind === 'jamo' && JAMO_PARTS[w.ch])){
+    if(!S.wrj) S.wrj = {};
+    wrPieces(w.ch).forEach(j=>{
+      const bad = w.jmiss ? !!w.jmiss[j] : (miss || auto);
+      S.wrj[j] = wrjApply(S.wrj[j], bad, !!w.helped, now);
+    });
   }
   WR_DONE_HOOKS.forEach(f=>{ try{ f(info); }catch(e){} });
   return info;
 }
+/* 지금 획에서 틀렸다 · 대신 그려 줬다 → 그 획의 자모에 표시 (자모 숙련도용) */
+function wrJMiss(w){
+  const t = WR.tmpl[w.si];
+  if(!w || !t || !t.jm) return;
+  if(!w.jmiss) w.jmiss = {};
+  w.jmiss[t.jm] = 1;
+}
+
+/* ---------- 22-B: 간격 복습 ----------
+   전에 써 봤고 아직 다 배우지 않은 글자 중 오래된 것을 다시 꺼냅니다.
+   단계가 오를수록 간격이 길어집니다: G0 2시간 · G1 6시간 · G2 1일 · G3 3일 · 다 배움 7일 */
+const WR_REV_SHARE = 1/3;
+const WR_REV_GAP = [2*3600e3, 6*3600e3, 86400e3, 3*86400e3, 7*86400e3];
+function wrDue(ch, now){
+  const r = S.wrm && S.wrm[ch];
+  if(!r) return -1;
+  const gap = WR_REV_GAP[Math.min(WRM_TOP, r.lv)];
+  return ((now || Date.now()) - (r.t || 0)) / gap;          /* 1 이상이면 꺼낼 때가 됨 */
+}
+/* 꺼낼 글자 하나 (없으면 null) — 가장 오래 기다린 글자. 최근에 쓴 글자 · 빼라는 글자는 피합니다 */
+function wrReviewPick(now, filt){
+  const t = now || Date.now();
+  let best = null, bd = 1;
+  Object.keys(S.wrm || {}).forEach(ch=>{
+    if(WR_RECENT.indexOf(ch) >= 0) return;
+    if(filt && !filt(ch)) return;
+    const d = wrDue(ch, t);
+    if(d >= bd){ bd = d; best = ch; }
+  });
+  return best;
+}
+/* 그 글자가 든 낱말 (말해 줄 때 「낱말」의 글자) — 낱말 990개, 없으면 포켓몬 이름 */
+function wrWordFor(ch, rnd){
+  const rr = rnd || Math.random;
+  const ws = WORD_ALL.filter(w => w.n.indexOf(ch) >= 0);
+  if(ws.length){ const w = ws[Math.floor(rr()*ws.length)]; return {word:w.n, emoji:w.emoji}; }
+  const m = MONS.find(m => m.n.indexOf(ch) >= 0);
+  return m ? {word:m.n, emoji:''} : null;
+}
 
 /* 21차 A5: 잡을 때 쓸 글자 — 잡는 포켓몬 이름에서 한 글자.
    lv 0·1(안 써 본 글자 포함)을 먼저, 최근에 쓴 글자는 피합니다.
-   5번에 1번쯤은 이름에 없는 글자(받침 글자 등)를 낱말 990개에서 섞어 모든 글자를 골고루 */
+   5번에 1번쯤은 이름에 없는 글자(받침 글자 등)를 낱말 990개에서 섞어 모든 글자를 골고루.
+   22-B: 3번에 1번쯤은 **복습 몫** — 전에 써 봤고 꺼낼 때가 된 글자(wrReviewPick)를 먼저 */
 const CW_OTHER = 0.2;
-function cwRank(ch){ return (wrmOf(ch) < 2 ? 0 : 2) + (WR_RECENT.indexOf(ch) >= 0 ? 1 : 0); }
+function cwRank(ch){ return (wrmOf(ch) < WRM_TOP ? 0 : 2) + (WR_RECENT.indexOf(ch) >= 0 ? 1 : 0); }
 function cwBest(list){
   if(!list.length) return null;
   let best = 9; list.forEach(c=>{ best = Math.min(best, cwRank(c)); });
@@ -10803,10 +10951,18 @@ function cwOtherPick(name, rnd){
   }
   return fall;
 }
-function cwPick(name, rnd){
+function cwPick(name, rnd, now){
   const rr = rnd || Math.random;
   const nm = String(name || '');
   const own = nm.split('').filter((c,i,a) => decomp(c) && a.indexOf(c) === i && canWrite(c));
+  if(rr() < WR_REV_SHARE){
+    const rv = wrReviewPick(now, c => canWrite(c));
+    if(rv){
+      if(nm.indexOf(rv) >= 0) return {ch:rv, word:nm, emoji:'', fromName:true, review:true};
+      const wd = wrWordFor(rv, rr);
+      if(wd) return {ch:rv, word:wd.word, emoji:wd.emoji, fromName:false, review:true};
+    }
+  }
   if(!own.length || rr() < CW_OTHER){
     const o = cwOtherPick(nm, rr);
     if(o) return o;
@@ -10833,8 +10989,15 @@ function wrFirstNewJamo(ch){
 }
 function wrMarkJamo(ch){ wrJamosOf(ch).forEach(j=>{ WR_JAMO_SEEN[j] = 1; }); }
 
-/* 받침 없는 쉬운 글자 하나 — 지금 배우는 낱말 단계(S.learn)에서 골라 옵니다 */
-function wrPickSyl(){
+/* 받침 없는 쉬운 글자 하나 — 지금 배우는 낱말 단계(S.learn)에서 골라 옵니다.
+   22-B: 3번에 1번쯤은 복습 몫 — 전에 써 봤고 꺼낼 때가 된 글자 */
+function wrPickSyl(rnd, now){
+  const rr = rnd || Math.random;
+  if(rr() < WR_REV_SHARE){
+    const rv = wrReviewPick(now, c => canWrite(c));
+    const wd = rv && wrWordFor(rv, rr);
+    if(wd) return {ch:rv, word:wd.word, emoji:wd.emoji, review:true};
+  }
   const st = pickStage('ko');
   let pool = (WORD_BY_LV[st] && WORD_BY_LV[st].length) ? WORD_BY_LV[st] : WORD_ALL;
   for(let k=0;k<50;k++){
@@ -10886,17 +11049,20 @@ function wrNewTarget(){
   wrPrep(w);
   return w;
 }
-/* 21차 A4: 새 글자를 시작할 때마다 — 이번에 어떤 가이드로 쓸지 정합니다.
-   태블릿 모드가 아니면 언제나 'trace'(지금까지의 방식) 이고 화면도 그대로입니다 */
+/* 21차 A4 → 22-B: 새 글자를 시작할 때마다 — 이번에 어떤 가이드로 쓸지 정합니다.
+   'blank' = G3 이상(빈 칸), 'trace' = G0~G2. 폰 · 태블릿 같습니다 (도장 2개는 'blank' 에서만) */
 function wrGuideOf(w){
-  if(!tabOn() || !w || w.kind !== 'syl' || !decomp(w.ch)) return 'trace';
-  return wrmOf(w.ch) >= 1 ? 'blank' : 'trace';
+  if(!w || w.kind !== 'syl' || !decomp(w.ch)) return 'trace';
+  return wrStepsOf(w.ch, w.kind).step >= 3 ? 'blank' : 'trace';
 }
 function wrPrep(w){
-  w.guide = wrGuideOf(w);
-  w.helped = false; w.recorded = false; w.forced = false; w.stuck = 0;
-  /* lv 0 이면 시범부터 (약 2초). 펜을 대는 순간 끝납니다 */
-  WR.demo = (tabOn() && w.kind === 'syl' && w.guide === 'trace' && wrmOf(w.ch) === 0) ? {t0:0} : null;
+  const P = wrStepsOf(w.ch, w.kind);
+  w.step = P.step; w.steps = P.steps;
+  w.start = (w.kind === 'syl' && S.wrm && S.wrm[w.ch]) ? null : P.step;   /* 처음 쓰는 글자의 출발 단계 */
+  w.guide = P.step >= 3 ? 'blank' : 'trace';
+  w.helped = false; w.recorded = false; w.forced = false; w.stuck = 0; w.jmiss = {};
+  /* G0 이면 시범부터 (약 2초). 펜 · 손가락을 대는 순간 끝납니다 */
+  WR.demo = (w.kind === 'syl' && P.step === 0) ? {t0:0} : null;
   WR.fb = null; WR.hint = null; WR.auto = 0;
   WR.lastAct = (typeof performance !== 'undefined') ? performance.now() : 0;
 }
@@ -11393,6 +11559,7 @@ function wrAfterJudgeTab(res, raw){
   const w = wrState();
   if(res === 'tiny'){ w.tip = `${wrTool()}으로 쭉 그어 봐!`; wrDots(); return; }
   if(res === 'ok'){ wrPass(raw, false); return; }
+  wrJMiss(w);                                  /* 22-B: 이 획의 자모에 표시 (자모 숙련도) */
   w.fail++; w.clean = false; w.stuck = (w.stuck || 0) + 1;
   const now = performance.now();
   WR.fb = {kind:res, t0:now, raw:raw.slice()};
@@ -11431,6 +11598,7 @@ function wrAfterJudge(res, raw){
   if(res === 'tiny'){ w.tip = '손가락으로 쭉 그어 봐!'; return; }   /* 톡 친 것은 실패가 아닙니다 */
   if(res === 'ok'){ wrPass(raw, false); return; }
 
+  wrJMiss(w);                                  /* 22-B: 이 획의 자모에 표시 (자모 숙련도) */
   w.fail++; w.clean = false;
   if(w.fail === 1){
     const tc = WR.tmpl[w.si];
@@ -11456,7 +11624,7 @@ function wrPass(raw, auto){
   const t = WR.tmpl[w.si];
   /* 남는 선은 두 번 부드럽게 — 6살 손가락의 지터가 그대로 남지 않게 (판정과는 무관) */
   const mine = raw ? wrSmooth(wrSmooth(raw)).map(p=>[p[0]/WR.size, p[1]/WR.size]) : null;
-  if(auto) w.forced = true;            /* 19차: 세 번 만에 같이 그려 준 획이 하나라도 있으면 표시 */
+  if(auto){ w.forced = true; wrJMiss(w); }   /* 19차: 세 번 만에 같이 그려 준 획이 하나라도 있으면 표시 */
   WR.drawn.push({pts: (auto || !mine) ? t.slice() : mine, auto:!!auto});
   w.si++; w.fail = 0;
   w.stuck = 0; WR.hint = null;                    /* 21차: 다음 획은 새로 셉니다 */
@@ -11507,13 +11675,10 @@ function wrDots(){
 function wrTipDefault(){
   const w = wrState();
   if(w.done) return '다 썼다! 🎉';
-  /* 21차: 태블릿 — 시범 중 · 혼자 쓰기(빈 칸) 문구 */
-  if(tabOn()){
-    if(WR.demo) return '잘 봐! 펜을 대면 바로 쓸 수 있어 👀';
-    if(w.guide === 'blank' && !(w.stuck >= 2)) return `혼자 써 볼까? ${w.si+1}번 획 ✏️`;
-    return `${w.si+1}번 획을 펜으로 그어 봐!`;
-  }
-  return `${w.si+1}번 획을 손가락으로 그어 봐!`;
+  /* 21차 · 22-B: 시범 중 · 혼자 쓰기(G2 이상) 문구 — 폰(손가락) · 태블릿(펜) 같은 모양 */
+  if(WR.demo) return `잘 봐! ${wrTool()}을 대면 바로 쓸 수 있어 👀`;
+  if(wrStepAt(w, w.si) >= 2) return `혼자 써 볼까? ${w.si+1}번 획 ✏️`;
+  return `${w.si+1}번 획을 ${wrTool()}으로 그어 봐!`;
 }
 
 /* ---------- 그리기 ---------- */
@@ -11576,7 +11741,21 @@ function wrBadge(ctx, p, k, n, kind, r){
 /* =========================================================
    21차 A3 · A4: 태블릿 모드 전용 그리기 (폰에서는 한 번도 불리지 않습니다)
    ========================================================= */
-const WR_STALL_MS = 4000;      /* 빈 칸에서 이만큼 멈추면 시작점·화살표만 살짝 */
+const WR_STALL_MS = 4000;
+/* 22-B: 획 i 를 이번에 어떤 단계로 보여 줄까 (0 진한 가이드 · 1 흐린 가이드 · 2 시작 부분만 · 3+ 빈 칸).
+   지금 쓸 획에서 막히면 그 획만 다시 진하게: 두 번 막힘(stuck), 흐린 가이드에서 한 번 틀림,
+   폰은 한 번 틀리면(폰의 "이쪽에서 시작해 볼까?" 안내가 가리킬 선이 있어야 합니다) */
+const WR_FADE = 0.35;
+function wrBaseStep(w, i){
+  if(!w || w.kind !== 'syl') return 0;
+  return (w.steps && w.steps[i] != null) ? w.steps[i] : (w.step | 0);
+}
+function wrStepAt(w, i){
+  if(!w || w.kind !== 'syl') return 0;
+  let s = wrBaseStep(w, i);
+  if(i === w.si && s > 0 && (w.stuck >= 2 || (w.fail >= 1 && (s <= 1 || !tabOn())))) s = 0;
+  return s;
+}      /* 빈 칸에서 이만큼 멈추면 시작점·화살표만 살짝 */
 function wrDemoMs(n){ return Math.max(1400, Math.min(2600, (n || 1) * 450)); }
 /* 21차 D: 시범을 획마다 천천히 — 아빠 "처음 보여주는 가이드가 너무 빠른 것 같아".
    획 하나를 min~max ms 동안(획이 길수록 오래) 그리고, 획 사이에 gap ms 쉬고, 첫 획 전에 lead ms 기다립니다.
@@ -11629,7 +11808,7 @@ function wrTabTick(w, now){
     }
     return;
   }
-  if(w.guide !== 'blank' || w.done || WR.drawing || WR.auto || WR.ghost) return;
+  if(wrBaseStep(w, w.si) < 2 || w.done || WR.drawing || WR.auto || WR.ghost) return;
   if(now - (WR.lastAct || now) < WR_STALL_MS) return;
   WR.lastAct = now;
   w.stuck = (w.stuck || 0) + 1;
@@ -11767,12 +11946,12 @@ function wrPaint(){
   if(!ctx) return;
   const now = performance.now();
   ctx.clearRect(0,0,k,k);
-  /* 21차: 태블릿 모드에서만 달라집니다. 폰(TB=false)은 한 줄도 바뀌지 않게 갈라 놓았습니다 */
+  /* 21차: 종이 · 틀림 알림은 태블릿 모드에서만 달라집니다.
+     22-B: 가이드 단계(G0~G3 · wrStepAt)는 폰 · 태블릿 같습니다 — 폰은 화면 배치는 그대로, 그리는 내용만 달라집니다.
+     G0 은 21차까지의 폰 화면과 똑같습니다 (시범만 더해짐) */
   const TB = tabOn();
-  if(TB) wrTabTick(w, now);
-  /* blank(lv1·2) 이면 밑그림·안내선·번호를 숨깁니다. 두 번 막히면 다시 보여 줍니다 */
-  const showGuide = !TB || (w.guide !== 'blank') || (w.stuck >= 2);
-  const demo = TB ? WR.demo : null;
+  wrTabTick(w, now);
+  const demo = WR.demo;
 
   if(TB){
     wrTabPaper(ctx, k, w);
@@ -11790,11 +11969,16 @@ function wrPaint(){
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
   const bw = Math.max(9, k*0.05);       /* 획 굵기 */
 
-  /* ① 아직 안 쓴 획 — 흐린 밑그림 */
+  /* ① 아직 안 쓴 획 — 흐린 밑그림 (G0 그대로 · G1 더 흐리게 · G2 부터 안 보임) */
   ctx.setLineDash([]);
-  if(showGuide) for(let i=w.si+1;i<WR.tmpl.length;i++){
+  for(let i=w.si+1;i<WR.tmpl.length;i++){
+    const s = wrStepAt(w, i);
+    if(s >= 2) continue;
+    ctx.save();
+    if(s === 1) ctx.globalAlpha = WR_FADE;
     ctx.strokeStyle = WR_SOFT; ctx.lineWidth = bw*0.8;
     wrPath(ctx, WR.tmpl[i], k); ctx.stroke();
+    ctx.restore();
   }
 
   /* ② 다 쓴 획 — 하준이가 그은 그대로 (대신 그려 준 획은 초록) */
@@ -11809,20 +11993,39 @@ function wrPaint(){
   if(!w.done && w.si < WR.tmpl.length){
     const t = WR.tmpl[w.si];
     const strong = w.fail >= 1;                       /* 1회 실패하면 더 또렷하게 */
-    if(showGuide && !demo){
+    const sNow = wrStepAt(w, w.si);
+    /* 22-B G2: 지금 쓸 획의 시작점과 첫 부분만 살짝 */
+    if(sNow === 2 && !demo){
+      const seg = wrPartial(t, 0.3);
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      if(seg.length > 1){
+        ctx.setLineDash([bw*0.9, bw*0.85]);
+        ctx.strokeStyle = WR_NOW; ctx.lineWidth = bw*0.8;
+        wrPath(ctx, seg, k); ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.arc(t[0][0]*k, t[0][1]*k, Math.max(8, k*0.03), 0, Math.PI*2);
+      ctx.fillStyle = WR_NOW; ctx.fill();
+      ctx.restore();
+    }
+    if(sNow <= 1 && !demo){
     ctx.save();
+    const fa = sNow === 1 ? WR_FADE : 1;              /* 22-B G1: 흐린 가이드 (모든 그리기를 이 비율로) */
     ctx.setLineDash([bw*0.9, bw*0.85]);
     ctx.strokeStyle = strong ? '#3FA8D6' : WR_NOW;
-    ctx.globalAlpha = strong ? 0.95 : 0.75;
+    ctx.globalAlpha = (strong ? 0.95 : 0.75) * fa;
     ctx.lineWidth = bw*0.9;
     wrPath(ctx, t, k); ctx.stroke();
     ctx.restore();
+    ctx.save(); ctx.globalAlpha = fa;
     wrArrow(ctx, t, k, strong ? '#3FA8D6' : WR_NOW);
+    ctx.restore();
 
     /* 시작점 반짝임 — "여기서 시작해!" */
     const pu = 0.5 + 0.5*Math.sin(now/(strong?170:300));
     ctx.save();
-    ctx.globalAlpha = 0.30 + 0.45*pu;
+    ctx.globalAlpha = (0.30 + 0.45*pu) * fa;
     ctx.beginPath();
     ctx.arc(t[0][0]*k, t[0][1]*k, Math.max(12,k*0.055) + pu*Math.max(6,k*0.03), 0, Math.PI*2);
     ctx.fillStyle = strong ? '#FFC93C' : '#BFE9FA';
@@ -11859,8 +12062,8 @@ function wrPaint(){
 
   /* ⑤ 획 번호 — ① 어디서 시작해 어디로.
      ㅅ ㅈ ㅊ 처럼 시작점이 같은 획은 번호가 겹치므로 자기 획 위로 조금 밀어 줍니다 */
-  if(TB) wrTabOver(ctx, k, w, now, bw);
-  if(!showGuide || demo) return;
+  wrTabOver(ctx, k, w, now, bw);          /* 시범 · 초록 시작점 (폰도). 틀림 알림(fb)은 태블릿에서만 생깁니다 */
+  if(demo) return;
   const br = Math.max(10, k*0.048);
   const placed = [];
   for(let i=0;i<WR.tmpl.length;i++){
@@ -11880,8 +12083,12 @@ function wrPaint(){
       p = wrAt(tp, Math.min(L*0.8, br*2.1*tr));
     }
     placed.push(p);
+    const s = wrStepAt(w, i);                 /* 22-B: G1 흐리게 · G2 부터 번호 없음 */
+    if(s >= 2) continue;
     const kind = i < w.si ? 'done' : (i === w.si && !w.done ? 'now' : 'wait');
+    ctx.save(); if(s === 1) ctx.globalAlpha = WR_FADE;
     wrBadge(ctx, [p[0]/k, p[1]/k], k, i+1, kind, i === w.si && !w.done ? br*1.12 : br*0.86);
+    ctx.restore();
   }
 }
 
@@ -12028,7 +12235,8 @@ function act(a){
     /* 보여줘 — 실패로 세지 않습니다. 언제든 몇 번이든 볼 수 있습니다 */
     case 'wrshow': { const w = wrState(); if(!w.done){ w.helped = true;
       /* 21차 D: 태블릿은 지금 쓸 획부터 끝까지 시범을 다시 — 고른 시범 속도 그대로. 펜을 대면 바로 끝 */
-      if(tabOn() && !WR.auto && !WR.drawing && WR.tmpl[w.si]){ WR.ghost = null; WR.hint = null; WR.demo = {t0:0, from:w.si}; w.tip = ''; tone(520,0.12,'triangle',0.05); wrDots(); }
+      /* 22-B: 폰도 음절이면 같은 시범 (어느 단계에서든) */
+      if((tabOn() || w.kind === 'syl') && !WR.auto && !WR.drawing && WR.tmpl[w.si]){ WR.ghost = null; WR.hint = null; WR.demo = {t0:0, from:w.si}; w.tip = ''; tone(520,0.12,'triangle',0.05); wrDots(); }
       else{ w.tip = '이렇게 그리는 거야! 👀'; wrGhost(1200); wrDots(); } } break; }
     /* 21차 A5: 🤝 같이 쓰기 — 지금 획을 유령 손이 그어 줍니다. 연출 중에도 언제나 눌립니다 (갇힘 0) */
     case 'wrhelp': wrHelpStroke(); break;
