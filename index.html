@@ -2244,6 +2244,61 @@ body.tzl #app.fldscr .dpad .dexbtn,body.tzl #app.fldscr .dpad .homebtn{font-size
 body.tzl #app.fldscr .regbar .btn,body.tzl #app.fldscr .regbar .pos{min-height:50px;font-size:15px;}
 body.tzl #app.fldscr .gateface{font-size:26px;}
 body.tzl #app.fldscr .drop{font-size:28px;}
+
+/* ============================================================
+   27-B: 받아쓰기 · 낱말 쓰기 · 하루 목표 · 엄마·아빠 리포트
+   ============================================================ */
+.wrmode{gap:5px;}
+.wrmode .btn{font-size:14px;padding:4px 2px;white-space:nowrap;letter-spacing:-.05em;min-width:0;}
+.wrhead .ch.chsnd{font-family:var(--font);font-size:clamp(20px,6.4vw,28px);min-height:40px;min-width:54px;cursor:pointer;
+  background:#DDF3FC;box-shadow:0 3px 0 var(--edge);color:var(--ink);}
+.wrhead .ch.chsnd:active{transform:translateY(2px);box-shadow:none;}
+.wrrow.dict .btn.wrsnd{flex:1.5;}
+.wstrip b{display:inline-block;min-width:1.3em;text-align:center;padding:0 2px;margin:0 1px;border-radius:7px;
+  border:2px dashed #C9D3DA;color:var(--ink-soft);line-height:1.3;}
+.wstrip b.done{border:2px solid var(--grass);background:#E6F6E3;color:var(--ink);}
+.wstrip b.now{border:2px solid var(--edge);background:var(--sun);color:var(--ink);}
+.wrempty{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  text-align:center;background:#fff;border:4px solid var(--edge);border-radius:20px;padding:14px;width:100%;
+  box-sizing:border-box;word-break:keep-all;overflow:hidden;}
+.wrempty .big{font-size:52px;line-height:1;}
+.wrempty b{font-size:18px;font-weight:900;}
+.wrempty span{font-size:14px;font-weight:800;color:var(--ink-soft);}
+.wrempty .btn{min-height:54px;font-size:17px;}
+.wrpaper .cheer.word{flex-direction:column;}
+.wrpaper .cheer.word.go{animation:wrcheerW 2.6s ease-out forwards;}
+.wcheer{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.wcheer .wpic{font-size:clamp(60px,20vw,120px);line-height:1;-webkit-text-stroke:0;}
+@keyframes wrcheerW{0%{opacity:0;transform:scale(.5);}15%{opacity:1;transform:scale(1.08);}30%{opacity:1;transform:scale(1);}85%{opacity:1;}100%{opacity:0;}}
+/* 맵 ✏️ 버튼 모서리 — 오늘 목표 진행 (지도 크기는 그대로) */
+#map .wrfab .gl{position:absolute;left:-10px;bottom:-7px;min-width:28px;height:20px;padding:0 4px;box-sizing:border-box;
+  border-radius:10px;background:#fff;border:2.5px solid var(--edge);font-size:10.5px;font-weight:900;line-height:15px;
+  letter-spacing:-.04em;color:var(--ink);pointer-events:none;white-space:nowrap;}
+#map .wrfab .gl.ok{background:var(--grass);}
+/* 하루 목표 달성 — 도장 쾅 아래쪽에 잠깐. 아무것도 막지 않습니다 */
+#goalfx{position:fixed;left:0;right:0;top:calc(120px + env(safe-area-inset-top));z-index:96;pointer-events:none;
+  display:none;justify-content:center;padding:0 10px;}
+#goalfx.go{display:flex;}
+#goalfx .gfx-card{display:flex;align-items:center;gap:10px;background:#FFFBE6;border:4px solid var(--edge);border-radius:20px;
+  padding:8px 14px 8px 8px;box-shadow:0 5px 0 rgba(0,0,0,.25);max-width:100%;box-sizing:border-box;
+  animation:sfxIn .22s ease-out, sfxOut .35s ease-in 3.2s forwards;}
+#goalfx .gfx-big{font-size:46px;line-height:1;animation:stThump .5s cubic-bezier(.3,1.5,.5,1) both;}
+#goalfx .gfx-side{min-width:0;}
+#goalfx .gfx-txt{font-weight:900;font-size:19px;color:#E0453A;white-space:nowrap;}
+#goalfx .gfx-sub{font-weight:800;font-size:12.5px;color:var(--ink);word-break:keep-all;}
+#goalfx .gfx-wk{font-weight:900;font-size:13px;color:var(--ink);margin-top:2px;}
+/* 리포트 */
+.repbars{width:100%;height:auto;display:block;max-height:160px;}
+.repkb{display:flex;height:14px;border-radius:7px;overflow:hidden;border:2px solid var(--edge);}
+.repkb i{display:block;min-width:3px;}
+.repkl{display:flex;flex-wrap:wrap;gap:3px 10px;font-weight:800;font-size:11.5px;color:var(--ink-soft);}
+.repkl span{white-space:nowrap;}
+.repkl i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px;}
+.setjamo span small{font-size:11px;color:var(--ink-soft);font-weight:800;vertical-align:baseline;line-height:1;}
+body.tab .wrhead .ch.chsnd{font-size:36px;min-width:76px;min-height:52px;}
+@media (orientation:landscape){
+  body.tab .wrmode{display:grid;grid-template-columns:1fr 1fr;}
+}
 </style>
 
 <div id="app">
@@ -5330,7 +5385,9 @@ function save(){
              /* 22-B: 자모 숙련도 */
              wrj:S.wrj,
              /* 21차 B: 도장 · 코스튬 */
-             stamp:S.stamp, cos:S.cos};
+             stamp:S.stamp, cos:S.cos,
+             /* 27-B: 엄마·아빠 리포트 — 날짜별 요약 (최근 30일만, 끝의 빈 값은 잘라서 작게) */
+             rep:repPack(S.rep)};
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(d)); }catch(e){ memoryStore = d; }
 }
 function load(){
@@ -5389,6 +5446,8 @@ function load(){
   S.stamp = saneStamp(d.stamp);
   S.cos = saneCos(d.cos, S.stamp);
   S.stampOpen = false; S.cosBox = null; S.closet = null;
+  /* 27-B: 리포트 — 이상한 값 · 30일 지난 날은 조용히 버립니다 */
+  S.rep = saneRep(d.rep);
   /* 6차: 쓰러짐(ko)은 S.mons 안에 같이 저장됩니다.
      체력이 이상하게 저장돼 있어도 아이가 갇히지 않게 여기서 바로잡습니다 */
   S.swapping = false; S.reviveTarget = null; S.reviveGot = 0;
@@ -5873,7 +5932,7 @@ const SET_BATTLE = [
   {n:'어려움', hp:1.28, dmg:1.30}
 ];
 const SET_WEAK = [ {n:'낮음', p:0.15}, {n:'보통', p:0.30}, {n:'높음', p:0.45} ];
-function freshSet(){ return {koStage:0, numStage:0, battle:1, want:0, weak:1, jamo:1, combo:1, solo:1}; }   /* 27-A: solo 혼자 한 번 더 1 켜기 · 0 끄기 */   /* 25차: combo 연타 전투 0 끄기 · 1 가끔 · 2 자주 */
+function freshSet(){ return {koStage:0, numStage:0, battle:1, want:0, weak:1, jamo:1, combo:1, solo:1, goal:5}; }   /* 27-B: goal 하루 목표 글자 수 3 · 5 · 10 */   /* 27-A: solo 혼자 한 번 더 1 켜기 · 0 끄기 */   /* 25차: combo 연타 전투 0 끄기 · 1 가끔 · 2 자주 */
 /* 저장에서 읽어 온 값 다듬기 — 이상하면 조용히 자동으로 돌아갑니다 */
 function saneSet(d){
   const s = freshSet();
@@ -5890,6 +5949,8 @@ function saneSet(d){
   const cb = int(d.combo,0,2);            if(cb != null) s.combo = cb;
   /* 27-A: 혼자 한 번 더. 이 값이 없는 옛 저장은 "켜기" 로 열립니다 */
   const so = int(d.solo,0,1);             if(so != null) s.solo = so;
+  /* 27-B: 하루 목표. 3 · 5 · 10 말고는 기본 5 */
+  const gl = int(d.goal,1,10);            if(gl === 3 || gl === 5 || gl === 10) s.goal = gl;
   return s;
 }
 function setOf(){
@@ -6280,7 +6341,7 @@ function viewField(){
     <div id="world" data-r="${S.reg}" style="transform:${worldTf()}"><div class="terrph"></div>${tiles}${drops}${folHtml()}<div id="player" class="${kidCls()}" style="transform:translate(${S.px*100}%, ${S.py*100}%);z-index:${3*S.py + 12}">${trainerSvg()}${feetFx()}</div>${worldFx(S.reg)}</div>
     ${/* 17차: ✏️ 글씨 쓰기 — 지도 위에 얹어서 지역줄·지도 크기를 하나도 건드리지 않습니다.
          배틀·포획과 완전히 따로 도는 길이라 언제 눌러도 손해가 없습니다 */''}
-    <button class="btn wrfab" data-act="write" aria-label="글씨 쓰기">✏️<span class="wt">글씨</span></button>
+    <button class="btn wrfab" data-act="write" aria-label="글씨 쓰기">✏️<span class="wt">글씨</span>${goalPill()}</button>
     ${/* 21차 B: 🎀 도장판 · 옷장 — 글씨 버튼 바로 아래. 상자가 있으면 🎁 로 흔들립니다 */''}
     <button class="btn stfab${boxesPending() ? ' gift' : ''}" data-act="stamps" aria-label="도장판">${boxesPending() ? '🎁' : '🎀'}<span class="wt">${boxesPending() ? '상자!' : `${(S.stamp || 0) % STAMP_BOARD}/${STAMP_BOARD}`}</span></button>
   </div>
@@ -6687,6 +6748,63 @@ function setMusicCard(){
       ${segHtml('mus', [{v:1,t:'켜기'},{v:0,t:'끄기'}], DEV.mus === 0 ? 0 : 1, 2)}
       <div class="setlab">🔉 음악 크기<small>목소리가 나올 때와 글씨를 쓸 때는 저절로 더 작아집니다</small></div>
       ${segHtml('mv', [{v:0,t:'작게'},{v:1,t:'보통'},{v:2,t:'크게'}], DEV.mv, 3)}
+    </div>`;
+}
+
+/* 27-B ③ · ④: 엄마·아빠 리포트 + 하루 목표 고르기 (게임 저장 — 기록 옮기기로 같이 갑니다) */
+let REP_VIEW = 'w';
+const REP_DOW = ['일','월','화','수','목','금','토'];
+function repBarsSvg(now){
+  const days = repLast(7, now), g = goalOf();
+  const vals = days.map(d => { const R = S.rep && S.rep[String(d)]; return {n:R ? R[0] : 0, ok:!!(R && R[12])}; });
+  const mx = Math.max(g, 1, ...vals.map(v => v.n));
+  const W = 280, H = 118, top = 16, base = 96, bw = 26, gap = (W - 7*bw) / 8;
+  const gy = (base - (base - top) * g / mx).toFixed(1);
+  let s = `<svg class="repbars" viewBox="0 0 ${W} ${H}" role="img" aria-label="최근 7일 쓴 글자 수">`;
+  s += `<line x1="4" x2="${W-4}" y1="${gy}" y2="${gy}" stroke="#F0A800" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+  vals.forEach((v, i)=>{
+    const x = (gap + i*(bw + gap)).toFixed(1), h = (base - top) * v.n / mx, today = i === 6;
+    if(v.n) s += `<rect x="${x}" y="${(base - h).toFixed(1)}" width="${bw}" height="${Math.max(2, h).toFixed(1)}" rx="5" fill="${v.ok ? '#63C266' : '#57BADF'}"/>`
+             + `<text x="${(+x + bw/2).toFixed(1)}" y="${(base - h - 3).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="900" fill="#26331F">${v.n}</text>`;
+    s += `<text x="${(+x + bw/2).toFixed(1)}" y="${base + 15}" text-anchor="middle" font-size="11" font-weight="${today ? 900 : 700}" fill="${today ? '#26331F' : '#6B7780'}">${today ? '오늘' : REP_DOW[(days[i] + 4) % 7]}</text>`;
+  });
+  s += `<line x1="2" x2="${W-2}" y1="${base}" y2="${base}" stroke="#B9C4CC" stroke-width="1.5"/></svg>`;
+  return s;
+}
+function setReportCard(){
+  const now = Date.now(), day = REP_VIEW === 'd';
+  const A = repAgg(repLast(day ? 1 : 7, now));
+  const G = goalNow(now), wk = goalWeek(now);
+  const kt = A.k[0] + A.k[1] + A.k[2] + A.k[3];
+  const KN = [['순서','#F2679B'], ['방향','#57BADF'], ['글자 안 순서','#FFC93C'], ['모양·자리','#9AA7B0']];
+  const kbar = kt
+    ? `<div class="repkb">${A.k.map((v,i)=> v ? `<i style="flex:${v};background:${KN[i][1]}"></i>` : '').join('')}</div>
+       <div class="repkl">${A.k.map((v,i)=>`<span><i style="background:${KN[i][1]}"></i>${KN[i][0]} ${Math.round(v / kt * 100)}%</span>`).join('')}</div>`
+    : `<div class="setnote">틀린 획이 없어요</div>`;
+  const topOf = o => Object.keys(o).sort((a,b)=> (o[b] - o[a]) || (a < b ? -1 : 1)).slice(0, 5);
+  const chips = (o, ks) => `<div class="setjamo">${ks.map(c => `<span>${c}<small> ${o[c]}번</small></span>`).join('')}</div>`;
+  const top = topOf(A.m), dtop = topOf(A.dm);
+  return `<div class="setcard">
+      <div class="sethd">📈 엄마·아빠 리포트</div>
+      <div class="seg c2"><button class="segb${day ? '' : ' on'}" data-act="rep:w">최근 7일</button><button class="segb${day ? ' on' : ''}" data-act="rep:d">오늘</button></div>
+      ${repBarsSvg(now)}
+      <div class="setnote">막대 = 그날 쓴 글자 수 · 노란 점선 = 하루 목표 ${goalOf()}개 · 초록 막대 = 목표를 이룬 날</div>
+      <div class="setline">쓴 글자 <span class="r">${A.n}자${day ? '' : ` · ${A.act}일 썼어요`}</span></div>
+      <div class="setline">틀림·도움 없이 쓴 비율 <span class="r">${A.n ? `${Math.round(A.c / A.n * 100)}% (${A.c}/${A.n})` : '-'}</span></div>
+      <div class="setline">받아쓰기 바로 맞힘 <span class="r">${A.dn ? `${A.dok} / ${A.dn}` : '-'}</span></div>
+      <div class="setline">다 쓴 낱말 · 혼자 한 번 더 성공 <span class="r">${A.wd}개 · ${A.so}번</span></div>
+      <div class="setline">하루 목표 <span class="r">오늘 ${Math.min(G.n, G.goal)}/${G.goal}${G.done ? ' 🎯' : ''} · 이번 주 ${wk}일</span></div>
+      <div class="setlab">🏅 새로 다 배운 글자</div>
+      ${A.nm ? `<div class="setjamo">${Array.from(A.nm).map(c => `<span>${c}</span>`).join('')}</div>` : `<div class="setnote">아직 없어요</div>`}
+      <div class="setlab">🔁 자주 틀린 글자 TOP 5<small>틀리거나 대신 그려 준 글자 · 이런 글자는 복습으로 조금 더 자주 나옵니다</small></div>
+      ${top.length ? chips(A.m, top) : `<div class="setnote">아직 없어요</div>`}
+      ${dtop.length ? `<div class="setlab">🔊 받아쓰기에서 헷갈린 글자<small>소리만 듣고 바로 못 쓴 글자 (보여 주고 같이 썼어요)</small></div>${chips(A.dm, dtop)}` : ''}
+      <div class="setlab">✏️ 자주 틀린 종류<small>순서 = 획 순서 · 방향 = 거꾸로 그음 · 글자 안 순서 = 초성→중성→받침을 건너뜀 · 모양·자리 = 시작·끝 자리</small></div>
+      ${kbar}
+      <div class="setline">자모 단계 변화 <span class="r">오름 ${A.ju} · 내림 ${A.jd}</span></div>
+      <div class="setlab">🎯 하루 목표<small>오늘 글자 몇 개를 쓸까요 · 다 하면 특별 도장 ${GOAL_GIFT}개 · 못 해도 손해는 없어요 (연속 기록 대신 "이번 주 며칠" 만 셉니다)</small></div>
+      ${segHtml('goal', GOAL_OPTS.map(v => ({v:v, t:v + '개'})), goalOf(), 3)}
+      <div class="setnote">최근 30일만 남깁니다 (숫자 쓰기는 세지 않아요).</div>
     </div>`;
 }
 
@@ -7284,6 +7402,7 @@ function viewSet(){
       <div class="setnote">⚠️ 어떻게 맞춰도 두 번 연달아 헤매면 저절로 제일 쉬운 문제가 나옵니다.
       틀려도 체력이 줄거나 잃는 것은 없습니다.</div>
     </div>
+    ${setReportCard()}
     ${setMusicCard()}
     ${setWriteCard()}
     ${setXferCard()}
@@ -12524,9 +12643,12 @@ function wrLetterDone(w){
   const help = !!w.helped || auto;
   const info = {ch:w.ch, kind:w.kind, guide:guide, miss:miss, help:help,
                 auto:auto, perfect:(!miss && !auto), clean:(guide === 'blank' && !miss && !help),
-                purpose:w.bat ? w.purpose : 'practice', step:(w.step | 0)};
+                purpose:w.bat ? w.purpose : 'practice', step:(w.step | 0),
+                /* 27-B: 리포트용 — 틀린 종류 · 받아쓰기 · 낱말 */
+                kinds:w.kinds || null, dict:!!w.dict, reveal:!!w.reveal, word:w.wd ? w.wd.word : null, ju:0, jd:0};
   const now = Date.now();
-  w.p1 = info;                                  /* 27-A: 혼자 한 번 더가 1차 결과를 봅니다 */
+  w.p1 = info;
+  if(w.wd){ if(!w.wd.res) w.wd.res = []; w.wd.res.push(info); }                                  /* 27-A: 혼자 한 번 더가 1차 결과를 봅니다 */
   w.jb = {};
   if(w.kind === 'syl' && decomp(w.ch)){
     if(!S.wrm) S.wrm = {};
@@ -12543,6 +12665,7 @@ function wrLetterDone(w){
       w.jb[j] = wrjOf(j);
       const bad = w.jmiss ? !!w.jmiss[j] : (miss || auto);
       S.wrj[j] = wrjApply(S.wrj[j], bad, !!w.helped, now);
+      if(S.wrj[j].lv > w.jb[j]) info.ju++; else if(S.wrj[j].lv < w.jb[j]) info.jd++;
     });
   }
   WR_DONE_HOOKS.forEach(f=>{ try{ f(info); }catch(e){} });
@@ -12592,7 +12715,7 @@ function wrSoloDone(w){
   const p1 = w.p1 || {};
   const clean = !!w.clean && !w.helped && !w.forced;
   const info = {ch:w.ch, kind:w.kind, solo:true, clean:clean, miss:!w.clean, help:!!w.helped || !!w.forced,
-                purpose:w.bat ? w.purpose : 'practice', first:p1};
+                purpose:w.bat ? w.purpose : 'practice', first:p1, kinds:w.kinds || null};
   const now = Date.now();
   if(w.kind === 'syl' && decomp(w.ch) && S.wrm && S.wrm[w.ch]){
     info.before = (p1.before != null) ? p1.before : S.wrm[w.ch].lv;
@@ -12631,7 +12754,7 @@ function wrSoloStart(w){
   w.jm1 = w.jmiss || {};
   w.soloNext = false; w.solo = true; w.soloRec = false;
   w.si = 0; w.fail = 0; w.done = false; w.clean = true; w.forced = false; w.tip = '';
-  w.helped = false; w.stuck = 0; w.jmiss = {};
+  w.helped = false; w.stuck = 0; w.jmiss = {}; w.kinds = null;
   w.step = 3; w.steps = WR.tmpl.map(()=>3); w.guide = 'blank';
   WR.drawn = []; WR.cur = []; WR.ghost = null; WR.demo = null; WR.fb = null; WR.hint = null; WR.auto = 0;
   /* 안내 말("이번엔 혼자 써 볼까?")이 끝날 때까지는 멈춤으로 세지 않습니다 (+1.5초) */
@@ -12764,10 +12887,164 @@ function wrPickSyl(rnd, now){
   }
   return null;
 }
+/* =========================================================
+   27-B ① 받아쓰기 — 글자를 보여 주지 않고 소리로만 ("사과의 사, 써 볼까?") → 빈 칸에 쓰기.
+   · G2 이상(시작 부분만 보고 쓸 수 있는 글자)만 냅니다 — 모르는 글자로 받아쓰기를 시키지 않습니다.
+     그런 글자가 하나도 없으면 연습 화면은 "가나다에서 조금 더 써 보자" 안내만 (막힘 없이 바로 가나다로).
+   · 🔊 다시 듣기는 언제든, 몇 번이든. 4초 멈추면 한 번 더 들려줍니다(도움 아님).
+   · 다른 글자를 쓰기 시작하면(첫 틀린 획) 그 획은 조용히 지우고 **정답 글자를 살짝(흐린 가이드) 보여 주며 같이** —
+     틀림으로 세지 않고 "보고 쓴 글자"(도움)로만 기록합니다. 숙련도는 그대로, 도장 1개, 혼자 한 번 더가 이어집니다.
+     또 멈추거나 👀 보여줘를 눌러도 같은 길입니다.
+   · 끝까지 도움 없이 쓰면 = 빈 칸에서 깨끗하게 쓴 것(도장 2 · 한 단계 위). 받아쓰기는 원래 가이드가 없으니
+     도움을 받은 경우에만 혼자 한 번 더가 붙습니다 (27-A wrSoloWant 그대로 — step 3 으로 둡니다).
+   · 잡을 때 쓰기에도 가끔: 다 배운 글자가 나오면 받아쓰기 모양으로 (cwOpen).
+   ========================================================= */
+const DICT_MIN_LV = 2;
+function wrDictPool(){
+  return Object.keys(S.wrm || {}).filter(ch => S.wrm[ch].lv >= DICT_MIN_LV && decomp(ch) && canWrite(ch));
+}
+/* 들려줄 낱말 — 짧은 낱말 · 그림이 맞는 낱말(20차 pic) 먼저. 그림은 pic 인 낱말만 보여 줍니다 */
+function wrDictWord(ch, rnd){
+  const rr = rnd || Math.random;
+  const ws = WORD_ALL.filter(w => w.n.indexOf(ch) >= 0 && w.n.length <= 3 && !/다$/.test(w.n));
+  const pics = ws.filter(w => w.pic);
+  const L = pics.length ? pics : ws;
+  if(L.length){ const w = L[Math.floor(rr()*L.length)]; return {word:w.n, emoji:w.pic ? w.emoji : ''}; }
+  const m = MONS.find(m => m.n.indexOf(ch) >= 0);
+  return m ? {word:m.n, emoji:''} : {word:null, emoji:''};
+}
+function wrDictPick(rnd, now){
+  const rr = rnd || Math.random, t = now || Date.now();
+  const pool = wrDictPool();
+  if(!pool.length) return null;
+  let cand = pool.filter(c => WR_RECENT.indexOf(c) < 0);
+  if(!cand.length) cand = pool.filter(c => c !== WR_RECENT[0]);
+  if(!cand.length) cand = pool;
+  /* 꺼낼 때가 된 글자 · 아직 다 배우지 않은 글자를 조금 더 자주 */
+  let tot = 0;
+  const wt = cand.map(c => { const v = 1 + Math.min(3, Math.max(0, wrDue(c, t))) + (S.wrm[c].lv < WRM_TOP ? 1 : 0); tot += v; return v; });
+  let r = rr()*tot, ch = cand[cand.length-1];
+  for(let i=0;i<cand.length;i++){ r -= wt[i]; if(r < 0){ ch = cand[i]; break; } }
+  const wd = wrDictWord(ch, rr);
+  return {ch:ch, word:wd.word, emoji:wd.emoji};
+}
+/* 들려줄 말 — "사과의 사, 써 볼까?" (낱말이 없으면 글자만) */
+function wrDictLine(w){
+  if(!w.word || w.word === w.ch) return `${w.ch}, 써 볼까?`;
+  return `${w.word}의 ${w.ch}, 써 볼까?`;
+}
+function wrDictSay(w){ if(w) say(wrDictLine(w), {rate:0.8}); }
+/* 정답 글자를 살짝 보여 주며 같이 쓰기로 — 흐린 가이드(G1)로 바꾸고 머리에 글자를 보여 줍니다 */
+function wrDictReveal(w, why){
+  if(!w || !w.dict || w.reveal || w.done) return false;
+  w.reveal = true; w.helped = true;
+  if(why === 'miss') w.dmiss = true;
+  w.step = 1; w.steps = WR.tmpl.map(()=>1); w.guide = 'trace';
+  WR.hint = null; WR.demo = null;
+  w.tip = '이 글자야! 같이 써 보자 ✨';
+  tone(660,0.1,'triangle',0.05);
+  if(S.wrb === w) render();      /* 배틀 덮개는 띠 · 상 줄까지 바뀌므로 통째로 (캔버스 획은 그대로 남습니다) */
+  else { wrHeadSync(); wrDots(); }
+  say(`${w.ch}! 같이 써 보자`, {rate:0.85});
+  return true;
+}
+/* 받아쓰기에서 첫 틀린 획 — 그 획은 빨갛게 잠깐 보였다 사라지고(지움), 틀림으로 세지 않습니다 */
+function wrDictMiss(w, raw){
+  if(!w || !w.dict || w.reveal) return false;
+  WR.fb = {kind:'x', t0:(typeof performance !== 'undefined') ? performance.now() : 0, raw:(raw || []).slice()};
+  return wrDictReveal(w, 'miss');
+}
+
+/* 27-B ③: 틀린 종류 — o 순서 · d 방향 · p 글자 안 순서(초→중→종을 건너뜀) · s 모양·자리 */
+function wrKindOf(w, res, raw){
+  if(res === 'dir' || res === 'rev') return 'd';
+  if(res === 'order'){
+    const t = WR.tmpl[w.si];
+    for(let j=w.si+1;j<WR.tmpl.length;j++){
+      let ok = false;
+      try{ ok = judgeStroke(raw, wrScaled(WR.tmpl[j]), WR.size) === 'ok'; }catch(e){}
+      if(ok) return (t && t.part && WR.tmpl[j].part && WR.tmpl[j].part !== t.part) ? 'p' : 'o';
+    }
+    return 'o';
+  }
+  return 's';
+}
+function wrKindNote(w, res, raw){
+  if(!w) return null;
+  const k = wrKindOf(w, res, raw || []);
+  if(!w.kinds) w.kinds = {};
+  w.kinds[k] = (w.kinds[k] | 0) + 1;
+  return k;
+}
+
+/* =========================================================
+   27-B ② 낱말 쓰기 — 한 글자 대신 2~3 글자 낱말을 한 글자씩 차례로.
+   · 글자마다 그 글자의 숙련도 단계대로 가이드 (22-B 그대로). 혼자 한 번 더(27-A)도 글자마다 바로
+     ("사" 보고 쓰기 → 가리고 "사" 혼자 → "과" …) — 한 글자씩 보고·가리고·쓰기라 흐름이 끊기지 않습니다.
+   · 한 번에 한 칸씩 크게(폰·태블릿 같음), 머리 줄에 낱말 진행 표시. 다 쓰면 낱말을 읽어 주고 그림/포켓몬.
+   · 연습 화면 📝 낱말 탭 + 잡을 때 쓰기에 가끔 "이름 전체 쓰기" (cwOpen · 도장 +1 보너스).
+   w.wd = {word, cs:[글자들], i:지금 몇 번째, emoji, mi:포켓몬 번호|null, res:[글자마다 1차 결과]}
+   ========================================================= */
+let WR_WRECENT = [];
+function wrWordOk(n){
+  const s = String(n || '');
+  return s.length >= 2 && s.length <= 3 && s.split('').every(c => decomp(c) && canWrite(c));
+}
+function wrWordPick(rnd){
+  const rr = rnd || Math.random;
+  /* 4번에 1번쯤은 잡은 포켓몬 이름 */
+  if(rr() < 0.25){
+    const ms = (S.dex || []).filter(i => MONS[i] && wrWordOk(MONS[i].n) && WR_WRECENT.indexOf(MONS[i].n) < 0);
+    if(ms.length){ const i = ms[Math.floor(rr()*ms.length)]; return {word:MONS[i].n, emoji:'', mi:i}; }
+  }
+  const st = pickStage('ko');
+  const base = WORD_ALL.filter(w => !/다$/.test(w.n) && wrWordOk(w.n) && WR_WRECENT.indexOf(w.n) < 0);
+  /* 지금 단계 + 한 단계 위까지 (1단계도 30개 남짓 — 같은 낱말만 돌지 않게) */
+  let pool = base.filter(w => w.pic && w.lv <= st + 1);
+  if(pool.length < 12) pool = base.filter(w => w.pic);
+  if(!pool.length) pool = base;
+  if(!pool.length) return {word:'사과', emoji:'', mi:null};
+  const w = pool[Math.floor(rr()*pool.length)];
+  return {word:w.n, emoji:w.pic ? w.emoji : '', mi:null};
+}
+function wrWordStart(w, p){
+  const cs = String(p.word).split('');
+  w.wd = {word:p.word, cs:cs, i:0, emoji:p.emoji || '', mi:(p.mi != null ? p.mi : null), res:[]};
+  w.ch = cs[0]; w.kind = 'syl'; w.word = p.word; w.emoji = p.emoji || '';
+  WR_WRECENT.unshift(p.word); if(WR_WRECENT.length > 6) WR_WRECENT.length = 6;
+}
+function wrWordLast(w){ return !w || !w.wd || w.wd.i >= w.wd.cs.length - 1; }
+/* 다음 글자로 (같은 낱말 안에서) */
+function wrWordStep(w){
+  const D = w && w.wd;
+  if(!D || D.i >= D.cs.length - 1) return false;
+  D.i++;
+  w.ch = D.cs[D.i];
+  w.si = 0; w.fail = 0; w.done = false; w.clean = true; w.tip = '';
+  wrNote(w.ch);
+  WR.tmpl = glyphStrokes(w.ch); WR.tmpl.glyph = w.ch;
+  WR.drawn = []; WR.cur = []; WR.ghost = null;
+  wrPrep(w);
+  return true;
+}
+/* 낱말 전체 결과 — 대신 그려 준 글자가 있으면 pass, 틀린 글자가 있으면 help, 아니면 perfect */
+function wrWordTier(w){
+  const r = (w && w.wd && w.wd.res) || [];
+  return r.some(x => x.auto) ? 'pass' : (r.some(x => x.miss) ? 'help' : 'perfect');
+}
+
 function wrNewTarget(){
   const w = wrState();
   w.si = 0; w.fail = 0; w.done = false; w.clean = true; w.tip = '';
-  if(w.mode === 'num'){
+  /* 27-B: 받아쓰기 · 낱말 모드 표시는 새 글자마다 다시 정합니다 */
+  w.wd = null; w.dict = false; w.reveal = false; w.dictEmpty = false;
+  if(w.mode === 'dict'){
+    const p = wrDictPick();
+    if(p){ w.ch = p.ch; w.kind = 'syl'; w.word = p.word; w.emoji = p.emoji; w.dict = true; }
+    else { w.dictEmpty = true; w.ch = '가'; w.kind = 'syl'; w.word = null; w.emoji = ''; }
+  }else if(w.mode === 'word'){
+    wrWordStart(w, wrWordPick());
+  }else if(w.mode === 'num'){
     const left = DIGIT10.filter(d => WR_RECENT.indexOf(d) < 0);
     w.ch = pick(left.length ? left : DIGIT10);
     w.kind = 'num'; w.word = null; w.emoji = '🔢';
@@ -12818,11 +13095,19 @@ function wrPrep(w){
   w.guide = P.step >= 3 ? 'blank' : 'trace';
   w.helped = false; w.recorded = false; w.forced = false; w.stuck = 0; w.jmiss = {};
   w.solo = false; w.soloNext = false; w.soloRec = false; w.p1 = null;   /* 27-A */
+  w.kinds = null;                                                         /* 27-B: 이 글자에서 틀린 종류 (리포트) */
   WR.cover = null; WR.soloTok++;
   /* G0 이면 시범부터 (약 2초). 펜 · 손가락을 대는 순간 끝납니다 */
   WR.demo = (w.kind === 'syl' && P.step === 0) ? {t0:0} : null;
   WR.fb = null; WR.hint = null; WR.auto = 0;
   WR.lastAct = (typeof performance !== 'undefined') ? performance.now() : 0;
+  /* 27-B 받아쓰기: 글자를 안 보여 주고 소리로만 — 빈 칸(번호·가이드·시범 없음)에서 시작합니다 */
+  if(w.dict){
+    w.reveal = false; w.dstall = 0; w.dmiss = false;
+    w.step = 3; w.steps = WR.tmpl.map(()=>3); w.guide = 'blank';
+    WR.demo = null;
+    WR.lastAct += 2500;            /* 들려주는 말("○○의 ○, 써 볼까?")이 끝날 때까지는 멈춤으로 세지 않습니다 */
+  }
 }
 /* 화면과 획 데이터가 어긋나지 않게 (되돌아오기·다시 그리기 대비) */
 function wrSync(){
@@ -12837,29 +13122,73 @@ function wrSync(){
 }
 
 /* ---------- 화면 ---------- */
+/* 27-B: 쓰기 판 머리 줄 — 연습 화면 · 배틀 덮개 같이 씁니다.
+   받아쓰기(아직 안 보여 줌)면 글자 자리에 🔊 버튼, 낱말 쓰기면 낱말 진행(사 · 과)을 보여 줍니다 */
+function wrHeadHtml(w){
+  const n = WR.tmpl.length;
+  const hide = !!w.dict && !w.reveal && !w.done;
+  const D = w.wd;
+  let t1;
+  if(hide) t1 = '잘 듣고 써 보자! 👂';
+  else if(D) t1 = `<span class="wstrip">${D.cs.map((c,i)=>`<b class="${i < D.i || (i === D.i && w.done && !w.soloNext) ? 'done' : (i === D.i ? 'now' : '')}">${c}</b>`).join('')}</span>`;
+  else if(w.bat) t1 = (w.kind === 'syl' && w.word) ? `「${w.word}」 의 ${w.ch}` : '한글 낱자를 써 보자!';
+  else t1 = w.kind === 'num' ? '숫자를 써 보자!'
+          : w.solo ? '✨ 혼자 한 번 더!'
+          : w.kind === 'syl' ? `「${w.word}」 의 ${w.ch}`
+          : '한글 낱자를 써 보자!';
+  const t2 = hide ? '받아쓰기' : (D ? `${D.i + 1} / ${D.cs.length} 글자` : `획 ${n}개`);
+  const ch = hide ? `<button class="ch chsnd" data-act="wrsay" aria-label="다시 듣기">🔊</button>`
+                  : `<span class="ch">${w.ch}</span>`;
+  return `<div class="wrhead${D ? ' wd' : ''}">
+      ${ch}
+      <span class="t1">${t1}</span>
+      <span class="t2">${t2}</span>
+      ${w.emoji ? `<span class="em">${w.emoji}</span>` : ''}
+    </div>`;
+}
+/* 머리 줄만 다시 (캔버스는 그대로 — 받아쓰기에서 글자를 보여 줄 때 · 다 썼을 때) */
+function wrHeadSync(){
+  const el = document.querySelector('.wrhead');
+  if(el && el.parentElement) el.outerHTML = wrHeadHtml(wrState());
+}
+/* 새 글자를 말해 줍니다 — 숫자 · 받아쓰기 · 낱말 · 글자 */
+function wrSayTarget(w){
+  if(!w) return;
+  if(w.kind === 'num') return say(`숫자 ${w.ch}`, {rate:0.8});
+  if(w.dictEmpty) return say('받아쓰기는 연습한 글자로 해. 가나다에서 글자를 조금 더 써 보자!', {rate:0.85});
+  if(w.dict) return say('받아쓰기! ' + wrDictLine(w), {rate:0.8});
+  if(w.wd) return say(`${w.wd.word}! 한 글자씩 써 보자. 먼저 ${w.ch}!`, {rate:0.82});
+  return say(w.ch, {rate:0.8});
+}
 function viewWrite(){
   const w = wrSync();
-  const n = WR.tmpl.length;
-  const t1 = w.kind === 'num' ? '숫자를 써 보자!'
-           : w.solo ? '✨ 혼자 한 번 더!'
-           : w.kind === 'syl' ? `「${w.word}」 의 ${w.ch}`
-           : '한글 낱자를 써 보자!';
   const dots = WR.tmpl.map((_,i)=>
     `<i class="${i < w.si ? 'done' : (i === w.si && !w.done ? 'now' : '')}"></i>`).join('');
+  /* 27-B: 탭 넷 — 가나다 · 받아쓰기 · 낱말 · 123 (320px 에서도 한 줄) */
+  const tab = (m, t) => `<button class="btn ${w.mode === m ? 'on' : 'off'}" data-act="wrmode:${m}">${t}</button>`;
+  const modes = `<div class="wrmode">${tab('ko','가나다')}${tab('dict','받아쓰기')}${tab('word','낱말')}${tab('num','123')}</div>`;
+  if(w.dictEmpty){
+    return `
+  <div class="wrwrap">
+    ${modes}
+    <div class="wrempty">
+      <div class="big">🔊</div>
+      <b>받아쓰기는 연습한 글자로 해요</b>
+      <span>가나다에서 글자를 몇 개 더 써 보면 열려요!</span>
+      <button class="btn btn-yellow" data-act="wrmode:ko">✏️ 가나다 쓰러 가기</button>
+    </div>
+    <div class="wrrow">
+      <button class="btn btn-white" data-act="back"><span class="e">🚪</span>나가기</button>
+    </div>
+  </div>`;
+  }
+  const dict = !!w.dict;
   return `
   <div class="wrwrap">
-    <div class="wrmode">
-      <button class="btn ${w.mode === 'ko' ? 'on' : 'off'}" data-act="wrmode:ko">가나다 한글</button>
-      <button class="btn ${w.mode === 'num' ? 'on' : 'off'}" data-act="wrmode:num">123 숫자</button>
-    </div>
+    ${modes}
     ${/* 19차 B: 두 줄이던 머리를 가로 한 줄로 눌렀습니다 (76 → 46px).
           남은 세로는 전부 캔버스에 갑니다 */''}
-    <div class="wrhead">
-      <span class="ch">${w.ch}</span>
-      <span class="t1">${t1}</span>
-      <span class="t2">획 ${n}개</span>
-      ${w.emoji ? `<span class="em">${w.emoji}</span>` : ''}
-    </div>
+    ${wrHeadHtml(w)}
     <div class="wrdots" id="wrdots">${dots}</div>
     <div class="wrpaper">
       <canvas id="wrcv" aria-label="글씨 쓰는 곳"></canvas>
@@ -12867,9 +13196,10 @@ function viewWrite(){
       <div class="hint" id="wrtip">${w.tip || wrTipDefault()}</div>
       <div class="cheer" id="wrcheer"></div>
     </div>
-    <div class="wrrow">
-      <button class="btn btn-blue" data-act="wrshow"><span class="e">👀</span>보여줘</button>
-      <button class="btn btn-yellow" data-act="wrnext"><span class="e">🔄</span>다른 글자</button>
+    <div class="wrrow${dict ? ' dict' : ''}">
+      ${dict ? `<button class="btn btn-blue wrsnd" data-act="wrsay"><span class="e">🔊</span>다시 듣기</button>` : ''}
+      <button class="btn ${dict ? 'btn-white' : 'btn-blue'}" data-act="wrshow"><span class="e">👀</span>보여줘</button>
+      <button class="btn btn-yellow" data-act="wrnext"><span class="e">🔄</span>${w.wd ? '다른 낱말' : '다른 글자'}</button>
       <button class="btn btn-white" data-act="back"><span class="e">🚪</span>나가기</button>
     </div>
   </div>`;
@@ -12881,7 +13211,7 @@ function openWrite(){
   wrNewTarget();
   S.screen = 'write'; S.msg = '';
   SFX.open(); render();
-  say(w.kind === 'num' ? `숫자 ${w.ch}` : w.ch, {rate:0.8});
+  wrSayTarget(w);
 }
 
 /* 19차 A-4: 연습이 배틀에 도움이 된다는 게 눈에 보이게 — 별 말고 아이템도 가끔.
@@ -12952,6 +13282,8 @@ function wrbOpen(purpose, tgt){
   S.wrb = {bat:true, purpose:purpose, ch:t.ch, kind:t.kind, word:t.word, emoji:t.emoji,
            si:0, fail:0, done:false, clean:true, forced:false, tip:''};
   if(t.mon) S.wrb.mon = t.mon;
+  if(t.wd) S.wrb.wd = t.wd;                     /* 27-B: 이름 전체 쓰기 */
+  if(t.dict) S.wrb.dict = true;                 /* 27-B: 받아쓰기 */
   WR.tmpl = glyphStrokes(t.ch); WR.tmpl.glyph = t.ch;
   WR.drawn = []; WR.cur = []; WR.ghost = null;
   wrPrep(S.wrb);
@@ -12976,15 +13308,54 @@ function cwWant(q){
   if(S.wild.cwDone) return false;               /* 이 포켓몬은 이미 한 글자 썼다 (볼에서 나왔다가 다시 던질 때) */
   return true;
 }
+/* 27-B: 잡을 때 쓰기 가끔 이벤트
+   · 이름 전체 쓰기 — 이름이 2~3 글자이고 대부분(3분의 2 이상) G2 이상인 글자일 때 4번에 1번쯤. 다 쓰면 도장 +1
+   · 받아쓰기 — 고른 글자가 다 배운 글자면 2번에 1번쯤, 아니어도 이름에 다 배운 글자가 있으면 가끔 그 글자로 */
+const CW_WORD_P = 0.25;
+const CW_DICT_P = 0.5;
+const CW_DICT_TRY = 0.2;
+function cwWordOk(name){
+  if(!wrWordOk(name)) return false;
+  const cs = String(name).split('');
+  const known = cs.filter(c => wrmOf(c) >= 2).length;
+  return known >= Math.ceil(cs.length * 2 / 3);
+}
+function cwPlan(m, rnd){
+  const rr = rnd || Math.random;
+  if(cwWordOk(m.n) && rr() < CW_WORD_P){
+    return {word:true, ch:m.n[0], wd:{word:m.n, cs:m.n.split(''), i:0, emoji:'', mi:IDX[m.n], res:[]}};
+  }
+  let t = cwPick(m.n, rr);
+  let dict = wrmOf(t.ch) >= WRM_TOP && rr() < CW_DICT_P;
+  if(!dict && rr() < CW_DICT_TRY){
+    const own = m.n.split('').filter((c,i,a) => a.indexOf(c) === i && decomp(c) && canWrite(c) && wrmOf(c) >= WRM_TOP && WR_RECENT.indexOf(c) < 0);
+    if(own.length){ t = {ch:pick(own), word:m.n, emoji:'', fromName:true}; dict = true; }
+  }
+  if(dict){
+    const wo = WORD_ALL.find(x => x.n === t.word);
+    if(!(wo && wo.pic)) t = Object.assign({}, t, {emoji:''});    /* 받아쓰기 그림은 맞는 것만 */
+  }
+  return {word:false, dict:dict, t:t};
+}
 function cwOpen(){
   const m = MONS[S.wild.mi];
-  const t = cwPick(m.n);
+  const P = cwPlan(m);
   S.wild.cwDone = true;
   S.quiz = null;
   S.screen = 'battle'; S.turn = 'me'; S.acting = false;
   const eul = josa(m.n,['을','를']);
-  const tg = {ch:t.ch, kind:'syl', word:t.word, emoji:t.emoji, mon:m.n};
-  tg.say = t.fromName ? `${m.n}${eul} 잡자! ${t.ch}, 써 볼까?`
+  if(P.word){
+    const tg = {ch:P.ch, kind:'syl', word:m.n, emoji:'', mon:m.n, wd:P.wd};
+    tg.say = `${m.n}${eul} 잡자! 이번엔 이름을 다 써 볼까? 먼저 ${P.ch}!`;
+    WR_WRECENT.unshift(m.n); if(WR_WRECENT.length > 6) WR_WRECENT.length = 6;
+    wrNote(P.ch);
+    wrbOpen('cw', tg);
+    return;
+  }
+  const t = P.t;
+  const tg = {ch:t.ch, kind:'syl', word:t.word, emoji:t.emoji, mon:m.n, dict:P.dict};
+  tg.say = P.dict ? `${m.n}${eul} 잡자! 받아쓰기야! ${wrDictLine(tg)}`
+         : t.fromName ? `${m.n}${eul} 잡자! ${t.ch}, 써 볼까?`
                       : `${m.n}${eul} 잡자! ${t.word}의 ${t.ch}, 써 볼까?`;
   wrNote(t.ch);
   wrbOpen('cw', tg);
@@ -13005,14 +13376,21 @@ function wrbPanel(){
   const n = WR.tmpl.length;
   const dots = WR.tmpl.map((_,i)=>
     `<i class="${i < w.si ? 'done' : (i === w.si && !w.done ? 'now' : '')}"></i>`).join('');
-  const t1 = (w.kind === 'syl' && w.word) ? `「${w.word}」 의 ${w.ch}` : '한글 낱자를 써 보자!';
   const ult = (w.purpose === 'ult');
   const cw = (w.purpose === 'cw');            /* 21차 A5: 잡을 때마다 한 글자 */
   const solo = !!w.solo;                      /* 27-A: 혼자 한 번 더 */
+  const dict = !!w.dict && !w.reveal;         /* 27-B: 받아쓰기 (아직 안 보여 줌) */
+  const wd = !!w.wd;                          /* 27-B: 이름 전체 쓰기 */
   const banner = solo ? (ult ? '✨ 혼자 한 번 더! 쓰면 파워 업!' : '✨ 혼자 한 번 더! 다 쓰면 볼!')
+               : dict ? '🔊 받아쓰기! 잘 듣고 써 봐!'
+               : wd   ? '📝 이름을 다 쓰면 꼭 잡혀!'
                : ult ? '💥 글자를 쓰면 필살기가 나간다!'
                : cw  ? '✏️ 다 쓰면 볼을 던져서 꼭 잡아!' : '✏️ 글자를 쓰면 잡을 수 있어!';
-  const prize = solo
+  const prize = (dict && !solo)
+    ? `<span class="hot">들리는 글자를 써 봐</span><span>모르면 👀 보여줘</span><span>그래도 꼭 잡혀!</span>`
+    : (wd && !solo)
+    ? `<span class="hot">이름 전체 쓰기!</span><span>다 쓰면 🎀+1</span><span>그래도 꼭 잡혀!</span>`
+    : solo
     ? (ult ? `<span class="hot">혼자 쓰면 ⚡더 세게</span><span>막히면 도와줄게</span><span>틀려도 괜찮아</span>`
            : `<span class="hot">혼자 쓰면 ⭐+1</span><span>막히면 도와줄게</span><span>그래도 꼭 잡혀!</span>`)
     : ult
@@ -13029,24 +13407,20 @@ function wrbPanel(){
     : `<button class="btn btn-white" data-act="wrbout"><span class="e">🔙</span>다른 문제</button>`;
   const skipBtn = ult
     ? `<button class="btn btn-yellow" data-act="wrbskip"><span class="e">⚡</span>그냥 쏘기</button>` : '';
+  const sndBtn = dict ? `<button class="btn btn-blue wrsnd" data-act="wrsay"><span class="e">🔊</span>다시 듣기</button>` : '';
   return `<div class="sheet wrsheet">
     <div class="wrwrap">
       <div class="wrbanner">${banner}</div>
       <div class="wrprize">${prize}</div>
-      <div class="wrhead">
-        <span class="ch">${w.ch}</span>
-        <span class="t1">${t1}</span>
-        <span class="t2">획 ${n}개</span>
-        ${w.emoji ? `<span class="em">${w.emoji}</span>` : ''}
-      </div>
+      ${wrHeadHtml(w)}
       <div class="wrdots" id="wrdots">${dots}</div>
       <div class="wrpaper">
         <canvas id="wrcv" aria-label="글씨 쓰는 곳"></canvas>
         <div class="hint" id="wrtip">${w.tip || wrTipDefault()}</div>
         <div class="cheer" id="wrcheer"></div>
       </div>
-      <div class="wrrow">
-        <button class="btn btn-blue" data-act="wrshow"><span class="e">👀</span>보여줘</button>
+      <div class="wrrow${dict ? ' dict' : ''}">
+        ${sndBtn}<button class="btn ${dict ? 'btn-white' : 'btn-blue'}" data-act="wrshow"><span class="e">👀</span>보여줘</button>
         ${skipBtn}${outBtn}
       </div>
     </div>
@@ -13058,19 +13432,23 @@ function wrbDone(){
   const w = S.wrb;
   if(!w) return;
   if(w.solo){ wrbSoloDone(w); return; }        /* 27-A: 혼자 한 번 더까지 끝났다 */
-  const tier = wrbTier(w), T = WRB_TIER[tier];
+  if(w.dict) wrHeadSync();                     /* 27-B: 받아쓰기 — 다 쓰면 글자를 보여 줍니다 */
+  if(w.wd && !wrWordLast(w)){ wrbWordMid(w); return; }   /* 27-B: 이름 전체 쓰기 — 다음 글자로 */
+  /* 27-B: 이름 전체 쓰기는 낱말 전체로, 받아쓰기에서 글자를 보고 썼으면 '도와줌' 몫 */
+  const tier = w.wd ? wrWordTier(w) : ((w.dict && w.reveal && !w.forced) ? 'help' : wrbTier(w)), T = WRB_TIER[tier];
   w.p1tier = tier;
   const ult = (w.purpose === 'ult');
   /* 포획 쪽은 별을 조금 더 넉넉하게 (데미지 보너스가 없으니까) */
   const star = ult ? T.star : (tier === 'perfect' ? 3 : (tier === 'help' ? 2 : 1));
   const got = star > 0 ? starPop(star) : 0;
-  const head = ult ? T.t : T.ct;
+  const head = w.wd ? '이름 다 썼다! 🎉' : (ult ? T.t : T.ct);
   w.tip = got ? `${head}  ⭐+${got}` : head;
   SFX.good(); confetti();
   const box = document.getElementById('wrcheer');
   if(box){ box.textContent = tier === 'perfect' ? '완벽해! 🎉' : '잘했어! 🎉';
            box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
   wrDots();
+  if(w.wd) wrWordBonus(w);                     /* 27-B: 이름 다 썼다 — 도장 +1 */
   if(S.learn) S.learn.q = (S.learn.q || 0) + 1;
   const mine = w;
   /* 21차 A5: 잡을 때 쓰기를 끝냈다 — 이번 볼은 반드시 잡힙니다 */
@@ -13084,7 +13462,7 @@ function wrbDone(){
     setTimeout(()=>{ if(S.wrb === mine && mine.soloNext) wrSoloBegin(mine); }, 1250);
     return;
   }
-  say(ult ? T.s : T.cs, {rate:0.9});
+  say(w.wd ? `${w.wd.word}! 이름 다 썼다! 이제 볼을 던지자!` : (ult ? T.s : T.cs), {rate:0.9});
   save();
   setTimeout(()=>{
     if(S.wrb !== mine) return;                 /* 그 사이 나갔으면 아무 일도 안 합니다 */
@@ -13095,6 +13473,7 @@ function wrbDone(){
 }
 /* 27-A: 혼자 한 번 더까지 다 썼다 — 깨끗하면 필살기 파워 업 · 별 +1. 틀려도 1차 몫 그대로 (손해 없음) */
 function wrbSoloDone(w){
+  if(w.wd && !wrWordLast(w)){ wrbWordMid(w); return; }   /* 27-B: 이름 전체 쓰기 — 다음 글자로 */
   const ult = (w.purpose === 'ult');
   const ok = !!w.clean && !w.helped && !w.forced;
   const T = WRB_TIER[w.p1tier || 'help'];
@@ -13119,6 +13498,60 @@ function wrbSoloDone(w){
     if(ult){ S.ultBoost = mul; S.ultSolo = ok; runAction('ult'); }
     else   { wrbToCatch(); }
   }, 1250);
+}
+/* 27-B: 이름 전체 쓰기 — 한 글자를 다 썼고 아직 남았다 (별은 이름을 다 쓰고 한 번에) */
+function wrbWordMid(w){
+  const mine = w;
+  SFX.good();
+  const box = document.getElementById('wrcheer');
+  if(box){ box.textContent = '좋아! 🎉'; box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
+  wrHeadSync();
+  if(w.soloNext){
+    w.tip = '잘했어! 이번엔 혼자 ✨'; wrDots();
+    say('잘했어!', {rate:0.9}); save();
+    setTimeout(()=>{ if(S.wrb === mine && mine.soloNext) wrSoloBegin(mine); }, 1250);
+    return;
+  }
+  const nx = w.wd.cs[w.wd.i + 1];
+  w.tip = `좋아! 다음은 「${nx}」 ✏️`; wrDots();
+  say(`좋아! 다음은 ${nx}!`, {rate:0.9}); save();
+  setTimeout(()=>{ if(S.wrb === mine && !mine.soloNext && wrWordStep(mine)) render(); }, 1150);
+}
+/* 이름 · 낱말을 끝까지 썼다 — 한 번만: 리포트 낱말 수 +1, 잡을 때 쓰기면 도장 +1 보너스 */
+function wrWordBonus(w){
+  if(!w || !w.wd || w.wd.bonus) return false;
+  w.wd.bonus = true;
+  repWord();
+  if(w.bat) stampAdd(1);
+  return true;
+}
+/* 연습 화면 낱말 쓰기 — 한 글자를 다 쓴 뒤 (별은 wrDone 이 글자마다 이미 줬습니다) */
+function wrWordAfter(w, my){
+  const D = w.wd;
+  wrHeadSync();
+  if(!wrWordLast(w)){
+    const nx = D.cs[D.i + 1];
+    w.tip = `좋아! 다음은 「${nx}」 ✏️`; wrDots();
+    say(`좋아! 다음은 ${nx}!`, {rate:0.85});
+    setTimeout(()=>{ if(my === WR.cheer && S.screen === 'write' && !S.wrb && wrState() === w && w.wd === D){ wrWordStep(w); render(); } }, 1400);
+    return;
+  }
+  /* 낱말 완성 — 읽어 주고 그림 / 포켓몬, 별 +1 보너스 */
+  const bonus = gainStars(1);
+  starNum.textContent = String(S.stars);
+  w.tip = `「${D.word}」 다 썼다! ⭐+${bonus}`;
+  wrWordBonus(w);
+  const box = document.getElementById('wrcheer');
+  if(box){
+    const pic = (D.mi != null && MONS[D.mi]) ? artBox(MONS[D.mi], Math.round((WR.size || 280) * 0.42), '')
+              : (D.emoji ? `<span class="wpic">${D.emoji}</span>` : '');
+    box.innerHTML = `<span class="wcheer">${pic}<b>${D.word}!</b></span>`;
+    box.classList.remove('go'); box.classList.remove('word'); void box.offsetWidth; box.classList.add('word'); box.classList.add('go');
+  }
+  wrDots();
+  save();
+  setTimeout(()=>say(`${D.word}! 다 썼다!`, {rate:0.85}), 350);
+  setTimeout(()=>{ if(my === WR.cheer && S.screen === 'write'){ wrNewTarget(); render(); } }, 2700);
 }
 /* 쓰기로 낸 포획 문제를 맞혔다 — 곧바로 볼을 던집니다 */
 function wrbToCatch(){
@@ -13363,6 +13796,8 @@ function wrAfterJudgeTab(res, raw){
   const w = wrState();
   if(res === 'tiny'){ w.tip = `${wrTool()}으로 쭉 그어 봐!`; wrDots(); return; }
   if(res === 'ok'){ wrPass(raw, false); return; }
+  if(wrDictMiss(w, raw)) return;               /* 27-B: 받아쓰기 — 위와 같음 */
+  wrKindNote(w, res, raw);
   wrJMiss(w);                                  /* 22-B: 이 획의 자모에 표시 (자모 숙련도) */
   w.fail++; w.clean = false; w.stuck = (w.stuck || 0) + 1;
   const now = performance.now();
@@ -13401,6 +13836,8 @@ function wrAfterJudge(res, raw){
   const w = wrState();
   if(res === 'tiny'){ w.tip = '손가락으로 쭉 그어 봐!'; return; }   /* 톡 친 것은 실패가 아닙니다 */
   if(res === 'ok'){ wrPass(raw, false); return; }
+  if(wrDictMiss(w, raw)) return;               /* 27-B: 받아쓰기에서 다른 글자 → 정답을 살짝 보여 주며 같이 (벌 없음) */
+  wrKindNote(w, res, raw);                     /* 27-B: 틀린 종류 (리포트) */
 
   wrJMiss(w);                                  /* 22-B: 이 획의 자모에 표시 (자모 숙련도) */
   w.fail++; w.clean = false;
@@ -13460,11 +13897,17 @@ function wrDone(){
   if(soloOk && !prize) w.tip = `✨ 혼자 썼다!  ⭐+${got}`;
   SFX.good(); confetti(); setTimeout(()=>SFX.star(), 420);
   save();
+  /* 27-B: 받아쓰기를 도움 없이 맞혔다 */
+  const dictOk = !!w.dict && !w.reveal && !w.solo && w.clean && !w.helped && !w.forced;
   const box = document.getElementById('wrcheer');
-  if(box){ box.textContent = soloOk ? '혼자 썼다! ✨' : '잘했어! 🎉'; box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
-  say(soloOk ? '혼자 썼다! 잘했어!' : `${w.ch}, 잘했어!`, {rate:0.85});
+  if(box){ box.textContent = soloOk ? '혼자 썼다! ✨' : (dictOk ? '맞았어! 🎉' : '잘했어! 🎉'); box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
+  if(w.dict) wrHeadSync();                       /* 받아쓰기 — 다 쓰면 글자를 보여 줍니다 */
   wrDots();
   const my = ++WR.cheer;
+  if(w.wd){ wrWordAfter(w, my); return; }        /* 27-B: 낱말 쓰기 — 다음 글자 · 낱말 완성 */
+  say(soloOk ? '혼자 썼다! 잘했어!'
+      : dictOk ? `맞았어! ${w.word && w.word !== w.ch ? w.word + '의 ' : ''}${w.ch}!`
+      : `${w.ch}, 잘했어!`, {rate:0.85});
   setTimeout(()=>{ if(my === WR.cheer && S.screen === 'write'){ wrNewTarget(); render(); } }, 1900);
 }
 /* 27-A: 연습 화면 1차 끝 — 별은 지금처럼 주고, 잠깐 축하한 뒤 빈 칸으로 (아이템은 혼자 쓰기 끝에 한 번) */
@@ -13502,6 +13945,7 @@ function wrTipDefault(){
   if(w.done) return '다 썼다! 🎉';
   /* 21차 · 22-B: 시범 중 · 혼자 쓰기(G2 이상) 문구 — 폰(손가락) · 태블릿(펜) 같은 모양 */
   if(WR.demo) return `잘 봐! ${wrTool()}을 대면 바로 쓸 수 있어 👀`;
+  if(w.dict && !w.reveal) return '들은 글자를 써 봐! 👂';      /* 27-B 받아쓰기 */
   if(wrStepAt(w, w.si) >= 2) return `혼자 써 볼까? ${w.si+1}번 획 ✏️`;
   return `${w.si+1}번 획을 ${wrTool()}으로 그어 봐!`;
 }
@@ -13636,6 +14080,11 @@ function wrTabTick(w, now){
   if(wrBaseStep(w, w.si) < 2 || w.done || WR.drawing || WR.auto || WR.ghost) return;
   if(now - (WR.lastAct || now) < WR_STALL_MS) return;
   WR.lastAct = now;
+  /* 27-B 받아쓰기: 처음 멈추면 한 번 더 들려주고(도움 아님), 또 멈추면 글자를 살짝 보여 줍니다 */
+  if(w.dict && !w.reveal){
+    if(!w.dstall){ w.dstall = 1; w.tip = '다시 들어 볼까? 🔊'; wrDots(); wrDictSay(w); return; }
+    wrDictReveal(w, 'stall'); return;
+  }
   w.stuck = (w.stuck || 0) + 1;
   w.helped = true;                              /* 힌트를 받았다 — 21-B 도장 1개 자리 (벌 아님) */
   WR.hint = {si:w.si};
@@ -13655,6 +14104,7 @@ function wrTabPaper(ctx, k, w){
   ctx.restore();
   const B = WR.tmpl.boxes;
   if(!B || w.done) return;
+  if(w.dict && !w.reveal) return;      /* 27-B 받아쓰기: 칸 모양(모음 방향·받침)도 답의 힌트라서 보여 주지 않습니다 */
   /* 21차 D: 시범 중에는 시범이 그리는 획의 칸을 밝힙니다 */
   const ci = WR.demo ? wrDemoCur(performance.now()) : w.si;
   const cur = WR.tmpl[ci] && WR.tmpl[ci].part;
@@ -14067,16 +14517,21 @@ function act(a){
     case 'write':  openWrite(); break;
     case 'wrmode': {
       const w = wrState();
-      if(w.mode !== arg){ w.mode = (arg === 'num' ? 'num' : 'ko'); wrNewTarget(); }
+      /* 27-B: 받아쓰기 · 낱말 탭 */
+      if(w.mode !== arg){ w.mode = (['ko','num','dict','word'].indexOf(arg) >= 0 ? arg : 'ko'); wrNewTarget(); }
       SFX.open(); render();
-      say(w.mode === 'num' ? `숫자 ${w.ch}` : w.ch, {rate:0.8});
+      wrSayTarget(w);
       break;
     }
     case 'wrnext': wrNewTarget(); SFX.open(); render();
-                   { const w = wrState(); say(w.kind === 'num' ? `숫자 ${w.ch}` : w.ch, {rate:0.8}); }
+                   wrSayTarget(wrState());
                    break;
+    /* 27-B: 🔊 다시 듣기 — 언제든, 몇 번이든 (도움으로 세지 않습니다) */
+    case 'wrsay': { const w = wrState(); if(w.dict) wrDictSay(w); else wrSayTarget(w); break; }
+    /* 27-B: 리포트 최근 7일 / 오늘 */
+    case 'rep': REP_VIEW = (arg === 'd' ? 'd' : 'w'); SFX.open(); render(); break;
     /* 보여줘 — 실패로 세지 않습니다. 언제든 몇 번이든 볼 수 있습니다 */
-    case 'wrshow': { const w = wrState(); if(!w.done){ w.helped = true;
+    case 'wrshow': { const w = wrState(); if(!w.done){ if(w.dict && !w.reveal) wrDictReveal(w, 'show'); w.helped = true;
       /* 21차 D: 태블릿은 지금 쓸 획부터 끝까지 시범을 다시 — 고른 시범 속도 그대로. 펜을 대면 바로 끝 */
       /* 22-B: 폰도 음절이면 같은 시범 (어느 단계에서든) */
       if((tabOn() || w.kind === 'syl') && !WR.auto && !WR.drawing && WR.tmpl[w.si]){ WR.ghost = null; WR.hint = null; WR.demo = {t0:0, from:w.si}; w.tip = ''; tone(520,0.12,'triangle',0.05); wrDots(); }
@@ -14115,6 +14570,7 @@ function act(a){
       else if(key === 'jamo' && v >= 0 && v <= 1) st.jamo = v;
       else if(key === 'combo' && v >= 0 && v <= 2) st.combo = v;   /* 25차 */
       else if(key === 'solo' && v >= 0 && v <= 1) st.solo = v;     /* 27-A */
+      else if(key === 'goal' && (v === 3 || v === 5 || v === 10)) st.goal = v;   /* 27-B: 하루 목표 */
       else break;
       SFX.open(); save(); render();
       break;
@@ -14323,7 +14779,7 @@ function cosState(){ if(!S.cos) S.cos = freshCos(); return S.cos; }
 function stampGain(info){ return (info && info.clean) ? 2 : 1; }
 function boxesPending(){ return Math.max(0, Math.floor((S.stamp || 0) / STAMP_BOARD) - cosState().opened); }
 /* 도장을 n 개 찍습니다 — 줄어드는 길은 없습니다. 판이 꽉 찼으면 몇 판 찼는지 돌려줍니다 */
-function stampAdd(n){
+function stampAdd(n, quiet){              /* 27-B: quiet 이면 도장 쾅 연출 없이 (하루 목표 선물은 자기 연출이 있습니다) */
   n = Math.max(0, Math.floor(n || 0));
   if(!n) return 0;
   const before = S.stamp || 0;
@@ -14331,7 +14787,7 @@ function stampAdd(n){
   const filled = Math.floor(S.stamp / STAMP_BOARD) - Math.floor(before / STAMP_BOARD);
   if(filled > 0){ S.boxAuto = true; bgmJingle('box', 0.7); }   /* 24차: 도장판이 꽉 찼다 */
   save();
-  stampFx(before, n);
+  if(!quiet) stampFx(before, n);
   return filled;
 }
 WR_DONE_HOOKS.push(info=>{ stampAdd(stampGain(info)); });
@@ -14345,6 +14801,167 @@ function stampSoloGain(info){
   return Math.max(0, Math.min(want, STAMP_LETTER_MAX - stampGain(f)));
 }
 WR_SOLO_HOOKS.push(info=>{ stampAdd(stampSoloGain(info)); });
+
+/* =========================================================
+   27-B ③ 엄마·아빠 리포트 — 날짜별 요약 S.rep (최근 30일만)
+   ---------------------------------------------------------
+   21-C QR 로 같이 옮겨지므로 아주 작게: 날짜(1970-01-01 부터 며칠째, 이 기기 시간대)마다 배열 하나.
+     [0 쓴 글자, 1 틀림·도움 없이 쓴 글자, 2 순서 틀림, 3 방향 틀림, 4 글자 안 순서 틀림, 5 모양·자리 틀림,
+      6 받아쓰기 낸 수, 7 받아쓰기 바로 맞힘, 8 다 쓴 낱말, 9 혼자 한 번 더 성공, 10 자모 단계 오름, 11 자모 단계 내림,
+      12 하루 목표 달성(1), 13 자주 틀린 글자 "가2나1"(위 6개), 14 새로 다 배운 글자 "가나", 15 받아쓰기에서 헷갈린 글자 "사1"]
+   숫자 쓰기는 "글자" 가 아니라서 세지 않습니다. 저장할 때 끝의 0 · 빈 글자는 잘라 냅니다(repPack).
+   ========================================================= */
+const REP_DAYS = 30;
+const REP_TOP = 6;
+function repDay(now){
+  const t = now || Date.now();
+  return Math.floor((t - new Date(t).getTimezoneOffset()*60000) / 864e5);
+}
+function repFresh(){ return [0,0,0,0,0,0,0,0,0,0,0,0,0,'','','']; }
+function repMap(s){ const o = {}; String(s || '').replace(/(\D)(\d+)/g, (_, c, n)=>{ o[c] = (o[c] || 0) + (+n); return ''; }); return o; }
+function repStr(o, max){
+  return Object.keys(o).filter(c => o[c] > 0).sort((a,b)=> (o[b] - o[a]) || (a < b ? -1 : 1)).slice(0, max).map(c => c + o[c]).join('');
+}
+function saneRep(d, now){
+  const out = {};
+  if(!d || typeof d !== 'object' || Array.isArray(d)) return out;
+  const today = repDay(now);
+  Object.keys(d).forEach(k=>{
+    const day = parseInt(k, 10), r = d[k];
+    if(String(day) !== k || !(day > today - REP_DAYS && day <= today + 1) || !Array.isArray(r)) return;
+    const x = repFresh();
+    for(let i=0;i<13;i++){ const v = r[i]; x[i] = (typeof v === 'number' && isFinite(v) && v > 0) ? Math.min(99999, Math.floor(v)) : 0; }
+    x[12] = x[12] ? 1 : 0;
+    x[13] = repStr(repMap(typeof r[13] === 'string' ? r[13].slice(0, 80) : ''), REP_TOP);
+    x[14] = Array.from(typeof r[14] === 'string' ? r[14] : '').filter((c,i,a) => /^[가-힣ㄱ-ㅣ]$/.test(c) && a.indexOf(c) === i).slice(0, 40).join('');
+    x[15] = repStr(repMap(typeof r[15] === 'string' ? r[15].slice(0, 80) : ''), REP_TOP);
+    out[k] = x;
+  });
+  return out;
+}
+function repPack(rep, now){
+  const out = {}, today = repDay(now);
+  Object.keys(rep || {}).forEach(k=>{
+    if(!(+k > today - REP_DAYS) || !Array.isArray(rep[k])) return;     /* 30일 지난 날은 저장하지 않습니다 */
+    const r = rep[k].slice();
+    while(r.length && (r[r.length-1] === 0 || r[r.length-1] === '')) r.pop();
+    out[k] = r;
+  });
+  return out;
+}
+function repPrune(now){
+  const today = repDay(now);
+  Object.keys(S.rep || {}).forEach(k=>{ if(!(+k > today - REP_DAYS)) delete S.rep[k]; });
+}
+function repToday(now){
+  if(!S.rep || typeof S.rep !== 'object' || Array.isArray(S.rep)) S.rep = {};
+  const k = String(repDay(now));
+  if(!S.rep[k]){ repPrune(now); S.rep[k] = repFresh(); }
+  return S.rep[k];
+}
+function repAddMap(R, i, ch){ const o = repMap(R[i]); o[ch] = (o[ch] || 0) + 1; R[i] = repStr(o, REP_TOP); }
+function repKinds(R, k){ if(!k) return; R[2] += k.o | 0; R[3] += k.d | 0; R[4] += k.p | 0; R[5] += k.s | 0; }
+/* 글자 하나를 다 썼다 (1차 — WR_DONE_HOOKS) */
+function repLetter(info, now){
+  if(!info || info.kind === 'num' || !info.ch) return null;
+  const R = repToday(now);
+  R[0]++;
+  if(!info.miss && !info.help) R[1]++;
+  repKinds(R, info.kinds);
+  if(info.dict){
+    R[6]++;
+    if(!info.reveal && !info.miss && !info.help) R[7]++;
+    else repAddMap(R, 15, info.ch);
+  }
+  if(info.miss || info.auto) repAddMap(R, 13, info.ch);
+  if(info.before != null && info.before < WRM_TOP && info.after >= WRM_TOP && R[14].indexOf(info.ch) < 0 && R[14].length < 40) R[14] += info.ch;
+  R[10] += info.ju | 0; R[11] += info.jd | 0;
+  goalCheck(R, now);
+  return R;
+}
+/* 혼자 한 번 더를 다 썼다 — 성공 수 · 그 안에서 틀린 종류 */
+function repSolo(info, now){
+  if(!info || info.kind === 'num') return;
+  const R = repToday(now);
+  if(info.clean) R[9]++;
+  repKinds(R, info.kinds);
+}
+function repWord(now){ repToday(now)[8]++; }
+WR_DONE_HOOKS.push(info=>{ repLetter(info); });
+WR_SOLO_HOOKS.push(info=>{ repSolo(info); });
+
+/* 여러 날 합치기 — 리포트 화면용 */
+function repAgg(days){
+  const a = {n:0, c:0, k:[0,0,0,0], dn:0, dok:0, wd:0, so:0, ju:0, jd:0, g:0, m:{}, nm:'', dm:{}, act:0};
+  days.forEach(d=>{
+    const R = S.rep && S.rep[String(d)];
+    if(!R) return;
+    a.n += R[0]; a.c += R[1];
+    for(let i=0;i<4;i++) a.k[i] += R[2+i];
+    a.dn += R[6]; a.dok += R[7]; a.wd += R[8]; a.so += R[9]; a.ju += R[10]; a.jd += R[11]; a.g += R[12];
+    if(R[0] > 0) a.act++;
+    const m = repMap(R[13]); Object.keys(m).forEach(c=>{ a.m[c] = (a.m[c] || 0) + m[c]; });
+    const dm = repMap(R[15]); Object.keys(dm).forEach(c=>{ a.dm[c] = (a.dm[c] || 0) + dm[c]; });
+    Array.from(R[14]).forEach(c=>{ if(a.nm.indexOf(c) < 0) a.nm += c; });
+  });
+  return a;
+}
+function repLast(n, now){ const t = repDay(now), out = []; for(let d=t-n+1; d<=t; d++) out.push(d); return out; }
+
+/* =========================================================
+   27-B ④ 하루 목표 — "오늘 글자 5개 쓰기" (어른 설정 3 · 5 · 10)
+   · 맵의 ✏️ 버튼 모서리에 작은 진행 표시(2/5 → 다 하면 🎯).
+   · 다 하면 축하 + 특별 도장 2개(코스튬 상자 진행 보너스). 하루에 한 번.
+   · 못 해도 손해 없음. 연속 기록(끊기는 숫자)은 쓰지 않고 "이번 주 n일 했어요"(월요일부터 누적)만 보여 줍니다.
+   ========================================================= */
+const GOAL_OPTS = [3, 5, 10];
+const GOAL_GIFT = 2;
+const GOAL_FX_MS = 2400;     /* 글자 축하 · 도장 쾅이 끝난 뒤에 */
+function goalOf(){ const g = setOf().goal; return GOAL_OPTS.indexOf(g) >= 0 ? g : 5; }
+function goalNow(now){
+  const R = S.rep && S.rep[String(repDay(now))];
+  return {n:R ? R[0] : 0, goal:goalOf(), done:!!(R && R[12])};
+}
+/* 이번 주(월요일부터 오늘까지) 목표를 이룬 날 수 */
+function goalWeek(now){
+  const t = repDay(now), mi = (((t + 4) % 7) + 6) % 7;      /* 1970-01-01 은 목요일 · 월 0 ~ 일 6 */
+  let c = 0;
+  for(let d=t-mi; d<=t; d++){ const R = S.rep && S.rep[String(d)]; if(R && R[12]) c++; }
+  return c;
+}
+function goalCheck(R, now){
+  if(!R || R[12] || R[0] < goalOf()) return false;
+  R[12] = 1;
+  stampAdd(GOAL_GIFT, true);
+  const wk = goalWeek(now), g = goalOf();
+  setTimeout(()=>goalFx(g, wk), GOAL_FX_MS);
+  return true;
+}
+const KO_NTH = ['', '첫', '두', '세', '네', '다섯', '여섯', '일곱'];
+let goalFxT = 0;
+function goalFx(g, wk){
+  let el = document.getElementById('goalfx');
+  if(!el || !el.classList){
+    if(!document.body || !document.createElement) return;
+    el = document.createElement('div'); el.id = 'goalfx'; el.setAttribute('aria-hidden','true');
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `<div class="gfx-card"><div class="gfx-big">🎯</div><div class="gfx-side">
+      <div class="gfx-txt">오늘 목표 달성!</div>
+      <div class="gfx-sub">글자 ${g}개 다 썼어 · 🎀 특별 도장 +${GOAL_GIFT}</div>
+      <div class="gfx-wk">이번 주 ${wk}일 했어요 ${'⭐'.repeat(Math.min(7, wk))}</div></div></div>`;
+  el.className = ''; void el.offsetWidth; el.className = 'go';
+  clearTimeout(goalFxT);
+  goalFxT = setTimeout(()=>{ el.className = ''; el.innerHTML = ''; }, 3600);
+  try{ confetti(); }catch(e){}
+  SFX.good(); setTimeout(()=>SFX.star(), 300);
+  say(`오늘 목표 다 했어! 특별 도장 두 개 줄게! 이번 주에 ${KO_NTH[Math.min(7, Math.max(1, wk))]} 번째야!`, {rate:0.9});
+  if(S.screen === 'field') render();
+}
+function goalPill(){
+  const G = goalNow();
+  return `<span class="gl${G.done ? ' ok' : ''}" aria-label="오늘 목표">${G.done ? '🎯' : `${Math.min(G.n, G.goal)}/${G.goal}`}</span>`;
+}
 
 /* "참 잘했어요" 도장 그림 */
 function stampSvg(){
