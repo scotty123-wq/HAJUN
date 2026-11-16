@@ -290,6 +290,154 @@ body.tab .xfqr{width:min(100%,440px,60vh);}
 .drop b{display:block;animation:dropHop .9s ease-in-out infinite alternate;}
 @keyframes dropHop{from{transform:translateY(1px) scale(.92);}to{transform:translateY(-3px) scale(1.06);}}
 
+/* ★ 23차: 그림책 지도 — 바닥 캔버스(.terr) 위에 칸 장식(.dc) · 하준이(#player) · 친구(#fol) · 연출(.wfx).
+   --ph 는 지금 시각(#map 에 박힘): 화면을 다시 그려도 살랑임이 처음부터 다시 시작하지 않게 */
+#map.t23 #world{z-index:0;transition:transform var(--stp,.19s) cubic-bezier(.33,.12,.45,1);}
+#map.t23.hold #world, #map.t23.hold #player, #map.t23.hold #fol{transition-timing-function:linear;}
+#map.t23.tok .tile{background:transparent !important;box-shadow:none !important;}
+#map.t23.enter #world{animation:wEnter .42s ease-out;}
+@keyframes wEnter{from{opacity:.2;}to{opacity:1;}}
+#map.t23::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;border-radius:inherit;
+  background:radial-gradient(120% 90% at 22% 12%, rgba(255,248,220,.18), rgba(255,248,220,0) 55%),
+             radial-gradient(closest-side at 50% 50%, rgba(0,0,0,0) 72%, rgba(20,10,30,.18));
+}
+#map.t23.r-cave::after{
+  background:radial-gradient(closest-side at 50% 52%, rgba(255,250,220,.10), rgba(0,0,0,0) 60%, rgba(20,10,40,.34));
+}
+.terrph{position:absolute;inset:0;pointer-events:none;}
+.terrph canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+/* 칸 장식 */
+#map.t23 .tile{position:relative;}
+.dc{position:absolute;left:0;bottom:0;width:100%;height:100%;pointer-events:none;display:block;}
+.tile .dc svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+.dc.tuft{height:125%;}
+.dc.tall{left:-14%;width:128%;height:200%;bottom:-4%;}
+.dc.tall.rock{left:-6%;width:112%;height:175%;bottom:-2%;}
+.dc g, .dc path, .dc circle, .dc rect{transform-box:fill-box;}
+.dc .sw, .dc .cn, .dc .tw, .dc .wv, .dc .rp, .dc .bb, .dc .gl, .dc .fl{
+  animation-delay:calc(var(--ph,0s) + var(--dl,0s));animation-iteration-count:infinite;
+}
+.dc .sw{transform-origin:50% 100%;animation-name:dcSway;animation-duration:3s;animation-timing-function:ease-in-out;}
+.dc .sw2{animation-duration:2.4s;}
+.dc .sw3{animation-duration:4s;}
+.dc .cn{transform-origin:50% 100%;animation-name:dcTree;animation-duration:6s;animation-timing-function:ease-in-out;}
+.dc .tw{transform-origin:50% 50%;animation-name:dcTwk;animation-duration:2.4s;animation-timing-function:ease-in-out;}
+.dc .wv{animation-name:dcDrift;animation-duration:4s;animation-timing-function:ease-in-out;}
+.dc .rp{transform-origin:50% 50%;animation-name:dcRipple;animation-duration:3s;animation-timing-function:ease-out;}
+.dc .bb{transform-origin:50% 50%;animation-name:dcBub;animation-duration:3s;animation-timing-function:ease-out;}
+.dc .bb.b2{animation-duration:2.4s;}
+.dc .gl{animation-name:dcGlow;animation-duration:3s;animation-timing-function:ease-in-out;}
+.dc .fl{transform-origin:50% 100%;animation-name:dcFlick;animation-duration:1.2s;animation-timing-function:ease-in-out;}
+.dc.lava .gl{opacity:.3;}
+@keyframes dcSway{0%,100%{transform:skewX(0deg);}50%{transform:skewX(-7deg);}}
+@keyframes dcTree{0%,100%{transform:rotate(0deg);}50%{transform:rotate(-1.4deg);}}
+@keyframes dcTwk{0%,100%{opacity:.15;transform:scale(.6);}50%{opacity:1;transform:scale(1);}}
+@keyframes dcDrift{0%,100%{transform:translateX(-1.5px);}50%{transform:translateX(1.5px);}}
+@keyframes dcRipple{0%{transform:scale(.25);opacity:.9;}80%,100%{transform:scale(1.3);opacity:0;}}
+@keyframes dcBub{0%,55%{transform:scale(0);opacity:0;}70%{transform:scale(1);opacity:1;}100%{transform:scale(1.35);opacity:0;}}
+@keyframes dcGlow{0%,100%{opacity:.18;}50%{opacity:.5;}}
+@keyframes dcFlick{0%,100%{transform:scaleY(1) skewX(0);}25%{transform:scaleY(1.12) skewX(3deg);}50%{transform:scaleY(.94) skewX(-2deg);}75%{transform:scaleY(1.07) skewX(1deg);}}
+/* 풀숲을 지나가면 풀이 휘청 */
+.tile.rs .dc .sw{animation:dcRustle .5s ease-out 1 !important;}
+@keyframes dcRustle{0%{transform:skewX(0);}25%{transform:skewX(16deg) scaleY(.92);}55%{transform:skewX(-11deg);}80%{transform:skewX(5deg);}100%{transform:skewX(0);}}
+/* 지도 전체 연출 */
+.wfx{position:absolute;inset:0;pointer-events:none;z-index:300;overflow:hidden;}
+.wfx i{position:absolute;display:block;animation-delay:calc(var(--ph,0s) + var(--dl,0s));animation-iteration-count:infinite;}
+.wfx .cld{left:0;width:60%;height:34%;border-radius:50%;transform:translateX(-80%);
+  background:radial-gradient(closest-side, rgba(25,45,80,.15), rgba(25,45,80,.07) 55%, rgba(25,45,80,0));
+  animation-name:wCloud;animation-duration:48s;animation-timing-function:linear;}
+@keyframes wCloud{from{transform:translateX(-80%) scale(var(--cs,1));}to{transform:translateX(190%) scale(var(--cs,1));}}
+.wfx .ffl{width:1.4%;height:1.4%;border-radius:50%;background:#FFF9C4;box-shadow:0 0 5px 2px rgba(255,238,130,.75);
+  animation-name:wFly, wGlow;animation-duration:12s, 3s;animation-timing-function:ease-in-out;
+  animation-delay:calc(var(--ph,0s) + var(--dl,0s)), calc(var(--ph,0s) + var(--dl2,0s));}
+@keyframes wFly{0%,100%{transform:translate(0,0);}25%{transform:translate(14px,-10px);}50%{transform:translate(-6px,-20px);}75%{transform:translate(-14px,4px);}}
+@keyframes wGlow{0%,100%{opacity:.25;}50%{opacity:1;}}
+.wfx .emb{width:1.1%;height:1.1%;border-radius:50%;background:#FFD24A;box-shadow:0 0 4px 1px rgba(255,150,40,.8);opacity:0;
+  animation-name:wEmber;animation-duration:4s;animation-timing-function:ease-out;}
+@keyframes wEmber{0%{transform:translate(0,0) scale(1);opacity:0;}12%{opacity:1;}100%{transform:translate(var(--ex,6px),-46px) scale(.4);opacity:0;}}
+.wfx .glint{width:2.2%;height:2.2%;background:radial-gradient(circle, #fff 0 18%, rgba(255,255,255,0) 60%);opacity:0;
+  animation-name:wGlint;animation-duration:4s;animation-timing-function:ease-in-out;}
+@keyframes wGlint{0%,70%,100%{opacity:0;transform:scale(.4);}80%{opacity:1;transform:scale(1.2);}90%{opacity:.4;transform:scale(.8);}}
+/* 하준이 — 칸보다 조금 크게, 발이 칸 아래쪽에 닿게 */
+#map.t23 #player{transition:transform var(--stp,.19s) cubic-bezier(.33,.12,.45,1);}
+#player .kid{position:absolute;left:-7.5%;width:115%;height:161%;top:-64%;overflow:visible;}
+#player .tv{display:none;}
+#player.f-d .tv-f, #player.f-u .tv-b, #player.f-l .tv-s, #player.f-r .tv-s{display:inline;}
+#player.f-l .kid{transform:scaleX(-1);}
+#player .dk{filter:brightness(.8);}
+#player .kl, #player .ka{transition:transform var(--stp,.19s) ease-in-out;}
+#player .tv-s .kl{transform-origin:50.5px 98px;}
+#player .tv-s .ka{transform-origin:50px 62px;}
+#player .tv-f .ka1, #player .tv-b .ka1{transform-origin:34px 61px;}
+#player .tv-f .ka2, #player .tv-b .ka2{transform-origin:66px 61px;}
+#player.walk.st0 .tv-s .kl1, #player.walk.st1 .tv-s .kl2{transform:rotate(-24deg);}
+#player.walk.st0 .tv-s .kl2, #player.walk.st1 .tv-s .kl1{transform:rotate(22deg);}
+#player.walk.st0 .tv-s .ka1, #player.walk.st1 .tv-s .ka2{transform:rotate(28deg);}
+#player.walk.st0 .tv-s .ka2, #player.walk.st1 .tv-s .ka1{transform:rotate(-26deg);}
+#player.walk.st0 .tv-f .kl1, #player.walk.st1 .tv-f .kl2,
+#player.walk.st0 .tv-b .kl2, #player.walk.st1 .tv-b .kl1{transform:translateY(-3.5px) scaleY(.94);}
+#player.walk.st0 .tv-f .ka1, #player.walk.st1 .tv-b .ka2{transform:rotate(9deg);}
+#player.walk.st1 .tv-f .ka2, #player.walk.st0 .tv-b .ka1{transform:rotate(-9deg);}
+#player.walk.st0 .tv-f .ka2, #player.walk.st1 .tv-b .ka1{transform:rotate(-3deg);}
+#player.walk.st1 .tv-f .ka1, #player.walk.st0 .tv-b .ka2{transform:rotate(3deg);}
+#player.walk .kid{animation:kBobA var(--stp,.19s) ease-in-out;}
+#player.walk.st1 .kid{animation-name:kBobB;}
+#player.walk.f-l .kid{animation-name:kBobAL;}
+#player.walk.f-l.st1 .kid{animation-name:kBobBL;}
+@keyframes kBobA{0%,100%{transform:translateY(0);}50%{transform:translateY(-3%);}}
+@keyframes kBobB{0%,100%{transform:translateY(0);}50%{transform:translateY(-3%);}}
+@keyframes kBobAL{0%,100%{transform:scaleX(-1) translateY(0);}50%{transform:scaleX(-1) translateY(-3%);}}
+@keyframes kBobBL{0%,100%{transform:scaleX(-1) translateY(0);}50%{transform:scaleX(-1) translateY(-3%);}}
+#player .ksh{transform-box:fill-box;transform-origin:50% 50%;transition:transform var(--stp,.19s);}
+#player.walk .ksh{transform:scaleX(.88);}
+/* 풀숲·물에 서 있으면 발 앞에 겹치는 풀/물결 */
+.kft{display:none;position:absolute;left:4%;width:92%;bottom:-4%;height:42%;pointer-events:none;}
+.kft svg{width:100%;height:100%;display:block;overflow:visible;}
+#player.ing .kft, #fol.ing .kft{display:block;}
+#fol .kft{left:0;width:100%;bottom:-2%;height:36%;}
+.kft .rp1{transform-box:fill-box;transform-origin:50% 50%;animation:kRipple 1.5s ease-out infinite;}
+@keyframes kRipple{from{transform:scale(.6);opacity:1;}to{transform:scale(1.25);opacity:0;}}
+/* 따라오는 친구 */
+#fol{position:absolute;left:0;top:0;width:8.3333%;height:8.3333%;pointer-events:none;
+  transition:transform var(--stp,.19s) cubic-bezier(.33,.12,.45,1);}
+#fol .fsh{position:absolute;left:18%;right:18%;bottom:2%;height:18%;border-radius:50%;background:rgba(0,0,0,.24);}
+#fol .fimg{position:absolute;left:4%;width:92%;height:92%;bottom:6%;transform-origin:50% 100%;
+  animation:folIdle 2.4s ease-in-out infinite;animation-delay:var(--ph,0s);}
+#fol .fimg .artbox{width:100%;height:100%;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25));}
+#fol.f-r .fimg .artbox{transform:scaleX(-1);}
+#fol.walk .fimg{animation:folHopA var(--stp,.19s) ease-out;}
+#fol.walk.st1 .fimg{animation-name:folHopB;}
+@keyframes folIdle{0%,100%{transform:translateY(0) scale(1,1);}50%{transform:translateY(-4%) scale(.98,1.02);}}
+@keyframes folHopA{0%{transform:translateY(0) scale(1.06,.94);}45%{transform:translateY(-22%) scale(.96,1.05);}100%{transform:translateY(0) scale(1,1);}}
+@keyframes folHopB{0%{transform:translateY(0) scale(1.06,.94);}45%{transform:translateY(-22%) scale(.96,1.05);}100%{transform:translateY(0) scale(1,1);}}
+/* 바닥 아이템이 나무에 가려지지 않게 */
+#map.t23 .drop{z-index:5;}
+
+/* ★ 23차: 배틀 배경 — 지역별 그림(하늘·원경·땅) + 포켓몬 아래 받침 원판 */
+.arena.bgr{isolation:isolate;}
+.arena .abg{position:absolute;inset:0;z-index:-2;pointer-events:none;}
+.arena .abg svg{width:100%;height:100%;display:block;}
+.arena .abg .cl{animation:abgCloud 24s ease-in-out infinite alternate;}
+.arena .abg .cl2{animation-duration:32s;}
+.arena .abg .tw{transform-box:fill-box;transform-origin:50% 50%;animation:dcTwk 2.4s ease-in-out infinite;}
+.arena .abg .tw2{animation-duration:3.2s;animation-delay:-1s;}
+.arena .abg .sm{transform-box:fill-box;transform-origin:50% 100%;animation:abgSmoke 6s ease-in-out infinite;}
+.arena .abg .sp{animation:dcTwk 3s ease-in-out infinite;}
+@keyframes abgCloud{from{transform:translateX(-14px);}to{transform:translateX(14px);}}
+@keyframes abgSmoke{0%,100%{transform:translateY(0) scale(1);opacity:.85;}50%{transform:translateY(-6px) scale(1.08);opacity:.6;}}
+.slot .platbox{position:absolute;left:0;width:100%;aspect-ratio:1;z-index:-1;pointer-events:none;}
+.slot.me .platbox{top:0;}
+.slot.foe .platbox{bottom:0;}
+.slot .platbox::before{content:'';position:absolute;left:0;right:0;bottom:-4%;height:26%;border-radius:50%;
+  background:radial-gradient(closest-side, rgba(0,0,0,.26), rgba(0,0,0,.1) 65%, rgba(0,0,0,0));}
+.slot .platbox::after{content:'';position:absolute;left:7%;right:7%;bottom:0;height:18%;border-radius:50%;
+  background:var(--plat,#8ED46E);box-shadow:inset 0 -4px 0 rgba(0,0,0,.14), inset 0 3px 0 rgba(255,255,255,.35);}
+.arena.bg-grass{--plat:radial-gradient(closest-side,#9EE07E,#72C25C);}
+.arena.bg-water{--plat:radial-gradient(closest-side,#FFF0C4,#EBD293);}
+.arena.bg-cave{--plat:radial-gradient(closest-side,#B4A8C6,#867A9C);}
+.arena.bg-peak{--plat:radial-gradient(closest-side,#E9BC98,#C38E6C);}
+
 /* 7차: 지역 이름 · 현재 위치 · 가방 — 길을 잃지 않게 늘 보입니다 */
 .regbar{display:flex;align-items:center;gap:6px;}
 .regbar .btn, .regbar .pos{
@@ -3023,55 +3171,242 @@ function ballSvg(cls){
     <path d="M30 26 Q38 18 50 17" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55"/>
   </svg>`;
 }
-/* 지도 위 하준이 — 21차 B: 옷장에서 고른 모자·옷·가방을 입습니다 (아무것도 안 입으면 예전 그대로).
-   look 을 안 주면 지금 입은 옷(kidLook)으로 그립니다 */
-function kidSvg(look){
+/* 지도 위 하준이 — 21차 B: 옷장에서 고른 모자·옷·가방을 입습니다.
+   ★ 23차: 아빠 "트레이너도 더 현실성 있게" — 2.9등신 어린이 모험가로 다시 그렸습니다.
+   빛은 왼쪽 위 하나. 머리카락 결·옷 주름·명암 · 앞/뒤/옆 세 방향(왼쪽은 옆모습을 뒤집음).
+   다리·팔은 묶음(g.kl / g.ka)이라 CSS 가 걸음마다 흔듭니다. 모자·옷·가방은 세 방향 모두에 그립니다.
+   kidSvg(look) 은 옷장·코스튬 그림용 앞모습 한 장, trainerSvg(look) 는 지도용 세 방향 묶음입니다. */
+const KID_SKIN = '#F7D2AE', KID_SKIN_D = '#E0A982', KID_HAIR = '#4B2F22', KID_HAIR_L = '#7E5440',
+      KID_PANTS = '#C9A26B', KID_PANTS_D = '#9F7B4C', KID_SHOE = '#D9483B', KID_LINE = '#3A2A22';
+const KID_SHIRT0 = {c:'#3D7FD6', d:'#2A5FA8'};   /* 아무것도 안 입었을 때 윗옷 */
+const KID_CAP0   = {c:'#2FA39A', d:'#1E746D'};   /* 아무것도 안 썼을 때 모자 */
+const KST = `stroke="${KID_LINE}" stroke-width="1.5" stroke-linejoin="round"`;
+function kidRes(look){
   const L = look || kidLook();
   const cap = L.cap && COS_BY_ID[L.cap], shirt = L.shirt && COS_BY_ID[L.shirt], bag = L.bag && COS_BY_ID[L.bag];
-  let back = '', body, straps = '', hat;
-  if(bag){
-    const c = COS_COL[bag.col];
-    back = `<rect x="25" y="54" width="50" height="27" rx="9" fill="${c.c}" stroke="${E}" stroke-width="4"/>`;
-    straps = `<path d="M40 53 V75 M60 53 V75" stroke="${c.d}" stroke-width="4.5" stroke-linecap="round"/>`;
+  const sc = shirt ? COS_COL[shirt.col] : KID_SHIRT0;
+  const p = shirt ? cosPaint(sc) : {defs:'', f:sc.c};
+  return { hat: cap ? cap.kind : 'cap', hc: cap ? COS_COL[cap.col] : KID_CAP0,
+           sk: shirt ? shirt.kind : 'tee', sc, sf: p.f, defs: p.defs, bag: bag ? COS_COL[bag.col] : null };
+}
+/* 다리 — 앞/뒤 (x = 다리 왼쪽 끝) */
+function kLegFB(x, cls, back){
+  return `<g class="kl ${cls}">
+    <rect x="${x}" y="97" width="8" height="25" rx="3.6" fill="${KID_SKIN}" ${KST}/>
+    <path d="M${x+5.6} 100 V117" stroke="${KID_SKIN_D}" stroke-width="2" opacity=".55"/>
+    <rect x="${x-.3}" y="116.5" width="8.6" height="6" rx="2" fill="#FBFAF4" ${KST}/>
+    <path d="M${x-2} 128 Q${x-2} 121.5 ${x+4} 121.5 Q${x+10} 121.5 ${x+10} 128 Q${x+10} 132 ${x+4} 132 Q${x-2} 132 ${x-2} 128 Z" fill="${KID_SHOE}" ${KST}/>
+    ${back ? `<path d="M${x-1.6} 129.6 H${x+9.6}" stroke="#7A2A22" stroke-width="2" stroke-linecap="round"/>`
+           : `<path d="M${x-1.4} 129.4 H${x+9.4}" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M${x+1} 124.6 Q${x+4} 123.4 ${x+7} 124.6" stroke="#fff" stroke-width="1.1" fill="none"/>`}
+  </g>`;
+}
+/* 다리 — 옆 (오른쪽을 봄) */
+function kLegS(cls, dark){
+  const x = 46.5;
+  return `<g class="kl ${cls}${dark ? ' dk' : ''}">
+    <rect x="${x}" y="96" width="8" height="26" rx="3.6" fill="${KID_SKIN}" ${KST}/>
+    <rect x="${x-.3}" y="116.5" width="8.6" height="6" rx="2" fill="#FBFAF4" ${KST}/>
+    <path d="M${x-1.6} 127.5 Q${x-1.6} 122 ${x+3} 122 L${x+7.5} 122 Q${x+13.5} 123 ${x+13.5} 128 Q${x+13.5} 132 ${x+8.5} 132 H${x+1} Q${x-1.6} 132 ${x-1.6} 129.5 Z" fill="${KID_SHOE}" ${KST}/>
+    <path d="M${x-1} 129.6 H${x+13}" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+  </g>`;
+}
+/* 팔 — 앞/뒤 왼쪽 팔 모양 (오른팔은 거울) */
+function kArmIn(R){
+  const stripe = R.sk === 'stripe' ? `<path d="M30.4 68.4 L36.9 69" stroke="#fff" stroke-width="2.2" opacity=".9"/>` : '';
+  return `<path d="M37.6 59.6 Q31.4 60.8 30 67 L29.2 72.6 Q33 74.4 36.8 73.3 Z" fill="${R.sf}" ${KST}/>${stripe}
+    <path d="M33.5 61.4 Q31.2 64 30.6 70" stroke="rgba(255,255,255,.25)" stroke-width="1.6" fill="none"/>
+    <rect x="29.5" y="71.5" width="6.5" height="15" rx="3.2" fill="${KID_SKIN}" ${KST}/>
+    <circle cx="32.7" cy="88" r="3.9" fill="${KID_SKIN}" ${KST}/>
+    <path d="M31 85.6 Q33 84.6 34.8 85.6" stroke="${KID_SKIN_D}" stroke-width="1" fill="none"/>`;
+}
+function kArmFB(cls, right){
+  return `<g class="ka ${cls}">${right ? `<g transform="matrix(-1 0 0 1 100 0)">${kArmIn(this.R)}</g>` : kArmIn(this.R)}</g>`;
+}
+/* 팔 — 옆 */
+function kArmS(R, cls, dark){
+  const stripe = R.sk === 'stripe' ? `<path d="M47.6 68.6 L55 68.9" stroke="#fff" stroke-width="2.2" opacity=".9"/>` : '';
+  return `<g class="ka ${cls}${dark ? ' dk' : ''}"><path d="M45.5 59.8 Q52.8 58.8 54.6 64 L55.6 72.6 Q51.6 74.2 47.4 73.1 Z" fill="${R.sf}" ${KST}/>${stripe}
+    <rect x="47.8" y="71.5" width="6.5" height="15" rx="3.2" fill="${KID_SKIN}" ${KST}/>
+    <circle cx="51" cy="88" r="3.8" fill="${KID_SKIN}" ${KST}/></g>`;
+}
+/* 윗옷 무늬 */
+function kShirtDeco(R, side){
+  if(R.sk === 'stripe') return side
+    ? `<path d="M41.4 67 H59.6 M40.8 74 H60.2 M40.3 81 H60.8" stroke="#fff" stroke-width="2.5" opacity=".9"/>`
+    : `<path d="M37.6 67 H62.4 M36.9 74 H63.1 M36.2 81 H63.8" stroke="#fff" stroke-width="2.6" opacity=".9"/>`;
+  if(R.sk === 'starry') return `<polygon points="${starPts(side ? 44.6 : 50, side ? 69 : 72, side ? 4.2 : 6.5, side ? 1.8 : 2.8)}" fill="#FFD23C" stroke="${KID_LINE}" stroke-width="1" stroke-linejoin="round"/>`;
+  return '';
+}
+/* 모자 — v: f 앞 · b 뒤 · s 옆 */
+function kHat(R, v){
+  const c = R.hc, k = R.hat;
+  const shadeF = `<path d="M57 14.5 Q68 17 68.5 32 Q63 31 59 30.8 Q61 22 57 14.5 Z" fill="rgba(0,0,0,.14)"/>`;
+  const hiF = `<path d="M38 18 Q42 15.4 46.4 15 Q41.4 20 40.2 26 Q37.6 23 38 18 Z" fill="rgba(255,255,255,.25)"/>`;
+  if(k === 'beanie'){
+    const cx = v === 's' ? 49.5 : 50;
+    return `<path d="M31.5 35 Q31 12 ${cx} 11.5 Q69 12 68.5 35 Z" fill="${c.c}" ${KST}/>
+      <path d="M40 14.6 V31 M${cx} 12 V31 M60 14.6 V31" stroke="rgba(0,0,0,.13)" stroke-width="1.6"/>
+      ${v === 'b' ? '' : shadeF}${hiF}
+      <rect x="30" y="29" width="40" height="8" rx="4" fill="${c.d}" ${KST}/>
+      <path d="M33 31.2 H67" stroke="rgba(255,255,255,.25)" stroke-width="1.2"/>
+      <circle cx="${cx}" cy="9.6" r="5.2" fill="#fff" ${KST}/><circle cx="${cx + 1.6}" cy="11" r="2.4" fill="rgba(0,0,0,.08)"/>`;
   }
-  if(!shirt){
-    body = `<rect x="34" y="52" width="32" height="32" rx="12" fill="#3D7FD6" stroke="${E}" stroke-width="4"/>`;
-  }else{
-    const c = COS_COL[shirt.col], p = cosPaint(c);
-    let deco = '';
-    if(shirt.kind === 'stripe') deco = `<path d="M36 62 H64 M35 70 H65 M36 78 H64" stroke="#fff" stroke-width="3.5"/>`;
-    if(shirt.kind === 'starry') deco = `<polygon points="${starPts(50,68,9,4)}" fill="#FFD23C"/>`;
-    body = `${p.defs}<rect x="34" y="52" width="32" height="32" rx="12" fill="${p.f}"/>${deco}
-      <rect x="34" y="52" width="32" height="32" rx="12" fill="none" stroke="${E}" stroke-width="4"/>`;
+  if(k === 'straw'){
+    const cx = v === 's' ? 49.5 : 50, ry = v === 's' ? 4.6 : 6.5;
+    const bow = v === 'b' ? `<path d="M50 29 L44.5 35 L47 36 L50 30.5 L53 36 L55.5 35 Z" fill="#E8412F" ${KST}/>` : '';
+    return `<ellipse cx="${cx}" cy="31" rx="28" ry="${ry}" fill="${c.c}" ${KST}/>
+      <ellipse cx="${cx}" cy="${31 + ry*.35}" rx="25" ry="${ry*.55}" fill="rgba(0,0,0,.12)"/>
+      <path d="M37 31 Q37 13.5 ${cx} 13.5 Q63 13.5 63 31 Q${cx} 33.4 37 31 Z" fill="${c.c}" ${KST}/>
+      <path d="M41 18 L43 30 M47 15 L48 30 M53 15 L52 30 M59 18 L57 30" stroke="${c.d}" stroke-width="1" opacity=".55"/>
+      <path d="M37.3 26.4 Q${cx} 29 62.7 26.4 L62.9 30 Q${cx} 32.6 37.1 30 Z" fill="#E8412F"/>${bow}
+      <path d="M41 17.5 Q44 14.8 48 14.6" stroke="rgba(255,255,255,.4)" stroke-width="1.6" fill="none"/>`;
   }
-  const kind = cap ? cap.kind : 'cap', cc = cap ? COS_COL[cap.col] : null;
-  if(!cap){
-    hat = `<path d="M27 32 A23 23 0 0 1 73 32 Z" fill="#E8412F" stroke="${E}" stroke-width="4"/>
-    <path d="M27 32 H80 A8 8 0 0 1 73 40 H27 Z" fill="#F2F2EE" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>`;
-  }else if(kind === 'beanie'){
-    hat = `<path d="M27 33 A23 23 0 0 1 73 33 Z" fill="${cc.c}" stroke="${E}" stroke-width="4"/>
-    <rect x="25" y="26" width="50" height="9" rx="4.5" fill="${cc.d}" stroke="${E}" stroke-width="4"/>
-    <circle cx="50" cy="11" r="6.5" fill="#fff" stroke="${E}" stroke-width="3.5"/>`;
-  }else if(kind === 'straw'){
-    hat = `<ellipse cx="50" cy="31" rx="35" ry="7.5" fill="${cc.c}" stroke="${E}" stroke-width="4"/>
-    <path d="M33 31 Q33 11 50 11 Q67 11 67 31 Z" fill="${cc.c}" stroke="${E}" stroke-width="4"/>
-    <path d="M34 26 H66" stroke="#E8412F" stroke-width="4.5"/>`;
-  }else if(kind === 'kcrown'){
-    hat = `<path d="M29 31 L28 11 L39 21 L50 6 L61 21 L72 11 L71 31 Z" fill="${cc.c}" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>
-    <circle cx="50" cy="23" r="4" fill="#E8412F" stroke="${E}" stroke-width="2.5"/>
-    <circle cx="38" cy="25" r="3" fill="#3D7FD6"/><circle cx="62" cy="25" r="3" fill="#3FAE5A"/>`;
-  }else{
-    hat = `<path d="M27 32 A23 23 0 0 1 73 32 Z" fill="${cc.c}" stroke="${E}" stroke-width="4"/>
-    <path d="M27 32 H80 A8 8 0 0 1 73 40 H27 Z" fill="${cc.d}" stroke="${E}" stroke-width="4" stroke-linejoin="round"/>`;
+  if(k === 'kcrown'){
+    const s = v === 's';
+    return `<path d="M${s?35:33.5} 32 L${s?34.5:32.5} 14 L${s?43:41.5} 22 L50 9 L${s?57:58.5} 22 L${s?64.5:67.5} 14 L${s?64:66.5} 32 Q50 34 ${s?35:33.5} 32 Z" fill="${c.c}" ${KST}/>
+      <path d="M${s?35:33.4} 28 Q50 30 ${s?64:66.6} 28" stroke="${c.d}" stroke-width="2.4" fill="none"/>
+      <path d="M50 12 L54 21 L50 30 Z" fill="rgba(255,255,255,.25)"/>
+      <circle cx="${s?34.5:32.5}" cy="14" r="1.9" fill="${c.c}" ${KST}/><circle cx="50" cy="9" r="2.1" fill="${c.c}" ${KST}/><circle cx="${s?64.5:67.5}" cy="14" r="1.9" fill="${c.c}" ${KST}/>
+      ${v === 'b' ? '' : `<circle cx="50" cy="24.6" r="2.6" fill="#E8412F" ${KST}/><circle cx="${s?43:41.5}" cy="26" r="2" fill="#3D7FD6"/><circle cx="${s?57:58.5}" cy="26" r="2" fill="#3FAE5A"/>`}`;
   }
-  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="나">
-    <ellipse cx="50" cy="92" rx="20" ry="6" fill="rgba(0,0,0,.22)"/>
-    ${back}${body}${straps}
-    <circle cx="50" cy="36" r="22" fill="#FFD9B0" stroke="${E}" stroke-width="4"/>
-    ${hat}
-    <circle cx="42" cy="42" r="3.6" fill="${E}"/><circle cx="58" cy="42" r="3.6" fill="${E}"/>
-    <path d="M45 50 Q50 55 55 50" fill="none" stroke="${E}" stroke-width="3" stroke-linecap="round"/>
-  </svg>`;
+  /* 야구모자 (기본) */
+  if(v === 's') return `<path d="M32 33.5 Q31.5 13.5 49.5 13 Q66 13.5 66.5 31.5 Q50 29.6 32 33.5 Z" fill="${c.c}" ${KST}/>
+    <path d="M56 14.6 Q66 17.5 66.5 31.5 Q61 30.6 58 30.4 Q60 21 56 14.6 Z" fill="rgba(0,0,0,.14)"/>${hiF}
+    <path d="M63 30.8 Q72 29.4 80.5 31.4 Q81 35 75 35.4 L63.4 35 Z" fill="${c.d}" ${KST}/>
+    <path d="M49.5 13.2 Q52 22 50.5 31" stroke="rgba(0,0,0,.18)" stroke-width="1.1" fill="none"/>
+    <circle cx="49.5" cy="13.3" r="1.9" fill="${c.d}"/>`;
+  if(v === 'b') return `<path d="M31.5 34 Q31 13.5 50 13 Q69 13.5 68.5 34 Q50 31.5 31.5 34 Z" fill="${c.c}" ${KST}/>
+    ${hiF}<path d="M50 13.2 V28" stroke="rgba(0,0,0,.18)" stroke-width="1.1"/>
+    <path d="M44.5 33.6 Q44.5 28.2 50 28.2 Q55.5 28.2 55.5 33.6 Z" fill="${KID_HAIR}" ${KST}/>
+    <path d="M44 31.4 H56" stroke="${c.d}" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="50" cy="13.4" r="2" fill="${c.d}"/>`;
+  return `<path d="M31.5 32.6 Q31 13.5 50 13 Q69 13.5 68.5 32.6 Q50 29.6 31.5 32.6 Z" fill="${c.c}" ${KST}/>
+    ${shadeF}${hiF}<path d="M50 13.2 V29.6" stroke="rgba(0,0,0,.18)" stroke-width="1.1"/>
+    <path d="M30.5 32 Q50 27.5 69.5 32 Q70.5 36 66 36.8 Q50 33.6 34 36.8 Q29.5 36 30.5 32 Z" fill="${c.d}" ${KST}/>
+    <path d="M34 33.4 Q50 30.4 66 33.4" stroke="rgba(255,255,255,.22)" stroke-width="1.2" fill="none"/>
+    <circle cx="50" cy="13.4" r="2" fill="${c.d}"/>`;
+}
+/* 가방 — 몸 뒤(back) 또는 앞에서 보이는 끈(straps) */
+function kBag(R, v, part){
+  const b = R.bag; if(!b) return '';
+  if(v === 'f'){
+    if(part === 'back') return `<rect x="33" y="61.5" width="34" height="23" rx="8" fill="${b.c}" ${KST}/>`;
+    return `<path d="M41.2 59.4 Q40.2 68 41.6 79.2 M58.8 59.4 Q59.8 68 58.4 79.2" stroke="${b.d}" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+      <rect x="39.6" y="72" width="4" height="3.4" rx="1" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/><rect x="56.4" y="72" width="4" height="3.4" rx="1" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/>`;
+  }
+  if(v === 'b'){
+    if(part === 'back') return '';
+    return `<path d="M40 61.4 Q41 58.4 44 58.2 M60 61.4 Q59 58.4 56 58.2" stroke="${b.d}" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <rect x="35.5" y="61.5" width="29" height="26" rx="7.5" fill="${b.c}" ${KST}/>
+      <path d="M57 62 Q64.5 62.5 64.5 69 L64.5 80 Q64.5 87.5 57.5 87.5 Q61 75 57 62 Z" fill="rgba(0,0,0,.14)"/>
+      <path d="M36 70 Q50 73.4 64 70 L64 67 Q64 62 59.5 62 H40.5 Q36 62 36 67 Z" fill="${b.d}" ${KST}/>
+      <rect x="42" y="75.5" width="16" height="9" rx="3" fill="${b.d}" opacity=".6"/>
+      <circle cx="50" cy="71.4" r="1.7" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/>
+      <path d="M39 64.6 Q41 63 44 63" stroke="rgba(255,255,255,.35)" stroke-width="1.5" fill="none"/>`;
+  }
+  /* 옆 */
+  if(part === 'back') return `<rect x="30.4" y="61" width="13" height="24.5" rx="5.2" fill="${b.c}" ${KST}/>
+    <path d="M30.8 68.4 H43 V65 Q43 61.4 39.2 61.4 H34.6 Q30.8 61.4 30.8 65 Z" fill="${b.d}" ${KST}/>
+    <path d="M32.4 72 Q32 78 33.4 83" stroke="rgba(255,255,255,.3)" stroke-width="1.4" fill="none"/>`;
+  return `<path d="M42 61.6 Q49 59.4 55 63.2" stroke="${b.d}" stroke-width="3" stroke-linecap="round" fill="none"/>`;
+}
+/* 앞모습 */
+function kidFront(R){
+  const ctx = {R};
+  return `<g class="tv tv-f">
+    ${kBag(R,'f','back')}
+    ${kLegFB(40.5,'kl1')}${kLegFB(51.5,'kl2')}
+    <path d="M35.5 84 H64.5 L66.5 102.6 Q59 105 51.6 103.4 L50 95 L48.4 103.4 Q41 105 33.5 102.6 Z" fill="${KID_PANTS}" ${KST}/>
+    <path d="M57 85 H64.5 L66.5 102.6 Q61.6 104.2 57.6 104 Z" fill="rgba(0,0,0,.13)"/><path d="M35.6 87 H64.4" stroke="${KID_PANTS_D}" stroke-width="1.4"/>
+    <path d="M37 60 Q50 55.5 63 60 L65.5 87 Q50 90.5 34.5 87 Z" fill="${R.sf}" ${KST}/>
+    ${kShirtDeco(R)}
+    <path d="M56.5 58.6 Q61 59 63 60 L65.5 87 Q61 88.4 57.5 88.8 Q59.6 74 56.5 58.6 Z" fill="rgba(0,0,0,.15)"/>
+    <path d="M40 63 Q42 61.5 45 61 L43.5 80 Q40.6 79 39.6 76 Z" fill="rgba(255,255,255,.16)"/>
+    <path d="M44 84.4 Q47 82.8 50 84.4 M55.4 70 Q57.2 72.4 56.2 75.4" stroke="rgba(0,0,0,.2)" stroke-width="1.1" fill="none"/>
+    ${kBag(R,'f','front')}
+    ${kArmFB.call(ctx,'ka1')}${kArmFB.call(ctx,'ka2',true)}
+    <rect x="46" y="53.5" width="8" height="6.5" fill="${KID_SKIN_D}"/>
+    <path d="M45.2 57.6 Q50 63.6 54.8 57.6" fill="${KID_SKIN_D}" ${KST}/>
+    <circle cx="32.4" cy="40" r="4" fill="${KID_SKIN}" ${KST}/><circle cx="67.6" cy="40" r="4" fill="${KID_SKIN}" ${KST}/>
+    <path d="M31.6 38.6 Q33.4 40 32.2 41.8 M68.4 38.6 Q66.6 40 67.8 41.8" stroke="${KID_SKIN_D}" stroke-width="1.1" fill="none"/>
+    <ellipse cx="50" cy="38" rx="17.5" ry="18.5" fill="${KID_SKIN}" ${KST}/>
+    <path d="M58 22 Q69 32 66 46 Q63 53 55 56 Q64 46 63 36 Q62 28 58 22 Z" fill="rgba(190,110,60,.16)"/>
+    <path d="M32.3 36 Q31 18.5 50 18 Q69 18.5 67.7 36 Q65 30 60.5 29.5 Q58 25 53 27.5 Q48 23.5 44 28 Q38 26.5 35.5 31.5 Q33.5 33 32.3 36 Z" fill="${KID_HAIR}" ${KST}/>
+    <path d="M40 22 Q45 20 49 21 M53 21.5 Q58 21 62 24 M37 27 Q39 24.4 42 23.6" stroke="${KID_HAIR_L}" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    <path d="M32.6 35.4 Q32.2 39.6 33.6 42" stroke="${KID_HAIR}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M67.4 35.4 Q67.8 39.6 66.4 42" stroke="${KID_HAIR}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M39.4 33.4 Q43 31.6 46 33 M54 33 Q57 31.6 60.6 33.4" stroke="${KID_HAIR}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <ellipse cx="43" cy="39.6" rx="2.5" ry="3.3" fill="#2B2018"/><ellipse cx="57" cy="39.6" rx="2.5" ry="3.3" fill="#2B2018"/>
+    <circle cx="43.9" cy="38.4" r="1" fill="#fff"/><circle cx="57.9" cy="38.4" r="1" fill="#fff"/>
+    <path d="M50 42.6 Q51.4 45 49.6 45.8" stroke="${KID_SKIN_D}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="38.8" cy="45.6" rx="3" ry="1.8" fill="#F29A8A" opacity=".45"/><ellipse cx="61.2" cy="45.6" rx="3" ry="1.8" fill="#F29A8A" opacity=".45"/>
+    <path d="M45.8 48.8 Q50 53.6 54.2 48.8 Q50 50.4 45.8 48.8 Z" fill="#B5483A" stroke="#7A2E24" stroke-width="1.1" stroke-linejoin="round"/>
+    ${kHat(R,'f')}
+  </g>`;
+}
+/* 뒷모습 */
+function kidBack(R){
+  const ctx = {R};
+  return `<g class="tv tv-b">
+    ${kLegFB(40.5,'kl1',true)}${kLegFB(51.5,'kl2',true)}
+    <path d="M35.5 84 H64.5 L66.5 102.6 Q59 105 51.6 103.4 L50 95 L48.4 103.4 Q41 105 33.5 102.6 Z" fill="${KID_PANTS}" ${KST}/>
+    <path d="M57 85 H64.5 L66.5 102.6 Q61.6 104.2 57.6 104 Z" fill="rgba(0,0,0,.13)"/><path d="M35.6 87 H64.4" stroke="${KID_PANTS_D}" stroke-width="1.4"/>
+    <path d="M42 91 h5 v5 h-5 Z M53 91 h5 v5 h-5 Z" fill="none" stroke="${KID_PANTS_D}" stroke-width="1"/>
+    <path d="M37 60 Q50 55.5 63 60 L65.5 87 Q50 90.5 34.5 87 Z" fill="${R.sf}" ${KST}/>
+    ${kShirtDeco(R)}
+    <path d="M56.5 58.6 Q61 59 63 60 L65.5 87 Q61 88.4 57.5 88.8 Q59.6 74 56.5 58.6 Z" fill="rgba(0,0,0,.15)"/>
+    <path d="M50 62 Q49 72 50.5 86" stroke="rgba(0,0,0,.12)" stroke-width="1.2" fill="none"/>
+    ${kBag(R,'b','front')}
+    ${kArmFB.call(ctx,'ka1')}${kArmFB.call(ctx,'ka2',true)}
+    <rect x="45.5" y="52" width="9" height="8" fill="${KID_SKIN}" ${KST}/>
+    <circle cx="32.4" cy="40" r="4" fill="${KID_SKIN}" ${KST}/><circle cx="67.6" cy="40" r="4" fill="${KID_SKIN}" ${KST}/>
+    <ellipse cx="50" cy="37.6" rx="17.6" ry="18.2" fill="${KID_HAIR}" ${KST}/>
+    <path d="M38 50 Q44 55.6 50 55.6 Q56 55.6 62 50 Q58 53 56 52 Q53 54 50 52.6 Q47 54 44 52 Q42 53 38 50 Z" fill="${KID_HAIR}"/>
+    <path d="M40 24 Q44 36 42 48 M50 21 Q51.2 36 50 51 M60 24 Q56 36 58 48 M45 22.6 Q47 34 46 49 M55 22.6 Q53.4 34 54.4 49" stroke="${KID_HAIR_L}" stroke-width="1.2" fill="none" opacity=".85"/>
+    <path d="M37.6 25 Q44 19 52 19.4" stroke="rgba(255,255,255,.25)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    ${kHat(R,'b')}
+  </g>`;
+}
+/* 옆모습 (오른쪽을 봄 — 왼쪽은 CSS 가 뒤집습니다) */
+function kidSide(R){
+  return `<g class="tv tv-s">
+    ${kArmS(R,'ka2',true)}
+    ${kLegS('kl2',true)}
+    ${kBag(R,'s','back')}
+    ${kLegS('kl1')}
+    <path d="M41.5 84 H60 L62 101 Q55.6 104 50.2 102.6 Q44.4 104 40.5 101 Z" fill="${KID_PANTS}" ${KST}/>
+    <path d="M55 85 H60 L62 101 Q58.6 102.6 55.6 102.8 Z" fill="rgba(0,0,0,.13)"/><path d="M41.6 87 H59.9" stroke="${KID_PANTS_D}" stroke-width="1.4"/>
+    <path d="M41 60 Q50 56.5 59 60 L61.5 87 Q50 90 39.5 87 Z" fill="${R.sf}" ${KST}/>
+    ${kShirtDeco(R, true)}
+    <path d="M54 58 Q58.6 58.8 59 60 L61.5 87 Q58 88.3 55 88.6 Q57 73 54 58 Z" fill="rgba(0,0,0,.15)"/>
+    <path d="M43 63 Q45 61.5 47 61.3 L46 80 Q43.6 79 43 76 Z" fill="rgba(255,255,255,.16)"/>
+    ${kBag(R,'s','front')}
+    <rect x="45" y="53.5" width="8" height="6.5" fill="${KID_SKIN_D}"/>
+    <ellipse cx="49" cy="38" rx="17" ry="18.5" fill="${KID_SKIN}" ${KST}/>
+    <path d="M64.6 37.6 Q69.4 41 65 44.4" fill="${KID_SKIN}" ${KST}/>
+    <path d="M58 52 Q63 49 65.6 45" stroke="${KID_SKIN_D}" stroke-width="1.2" fill="none" opacity=".7"/>
+    <path d="M32.4 40 Q30.5 18.5 50 18 Q66.5 18.5 66 31 Q60 27.5 54.6 29.4 Q51.4 31.6 50.6 36.4 Q49.4 41 50.6 45 Q44.6 44.4 41 47 Q35.4 47.4 32.4 40 Z" fill="${KID_HAIR}" ${KST}/>
+    <path d="M36 28 Q41 22 48 21 M35 35 Q38 30 44 28.4 M38 42 Q41 37 46 36" stroke="${KID_HAIR_L}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <circle cx="46" cy="40.4" r="4" fill="${KID_SKIN}" ${KST}/><path d="M45 39 Q47 40.4 45.6 42.2" stroke="${KID_SKIN_D}" stroke-width="1.1" fill="none"/>
+    <path d="M57 33.3 Q60 31.8 62.6 33.4" stroke="${KID_HAIR}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <ellipse cx="60" cy="39.6" rx="2.2" ry="3.2" fill="#2B2018"/><circle cx="60.8" cy="38.4" r=".95" fill="#fff"/>
+    <ellipse cx="59.6" cy="45.6" rx="2.6" ry="1.7" fill="#F29A8A" opacity=".45"/>
+    <path d="M59.6 48.6 Q62.6 51.4 64.6 48.4" fill="#B5483A" stroke="#7A2E24" stroke-width="1.1" stroke-linejoin="round"/>
+    ${kHat(R,'s')}
+    ${kArmS(R,'ka1')}
+  </g>`;
+}
+/* 옷장·코스튬 그림 — 앞모습 한 장 */
+function kidSvg(look){
+  const R = kidRes(look);
+  return `<svg viewBox="12 4 76 134" xmlns="http://www.w3.org/2000/svg" aria-label="나">${R.defs}
+    <ellipse cx="50" cy="132" rx="16" ry="4" fill="rgba(0,0,0,.2)"/>${kidFront(R)}</svg>`;
+}
+/* 지도용 — 세 방향을 다 넣어 두고 #player 의 f-d/f-u/f-l/f-r 로 하나만 보입니다 */
+function trainerSvg(look){
+  const R = kidRes(look);
+  return `<svg class="kid" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" aria-label="나">${R.defs}
+    <ellipse class="ksh" cx="50" cy="132" rx="15" ry="4.2" fill="rgba(0,0,0,.26)"/>
+    ${kidFront(R)}${kidBack(R)}${kidSide(R)}</svg>`;
 }
 
 /* =========================================================
@@ -3171,6 +3506,611 @@ function gateArt(reg, idx){
   const open = regOpen(g.to);
   const dest = REGIONS[g.to];
   return `<span class="gateface${open?'':' shut'}">${open ? dest.emoji : '🔒'}</span>`;
+}
+
+/* =========================================================
+   ★ 23차: 그림책 같은 지도 (아빠: "좀 더 이쁘고 실감나는 배경과 캐릭이었음 좋겠는데")
+   ---------------------------------------------------------
+   · 바닥은 지역마다 캔버스 한 장(TERR)에 한 번만 그려 둡니다 — 칸 경계가 둥글게 섞이고
+     흙알갱이·풀잎·물결 무늬가 들어갑니다. 무늬는 좌표 해시로 정해져서 다시 그려도 똑같습니다.
+   · 칸 위의 장식(풀숲·나무·물결·수정·용암)은 작은 SVG 이고, 살랑이는 연출은 CSS transform/opacity 만 씁니다.
+     연출 시작점은 #map 의 --ph(지금 시각) 로 맞춰서 화면을 다시 그려도 처음부터 다시 시작하지 않습니다.
+   · 나무·바위는 줄(y)마다 z-index 가 달라서 하준이가 뒤로 가면 가려집니다.
+   · 게임 규칙(칸 번호·막힘·풀숲 판정·관문)은 하나도 안 바꿨습니다. 그림만 바뀝니다.
+   ========================================================= */
+/* 좌표 해시 0~1 — 같은 칸은 언제나 같은 값 */
+function hsh(x, y, s){
+  let h = (Math.imul(x|0, 374761393) + Math.imul(y|0, 668265263) + Math.imul((s|0) + 1, 1442695041)) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+/* 씨앗이 같으면 같은 수열 */
+function rngOf(seed){
+  let a = (seed >>> 0) || 1;
+  return ()=>{ a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+const f1 = v => (Math.round(v*10)/10);
+
+/* ---------- 바닥 캔버스 ---------- */
+const TERR_PAL = {
+  grass:{ ground:['#EDCF95','#DDB877'], speck:['#C49B5A','#F8E2B0','#B08850'], glow:'rgba(255,240,170,.55)',
+    layers:[
+      {t:[2], f:['#7DC766','#5EAE52'], rim:'rgba(70,130,55,.55)', edge:'rgba(30,80,35,.45)', tex:'lawn', tc:['#4E9A45','#97D97C'], tuft:true},
+      {t:[3], f:['#74CDEF','#3E9FD6'], rim:'rgba(255,255,255,.75)', edge:'rgba(20,70,130,.45)', tex:'water'},
+      {t:[1], f:['#4AA54C','#2F8540'], rim:'rgba(35,95,40,.65)', edge:'rgba(15,60,25,.55)', tex:'blades', tc:['#2C7537','#5DB85A','#7FD06C'], tuft:true},
+      {t:[4], f:['#8ED273','#71BC5E'], rim:'rgba(90,150,70,.45)', edge:'rgba(40,100,40,.3)', tex:'lawn', tc:['#5DA950','#A6E08A'], small:true}
+    ]},
+  water:{ ground:['#F8E6B4','#EBD293'], speck:['#D6B877','#FFF6D8','#C4A465'], glow:'rgba(255,250,200,.6)',
+    layers:[
+      {t:[3], f:['#3486D0','#18518F'], rim:'rgba(150,225,248,.95)', rimW:.32, edge:'rgba(5,30,70,.55)', tex:'deep'},
+      {t:[1], f:['#B3ECF9','#7ED2EE'], rim:'rgba(255,255,255,.95)', rimW:.26, edge:'rgba(40,140,190,.5)', tex:'shallow'}
+    ]},
+  cave:{ ground:['#9A8FA8','#7D7290'], speck:['#6A607E','#BAB0C6','#5B5170'], glow:'rgba(200,240,255,.45)',
+    layers:[
+      {t:[2], f:['#62587A','#463D5C'], rim:'rgba(25,18,40,.7)', edge:'rgba(15,10,28,.55)', tex:'wall', raise:true},
+      {t:[3], f:['#211A33','#0E0A18'], rim:'rgba(25,18,40,.8)', edge:'rgba(0,0,0,.75)', tex:'pit'},
+      {t:[1], f:['#5BA27A','#3C7A5C'], rim:'rgba(110,210,150,.5)', edge:'rgba(20,60,40,.5)', tex:'moss'}
+    ]},
+  peak:{ ground:['#D8A884','#C08D6B'], speck:['#A57152','#EDC7A6','#8E5E45'], glow:'rgba(255,220,150,.55)',
+    layers:[
+      {t:[2], f:['#7A584D','#5A3E36'], rim:'rgba(55,32,26,.6)', edge:'rgba(30,15,10,.45)', tex:'rock', raise:true},
+      {t:[3], f:['#FFA040','#E8541C'], rim:'rgba(255,205,90,.9)', rimW:.3, edge:'rgba(120,35,10,.6)', tex:'lava'},
+      {t:[1], f:['#E2A456','#C7843A'], rim:'rgba(150,80,30,.5)', edge:'rgba(110,50,20,.45)', tex:'ashgrass', tc:['#9A4A22','#B9652C','#F2C070'], tuft:true}
+    ]}
+};
+const TERR = {};
+const TS = 96;                 /* 캔버스 한 칸 크기(px) — 태블릿에서도 흐리지 않게 넉넉히 */
+function terrCanvas(r){
+  if(TERR[r] !== undefined) return TERR[r];
+  TERR[r] = null;
+  try{
+    if(typeof Path2D !== 'function' || !document.createElement) return null;
+    const reg = REGIONS[r]; if(!reg) return null;
+    const P = TERR_PAL[reg.key] || TERR_PAL.grass;
+    const cv = document.createElement('canvas');
+    cv.width = REG_W*TS; cv.height = REG_H*TS;
+    const g = cv.getContext('2d');
+    if(!g || typeof g.roundRect !== 'function') return null;
+    terrPaint(g, r, P, cv.width, cv.height);
+    cv.className = 'terr';
+    cv.setAttribute('aria-hidden', 'true');
+    TERR[r] = cv;
+  }catch(e){ TERR[r] = null; }
+  return TERR[r];
+}
+function terrPaint(g, r, P, W, H){
+  const reg = REGIONS[r];
+  /* 1) 땅 — 은은한 그라데이션 + 큰 얼룩 + 알갱이 */
+  const gg = g.createLinearGradient(0, 0, W*.6, H);
+  gg.addColorStop(0, P.ground[0]); gg.addColorStop(1, P.ground[1]);
+  g.fillStyle = gg; g.fillRect(0, 0, W, H);
+  const R = rngOf(r*7919 + 13);
+  for(let i=0;i<70;i++){
+    const x = R()*W, y = R()*H, rad = TS*(.5 + R()*1.3);
+    const rg = g.createRadialGradient(x, y, 0, x, y, rad);
+    rg.addColorStop(0, R() < .5 ? 'rgba(255,255,255,.12)' : 'rgba(60,30,10,.07)');
+    rg.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = rg; g.fillRect(x-rad, y-rad, rad*2, rad*2);
+  }
+  for(let ty=0;ty<REG_H;ty++) for(let tx=0;tx<REG_W;tx++){
+    const RR = rngOf(Math.floor(hsh(tx, ty, r*31 + 1)*4294967295));
+    for(let k=0;k<18;k++){
+      g.globalAlpha = .35 + RR()*.4;
+      g.fillStyle = P.speck[k % 3];
+      g.beginPath(); g.ellipse(tx*TS + RR()*TS, ty*TS + RR()*TS, TS*(.012 + RR()*.03), TS*(.01 + RR()*.022), RR()*3, 0, Math.PI*2); g.fill();
+    }
+    /* 작은 자갈 몇 개 (빛은 왼쪽 위에서) */
+    if(RR() < .55){
+      const px = tx*TS + TS*(.15 + RR()*.7), py = ty*TS + TS*(.15 + RR()*.7), pr = TS*(.035 + RR()*.03);
+      g.globalAlpha = .28; g.fillStyle = '#000'; g.beginPath(); g.ellipse(px + pr*.3, py + pr*.45, pr, pr*.7, 0, 0, Math.PI*2); g.fill();
+      g.globalAlpha = .9; g.fillStyle = P.speck[1]; g.beginPath(); g.ellipse(px, py, pr, pr*.72, 0, 0, Math.PI*2); g.fill();
+      g.globalAlpha = .55; g.fillStyle = '#fff'; g.beginPath(); g.ellipse(px - pr*.3, py - pr*.25, pr*.35, pr*.22, 0, 0, Math.PI*2); g.fill();
+    }
+  }
+  g.globalAlpha = 1;
+  /* 2) 관문 자리 — 따뜻한 빛 */
+  for(let i=0;i<REG_W*REG_H;i++) if(reg.map[i] === GATE_TILE){
+    const x = (i % REG_W + .5)*TS, y = (Math.floor(i / REG_W) + .5)*TS;
+    const rg = g.createRadialGradient(x, y, 0, x, y, TS*.8);
+    rg.addColorStop(0, 'rgba(255,240,170,.9)'); rg.addColorStop(1, 'rgba(255,240,170,0)');
+    g.fillStyle = rg; g.fillRect(x - TS, y - TS, TS*2, TS*2);
+  }
+  /* 3) 칸 종류별 덩어리 — 모서리가 둥글게 이어집니다 */
+  P.layers.forEach(L => terrLayer(g, r, L, W, H));
+  /* 4) 왼쪽 위에서 오는 햇빛 */
+  const lg = g.createLinearGradient(0, 0, W, H);
+  lg.addColorStop(0, 'rgba(255,250,225,.16)'); lg.addColorStop(.55, 'rgba(255,250,225,0)'); lg.addColorStop(1, 'rgba(40,20,60,.10)');
+  g.fillStyle = lg; g.fillRect(0, 0, W, H);
+}
+function terrLayer(g, r, L, W, H){
+  const has = (x, y) => L.t.indexOf(tileAt(r, x, y)) >= 0;
+  const cells = [];
+  const p = new Path2D();
+  for(let y=0;y<REG_H;y++) for(let x=0;x<REG_W;x++){
+    if(!has(x, y)) continue;
+    cells.push([x, y]);
+    if(L.small){ p.moveTo((x+.5)*TS + TS*.44, (y+.55)*TS); p.ellipse((x+.5)*TS, (y+.55)*TS, TS*.44, TS*.36, 0, 0, Math.PI*2); continue; }
+    const u = has(x, y-1), d = has(x, y+1), l = has(x-1, y), rr = has(x+1, y), rad = TS*.4;
+    const e = 0;    /* 한 경로로 칠하므로 이웃과 딱 붙여도 틈이 안 생깁니다 (겹치면 안쪽 그림자에 줄이 생김) */
+    p.roundRect(x*TS - (l?e:0), y*TS - (u?e:0), TS + (l?e:0) + (rr?e:0), TS + (u?e:0) + (d?e:0),
+      [(u||l)?0:rad, (u||rr)?0:rad, (d||rr)?0:rad, (d||l)?0:rad]);
+  }
+  if(!cells.length) return;
+  /* 가장자리 번짐 */
+  g.save(); g.shadowColor = L.rim; g.shadowBlur = TS*(L.rimW || .2); g.fillStyle = L.rim; g.fill(p); g.restore();
+  if(L.raise){ g.save(); g.translate(TS*.04, TS*.1); g.fillStyle = 'rgba(20,10,20,.4)'; g.fill(p); g.restore(); }
+  const lg = g.createLinearGradient(0, 0, 0, H);
+  lg.addColorStop(0, L.f[0]); lg.addColorStop(1, L.f[1]);
+  g.fillStyle = lg; g.fill(p);
+  g.save(); g.clip(p);
+  cells.forEach(([x, y]) => terrTex(g, L, x, y, r));
+  /* 안쪽 그림자 — 큰 사각형에서 덩어리를 뺀 모양의 그림자만 안으로 떨어집니다 */
+  const q = new Path2D(); q.rect(-W, -H, W*3, H*3); q.addPath(p);
+  g.shadowColor = L.edge; g.shadowBlur = TS*.16;
+  g.shadowOffsetX = L.raise ? -TS*.03 : TS*.03; g.shadowOffsetY = L.raise ? -TS*.05 : TS*.06;
+  g.fillStyle = '#000'; g.fill(q, 'evenodd');
+  g.restore();
+  if(L.raise){   /* 솟은 바위 윗면 빛 */
+    g.save(); g.clip(p);
+    const q2 = new Path2D(); q2.rect(-W, -H, W*3, H*3); q2.addPath(p);
+    g.shadowColor = 'rgba(255,255,255,.35)'; g.shadowBlur = TS*.1; g.shadowOffsetX = TS*.03; g.shadowOffsetY = TS*.05;
+    g.fillStyle = '#000'; g.fill(q2, 'evenodd'); g.restore();
+  }
+  /* 풀 덩어리는 가장자리에 풀잎이 삐져나와 땅과 섞입니다 */
+  if(L.tuft) cells.forEach(([x, y]) => {
+    const RR = rngOf(Math.floor(hsh(x, y, 77 + r)*4294967295));
+    [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx, dy]) => {
+      if(has(x+dx, y+dy)) return;
+      for(let k=0;k<6;k++){
+        const t = (k + .2 + RR()*.6)/6;
+        const bx = dx ? (x + (dx > 0 ? 1 : 0))*TS : (x + t)*TS;
+        const by = dy ? (y + (dy > 0 ? 1 : 0))*TS : (y + t)*TS;
+        const len = TS*(.08 + RR()*.1);
+        g.strokeStyle = L.tc[k % L.tc.length]; g.lineWidth = TS*.022; g.lineCap = 'round';
+        g.beginPath(); g.moveTo(bx - dx*TS*.04, by - dy*TS*.04 + (dx ? TS*.02 : 0));
+        g.quadraticCurveTo(bx + dx*len*.5 + (RR()-.5)*TS*.06, by + dy*len*.5 - (dy ? 0 : len*.3), bx + dx*len + (RR()-.5)*TS*.08, by + dy*len - (dy ? 0 : len*.6));
+        g.stroke();
+      }
+    });
+  });
+}
+/* 칸 안 무늬 */
+function terrTex(g, L, x, y, r){
+  const RR = rngOf(Math.floor(hsh(x, y, r*13 + L.t[0]*101)*4294967295));
+  const X = x*TS, Y = y*TS;
+  const arc = (cx, cy, w, col, lw) => { g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.moveTo(cx - w, cy); g.quadraticCurveTo(cx - w/2, cy - w*.45, cx, cy); g.quadraticCurveTo(cx + w/2, cy + w*.45, cx + w, cy); g.stroke(); };
+  g.lineCap = 'round';
+  switch(L.tex){
+    case 'lawn':
+      for(let k=0;k<26;k++){
+        const bx = X + RR()*TS, by = Y + RR()*TS, h = TS*(.04 + RR()*.05);
+        g.strokeStyle = L.tc[k % 2]; g.lineWidth = TS*.018; g.globalAlpha = .7;
+        g.beginPath(); g.moveTo(bx, by); g.lineTo(bx - h*.4, by - h); g.moveTo(bx, by); g.lineTo(bx + h*.4, by - h); g.stroke();
+      }
+      g.globalAlpha = 1; break;
+    case 'blades':
+      /* 키 큰 풀 — 아래는 진하게, 잎은 위로 */
+      { const sh = g.createLinearGradient(0, Y, 0, Y + TS); sh.addColorStop(0, 'rgba(255,255,255,.06)'); sh.addColorStop(1, 'rgba(0,40,10,.22)'); g.fillStyle = sh; g.fillRect(X, Y, TS, TS); }
+      for(let k=0;k<34;k++){
+        const bx = X + RR()*TS, by = Y + TS*(.25 + RR()*.8), h = TS*(.12 + RR()*.16), lean = (RR() - .5)*TS*.12;
+        g.strokeStyle = L.tc[k % 3]; g.lineWidth = TS*(.02 + RR()*.014); g.globalAlpha = .85;
+        g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo(bx + lean*.3, by - h*.6, bx + lean, by - h); g.stroke();
+      }
+      g.globalAlpha = 1; break;
+    case 'water': case 'shallow':
+      for(let k=0;k<4;k++) arc(X + TS*(.2 + RR()*.6), Y + TS*(.15 + k*.22 + RR()*.06), TS*(.1 + RR()*.08), 'rgba(255,255,255,.55)', TS*.025);
+      g.globalAlpha = .35;
+      for(let k=0;k<3;k++){ g.strokeStyle = '#fff'; g.lineWidth = TS*.012; g.beginPath(); const cx = X + RR()*TS, cy = Y + RR()*TS; g.ellipse(cx, cy, TS*.14, TS*.07, RR(), 0, Math.PI*1.3); g.stroke(); }
+      g.globalAlpha = 1; break;
+    case 'deep':
+      { const rg = g.createRadialGradient(X + TS/2, Y + TS/2, TS*.1, X + TS/2, Y + TS/2, TS*.75); rg.addColorStop(0, 'rgba(5,25,70,.25)'); rg.addColorStop(1, 'rgba(5,25,70,0)'); g.fillStyle = rg; g.fillRect(X, Y, TS, TS); }
+      for(let k=0;k<3;k++) arc(X + TS*(.2 + RR()*.6), Y + TS*(.2 + k*.28), TS*(.1 + RR()*.06), 'rgba(170,225,255,.35)', TS*.022);
+      break;
+    case 'wall':
+      for(let k=0;k<5;k++){
+        const cx = X + RR()*TS, cy = Y + RR()*TS, rw = TS*(.12 + RR()*.12), rh = rw*(.6 + RR()*.3);
+        g.fillStyle = 'rgba(20,12,35,.25)'; g.beginPath(); g.ellipse(cx + rw*.15, cy + rh*.25, rw, rh, 0, 0, Math.PI*2); g.fill();
+        g.fillStyle = 'rgba(150,138,180,.30)'; g.beginPath(); g.ellipse(cx, cy, rw, rh, 0, 0, Math.PI*2); g.fill();
+        g.fillStyle = 'rgba(255,255,255,.14)'; g.beginPath(); g.ellipse(cx - rw*.3, cy - rh*.35, rw*.45, rh*.3, 0, 0, Math.PI*2); g.fill();
+      }
+      break;
+    case 'pit':
+      { const rg = g.createRadialGradient(X + TS/2, Y + TS*.55, 0, X + TS/2, Y + TS*.55, TS*.6); rg.addColorStop(0, 'rgba(0,0,0,.6)'); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(X, Y, TS, TS); }
+      for(let k=0;k<4;k++){ g.fillStyle = k % 2 ? 'rgba(140,200,255,.55)' : 'rgba(220,160,255,.5)'; g.beginPath(); g.arc(X + RR()*TS, Y + RR()*TS, TS*.012, 0, Math.PI*2); g.fill(); }
+      break;
+    case 'moss':
+      for(let k=0;k<9;k++){
+        const cx = X + RR()*TS, cy = Y + RR()*TS, rr = TS*(.06 + RR()*.08);
+        g.fillStyle = k % 3 ? 'rgba(130,215,150,.55)' : 'rgba(40,110,70,.45)'; g.beginPath(); g.arc(cx, cy, rr, 0, Math.PI*2); g.fill();
+      }
+      for(let k=0;k<7;k++){ g.fillStyle = 'rgba(210,255,200,.7)'; g.beginPath(); g.arc(X + RR()*TS, Y + RR()*TS, TS*.012, 0, Math.PI*2); g.fill(); }
+      break;
+    case 'rock':
+      g.strokeStyle = 'rgba(30,15,10,.35)'; g.lineWidth = TS*.018;
+      for(let k=0;k<3;k++){ const sx = X + RR()*TS, sy = Y + RR()*TS; g.beginPath(); g.moveTo(sx, sy); g.lineTo(sx + (RR()-.5)*TS*.3, sy + RR()*TS*.2); g.lineTo(sx + (RR()-.5)*TS*.4, sy + TS*.25); g.stroke(); }
+      g.fillStyle = 'rgba(255,230,210,.12)'; g.beginPath(); g.ellipse(X + TS*.35, Y + TS*.3, TS*.25, TS*.12, -.3, 0, Math.PI*2); g.fill();
+      break;
+    case 'lava':
+      for(let k=0;k<4;k++){ g.fillStyle = 'rgba(120,35,10,.28)'; g.beginPath(); g.ellipse(X + RR()*TS, Y + RR()*TS, TS*(.08 + RR()*.1), TS*(.05 + RR()*.06), RR()*3, 0, Math.PI*2); g.fill(); }
+      for(let k=0;k<3;k++) arc(X + TS*(.2 + RR()*.6), Y + TS*(.2 + k*.28), TS*(.12 + RR()*.06), 'rgba(255,236,120,.75)', TS*.03);
+      break;
+    case 'ashgrass':
+      for(let k=0;k<22;k++){
+        const bx = X + RR()*TS, by = Y + TS*(.3 + RR()*.75), h = TS*(.08 + RR()*.12), lean = (RR() - .5)*TS*.1;
+        g.strokeStyle = L.tc[k % 3]; g.lineWidth = TS*.02; g.globalAlpha = .8;
+        g.beginPath(); g.moveTo(bx, by); g.quadraticCurveTo(bx + lean*.3, by - h*.6, bx + lean, by - h); g.stroke();
+      }
+      g.globalAlpha = 1;
+      for(let k=0;k<3;k++){ g.fillStyle = 'rgba(255,190,80,.8)'; g.beginPath(); g.arc(X + RR()*TS, Y + RR()*TS, TS*.014, 0, Math.PI*2); g.fill(); }
+      break;
+  }
+}
+
+/* ---------- 칸 위 장식 (SVG) ---------- */
+const SVGD = (vb, body, cls, dl, extra) =>
+  `<i class="dc ${cls}" style="--dl:${dl}s${extra || ''}"><svg viewBox="${vb}" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${body}</svg></i>`;
+/* 풀잎 한 묶음 (밑동 y=50) */
+function bladeSet(seed, n, cols, x0, x1, hmin, hmax, B){
+  const R = rngOf(seed); let s = ''; B = B || 50;
+  for(let i=0;i<n;i++){
+    const bx = x0 + (x1 - x0)*(i + .2 + R()*.6)/n, h = hmin + R()*(hmax - hmin), lean = (R() - .5)*9, w = 1.8 + R()*1.4;
+    s += `<path d="M${f1(bx-w)} ${B} Q${f1(bx+lean*.25)} ${f1(B-h*.55)} ${f1(bx+lean)} ${f1(B-h)} Q${f1(bx+lean*.3+w*.6)} ${f1(B-h*.5)} ${f1(bx+w)} ${B} Z" fill="${cols[i % cols.length]}"/>`;
+  }
+  return s;
+}
+/* 나무 3가지 (viewBox 0 0 40 64, 밑동 y≈58) */
+function treeSvg(v, hue){
+  const G = [['#2B7A3C','#3E9A48','#76C865'],['#2F8046','#4BAA52','#8AD874'],['#2A6E46','#3A8E58','#6DBE7A']][hue];
+  const sh = `<ellipse cx="20" cy="58.5" rx="15" ry="4.2" fill="rgba(20,40,10,.32)"/>`;
+  const trunk = `<path d="M17.2 58 Q17.6 48 16.8 40 L23.2 40 Q22.4 48 22.8 58 Q20 59.5 17.2 58 Z" fill="#8A5A33" stroke="${E}" stroke-width="1.2"/><path d="M21 42 Q21.5 50 21.6 57" stroke="#6A4224" stroke-width="1.4" fill="none"/>`;
+  if(v === 2){   /* 뾰족 나무 — 둥글둥글하게 */
+    return sh + trunk + `<g class="cn"><path d="M20 6 Q24 12 31 22 Q27 22.5 26 23 Q31 29 35 37 Q29 38.5 20 38.5 Q11 38.5 5 37 Q9 29 14 23 Q13 22.5 9 22 Q16 12 20 6 Z" fill="${G[1]}" stroke="${E}" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M20 6 Q24 12 31 22 Q27 22.5 26 23 Q31 29 35 37 Q29 38.5 22 38.5 Q27 28 20 6 Z" fill="${G[0]}" opacity=".75"/>
+      <path d="M17 13 Q14 17 12 21 M14 27 Q11 31 9 35" stroke="${G[2]}" stroke-width="2.2" stroke-linecap="round" fill="none"/></g>`;
+  }
+  const big = v === 1;
+  return sh + trunk + `<g class="cn">
+    <circle cx="${big?11:12}" cy="${big?30:31}" r="${big?10:9}" fill="${G[0]}" stroke="${E}" stroke-width="1.4"/>
+    <circle cx="${big?29:28}" cy="${big?30:31}" r="${big?10:9}" fill="${G[0]}" stroke="${E}" stroke-width="1.4"/>
+    <circle cx="20" cy="${big?19:21}" r="${big?13:12}" fill="${G[1]}" stroke="${E}" stroke-width="1.4"/>
+    <circle cx="20" cy="32" r="10" fill="${G[1]}"/>
+    <path d="M10 37 Q20 42 30 37 Q31 40 27 41.5 Q20 43 13 41.5 Q9 40 10 37 Z" fill="${G[0]}" opacity=".7"/>
+    <circle cx="15" cy="15" r="4.6" fill="${G[2]}" opacity=".9"/><circle cx="9.5" cy="26" r="3" fill="${G[2]}" opacity=".7"/>
+    <circle cx="24" cy="13" r="1.6" fill="#fff" opacity=".45"/>
+    ${hue === 1 ? `<circle cx="27" cy="27" r="1.8" fill="#F26D6D" stroke="${E}" stroke-width=".8"/><circle cx="14" cy="34" r="1.8" fill="#F26D6D" stroke="${E}" stroke-width=".8"/>` : ''}
+  </g>`;
+}
+function rockSvg(col, cap, h){
+  const [c0, c1, c2] = col;
+  return `<ellipse cx="20" cy="58.5" rx="15.5" ry="4" fill="rgba(0,0,0,.3)"/>
+    <path d="M5 57 Q4 ${f1(52-h)} 10 ${f1(46-h)} Q15 ${f1(40-h)} 22 ${f1(41-h)} Q32 ${f1(42-h)} 35 ${f1(50-h)} Q37 55 35 57.5 Q20 60.5 5 57 Z" fill="${c1}" stroke="${E}" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M22 ${f1(41-h)} Q32 ${f1(42-h)} 35 ${f1(50-h)} Q37 55 35 57.5 Q27 59.4 21 59 Q30 ${f1(50-h/2)} 22 ${f1(41-h)} Z" fill="${c0}" opacity=".8"/>
+    <path d="M9 ${f1(48-h)} Q14 ${f1(42-h)} 20 ${f1(42.5-h)}" stroke="${c2}" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+    ${cap ? `<path d="M12 ${f1(45.5-h)} Q17 ${f1(40.5-h)} 23 ${f1(41-h)} Q29 ${f1(41.5-h)} 32 ${f1(46-h)} Q27 ${f1(44.5-h)} 22 ${f1(45.5-h)} Q17 ${f1(44-h)} 12 ${f1(45.5-h)} Z" fill="${cap}"/>` : ''}`;
+}
+function palmSvg(){
+  return `<ellipse cx="20" cy="58.5" rx="12" ry="3.6" fill="rgba(0,0,0,.28)"/>
+    <path d="M19 58 Q17 44 21 28 L24 28.5 Q21 44 23 58 Z" fill="#B07A45" stroke="${E}" stroke-width="1.2"/>
+    <path d="M19.6 52 h3 M19.4 46 h3 M19.8 40 h3 M20.6 34 h3" stroke="#7E5229" stroke-width="1.2"/>
+    <g class="cn"><path d="M22.5 28 Q12 20 3 27 Q12 23 22.5 29 Z M22.5 28 Q32 19 39 27 Q31 23 22.5 29 Z M22.5 28 Q16 14 8 13 Q17 17 22 28 Z M22.5 28 Q29 13 35 13 Q28 18 23 28 Z M22.5 28 Q23 15 21 9 Q25 16 23.5 28 Z" fill="#3FA552" stroke="${E}" stroke-width="1.1" stroke-linejoin="round"/>
+    <circle cx="21" cy="29.5" r="2.2" fill="#8A5A2B"/><circle cx="24.5" cy="30" r="2" fill="#8A5A2B"/></g>`;
+}
+function tileDecor(rk, t, x, y){
+  const h = hsh(x, y, 5), h2 = hsh(x, y, 9);
+  const dl = -f1((x*.17 + y*.11) % 3 + h*.3);      /* 바람이 칸마다 조금씩 늦게 와서 물결처럼 */
+  const seed = Math.floor(h*1e9);
+  if(t === 1){
+    if(rk === 'grass'){
+      const back = bladeSet(seed, 7, ['#2E7C39','#35883F'], 2, 38, 18, 30);
+      const front = bladeSet(seed + 7, 6, ['#58B655','#6CC65F','#4CA64C'], 4, 36, 14, 26);
+      return SVGD('0 0 40 50', `<g class="sw">${back}</g><g class="sw sw2">${front}<path d="M9 50 Q10 44 12 41 M27 50 Q28 45 30 43" stroke="#A6E58A" stroke-width="1.2" fill="none" stroke-linecap="round"/></g>`, 'tuft', dl);
+    }
+    if(rk === 'water'){
+      return SVGD('0 0 40 40', `<g class="wv"><path d="M5 15 q5 -4.5 10 0 t10 0 t10 0" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".95"/>
+        <path d="M8 28 q4.5 -4 9 0 t9 0 t9 0" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".85"/></g>
+        <circle class="rp" cx="${f1(12 + h2*16)}" cy="${f1(18 + h*12)}" r="7" fill="none" stroke="#fff" stroke-width="1.4"/>`, 'shal', dl);
+    }
+    if(rk === 'cave'){
+      return SVGD('0 0 40 40', `<g><ellipse cx="13" cy="28" rx="8" ry="5" fill="#5FB27E" stroke="#2F6B4A" stroke-width="1"/><ellipse cx="26" cy="22" rx="9" ry="5.6" fill="#6CC08A" stroke="#2F6B4A" stroke-width="1"/>
+        <ellipse cx="29" cy="33" rx="6" ry="3.8" fill="#57A877" stroke="#2F6B4A" stroke-width="1"/>
+        <path d="M8 26 Q12 23 16 25 M21 20 Q26 17 31 19" stroke="#A9F0BE" stroke-width="1.3" fill="none" stroke-linecap="round"/></g>
+        <g class="tw"><circle cx="${f1(10 + h*6)}" cy="20" r="1.4" fill="#E6FFD8"/><circle cx="${f1(24 + h2*8)}" cy="13" r="1.2" fill="#D8FFF0"/><circle cx="33" cy="27" r="1.1" fill="#F2FFD0"/></g>`, 'moss', dl);
+    }
+    /* peak — 마른 풀 + 불씨 */
+    const back = bladeSet(seed, 6, ['#9A4A22','#A9592A'], 3, 37, 14, 24);
+    const front = bladeSet(seed + 3, 5, ['#E09A48','#F2BE6A','#C9772F'], 5, 35, 11, 20);
+    return SVGD('0 0 40 50', `<g class="sw">${back}</g><g class="sw sw2">${front}</g><circle class="tw" cx="${f1(10 + h2*20)}" cy="${f1(22 + h*8)}" r="1.6" fill="#FFD24A"/>`, 'tuft ash', dl);
+  }
+  if(t === 2){
+    const z = '';
+    if(rk === 'grass') return SVGD('0 0 40 64', treeSvg(Math.floor(h*3) % 3, Math.floor(h2*3) % 3), 'tall tree', -f1(h*6), z);
+    if(rk === 'water') return h < .3 ? SVGD('0 0 40 64', palmSvg(), 'tall palm', -f1(h2*6))
+      : SVGD('0 0 40 64', rockSvg(['#7C8B97','#A7B5C0','#E2EAF0'], null, Math.floor(h2*6)), 'tall rock', 0);
+    if(rk === 'cave'){
+      const cr = h2 < .22 ? `<g class="tw"><path d="M27 ${41 - 4} l3 -9 l3 9 Z" fill="#8FE8F5" stroke="${E}" stroke-width="1"/><path d="M31.5 38 l2 -6 l2 6 Z" fill="#F5A8E0" stroke="${E}" stroke-width="1"/></g>` : '';
+      return SVGD('0 0 40 64', rockSvg(['#3E3556','#655B80','#9C92B8'], null, Math.floor(h*8)) + cr, 'tall rock', -f1(h*3));
+    }
+    return SVGD('0 0 40 64', rockSvg(['#4A3029','#6E4D43','#A07F70'], h2 < .5 ? '#F3E6DA' : null, Math.floor(h*8)), 'tall rock', 0);
+  }
+  if(t === 3){
+    if(rk === 'cave') return SVGD('0 0 40 40', `<g class="tw"><circle cx="${f1(12 + h*8)}" cy="${f1(16 + h2*8)}" r="1.2" fill="#9ED8FF"/><circle cx="${f1(24 + h2*6)}" cy="${f1(24 + h*6)}" r="1" fill="#E3B2FF"/></g>`, 'pit', dl);
+    if(rk === 'peak') return SVGD('0 0 40 40', `<rect class="gl" x="0" y="0" width="40" height="40" fill="#FFE07A"/>
+      <circle class="bb" cx="${f1(10 + h*10)}" cy="${f1(12 + h2*10)}" r="3.4" fill="#FFD24A" stroke="#C9461A" stroke-width="1"/>
+      <circle class="bb b2" cx="${f1(24 + h2*8)}" cy="${f1(24 + h*8)}" r="2.6" fill="#FFE27A" stroke="#C9461A" stroke-width="1"/>`, 'lava', dl);
+    return SVGD('0 0 40 40', `<g class="wv"><path d="M6 14 q4.5 -3.5 9 0 t9 0" fill="none" stroke="#BFE9FA" stroke-width="2" stroke-linecap="round" opacity=".75"/>
+      <path d="M16 29 q4.5 -3.5 9 0 t9 0" fill="none" stroke="#BFE9FA" stroke-width="2" stroke-linecap="round" opacity=".6"/></g>
+      <path class="tw" d="M${f1(10 + h*20)} ${f1(18 + h2*8)} l1.3 -3.6 l1.3 3.6 l3.6 1.3 l-3.6 1.3 l-1.3 3.6 l-1.3 -3.6 l-3.6 -1.3 Z" fill="#fff"/>`, 'deep', dl);
+  }
+  if(t === 4){
+    if(rk === 'grass'){
+      const C = [['#F2679B','#FFC93C'],['#FFFFFF','#FFC93C'],['#FFD23C','#FF8A2B'],['#B48BF0','#FFE27A']];
+      const fl = (cx, cy, k, s) => { const c = C[k % 4]; let p = ''; for(let i=0;i<5;i++){ const a = i*1.2566 - 1.5708; p += `<circle cx="${f1(cx + Math.cos(a)*3.6*s)}" cy="${f1(cy + Math.sin(a)*3.6*s)}" r="${f1(2.9*s)}" fill="${c[0]}" stroke="${E}" stroke-width=".9"/>`; } return `<path d="M${cx} ${cy + 3} Q${cx + 1} ${cy + 9} ${cx} 38" stroke="#3E8E3E" stroke-width="1.6" fill="none"/>` + p + `<circle cx="${cx}" cy="${cy}" r="${f1(2.2*s)}" fill="${c[1]}" stroke="${E}" stroke-width=".9"/>`; };
+      const k = Math.floor(h*4);
+      return SVGD('0 0 40 40', `<g class="sw sw3">${fl(13, 18, k, 1)}${fl(27, 24, k + 1, .85)}${h2 > .4 ? fl(20, 31, k + 2, .7) : ''}</g>`, 'flw', dl);
+    }
+    if(rk === 'water'){
+      if(h < .5) return SVGD('0 0 40 40', `<ellipse cx="20" cy="31" rx="10" ry="2.6" fill="rgba(0,0,0,.18)"/><path d="M20 31 q-12 0 -12 -9 q0 -8 12 -8 q12 0 12 8 q0 9 -12 9 Z" fill="#FFC4DE" stroke="${E}" stroke-width="1.4"/><g fill="none" stroke="#D9759F" stroke-width="1.3" stroke-linecap="round"><path d="M20 31 L13 17"/><path d="M20 31 L20 14.5"/><path d="M20 31 L27 17"/></g><path d="M12 19 Q15 15.5 19 15" stroke="#fff" stroke-width="1.4" fill="none" opacity=".8"/>`, 'shell', 0);
+      return SVGD('0 0 40 40', `<ellipse cx="20" cy="31" rx="10" ry="2.6" fill="rgba(0,0,0,.18)"/><polygon points="${starPts(20, 22, 11, 4.6)}" fill="#FF9A5A" stroke="${E}" stroke-width="1.3" stroke-linejoin="round"/><circle cx="20" cy="22" r="1.4" fill="#FFE0B8"/><circle cx="16" cy="18" r=".9" fill="#FFE0B8"/><circle cx="24" cy="18.5" r=".9" fill="#FFE0B8"/>`, 'shell', 0);
+    }
+    if(rk === 'cave'){
+      const c = h < .5 ? ['#8FE8F5','#4FB8D0'] : ['#F5A8E0','#C46BB0'];
+      return SVGD('0 0 40 40', `<ellipse cx="20" cy="34" rx="12" ry="3" fill="rgba(0,0,0,.25)"/><circle class="gl" cx="20" cy="22" r="14" fill="${c[0]}" opacity=".25"/>
+        <path d="M20 6 L27 20 L20 35 L13 20 Z" fill="${c[0]}" stroke="${E}" stroke-width="1.3" stroke-linejoin="round"/><path d="M20 6 L27 20 L20 35 Z" fill="${c[1]}" opacity=".55"/>
+        <path d="M11 34 L8 25 L14 27 Z M29 34 L32 24 L26 27 Z" fill="${c[0]}" stroke="${E}" stroke-width="1.1" stroke-linejoin="round"/>
+        <path class="tw" d="M16 13 l.9 -2.4 l.9 2.4 l2.4 .9 l-2.4 .9 l-.9 2.4 l-.9 -2.4 l-2.4 -.9 Z" fill="#fff"/>`, 'crys', dl);
+    }
+    return SVGD('0 0 40 40', `<ellipse cx="20" cy="34" rx="11" ry="3" fill="rgba(0,0,0,.25)"/><circle class="gl" cx="20" cy="24" r="13" fill="#FFB84A" opacity=".3"/>
+      <path d="M10 33 h20" stroke="#6E4D43" stroke-width="3" stroke-linecap="round"/>
+      <g class="fl"><path d="M20 8 q8 9 8 16 a8 8 0 0 1 -16 0 q0 -7 8 -16 Z" fill="#FF8A2B" stroke="${E}" stroke-width="1.3"/><path d="M20 18 q3.6 5 3.6 8 a3.6 3.6 0 0 1 -7.2 0 q0 -3 3.6 -8 Z" fill="#FFE08A"/></g>`, 'flame', dl);
+  }
+  return '';
+}
+/* 지도 전체에 겹치는 연출 — 구름 그림자 · 반딧불 · 불씨 */
+function worldFx(r){
+  const reg = REGIONS[r], rk = reg.key, R = rngOf(r*104729 + 7);
+  let s = '';
+  if(rk !== 'cave'){
+    for(let i=0;i<3;i++) s += `<i class="cld" style="top:${f1(5 + i*30 + R()*10)}%;--dl:${-f1(i*16 + R()*6)}s;--cs:${f1(.8 + R()*.5)}"></i>`;
+  }
+  if(rk === 'cave'){
+    for(let i=0;i<12;i++) s += `<i class="ffl" style="left:${f1(8 + R()*84)}%;top:${f1(8 + R()*84)}%;--dl:${-f1(R()*12)}s;--dl2:${-f1(R()*3)}s"></i>`;
+  }
+  if(rk === 'peak'){
+    const lava = []; reg.map.forEach((t, i) => { if(t === 3) lava.push(i); });
+    for(let i=0;i<14;i++){
+      const at = lava.length ? lava[i % lava.length] : 40;
+      s += `<i class="emb" style="left:${f1((at % REG_W + .2 + R()*.6)/REG_W*100)}%;top:${f1((Math.floor(at / REG_W) + .3 + R()*.5)/REG_H*100)}%;--dl:${-f1(R()*4)}s;--ex:${f1((R() - .5)*30)}px"></i>`;
+    }
+  }
+  if(rk === 'water'){
+    const wat = []; reg.map.forEach((t, i) => { if(t === 3) wat.push(i); });
+    for(let i=0;i<8 && wat.length;i++){
+      const at = wat[Math.floor(R()*wat.length)];
+      s += `<i class="glint" style="left:${f1((at % REG_W + .15 + R()*.7)/REG_W*100)}%;top:${f1((Math.floor(at / REG_W) + .15 + R()*.7)/REG_H*100)}%;--dl:${-f1(R()*4)}s"></i>`;
+    }
+  }
+  return `<div class="wfx" aria-hidden="true">${s}</div>`;
+}
+
+/* =========================================================
+   ★ 23차: 부드럽게 걷기 · 카메라 · 따라오는 친구
+   ---------------------------------------------------------
+   · 칸 이동 규칙(move)은 그대로. 그림만 칸 사이를 미끄러지듯 지나갑니다 (STEP_MS).
+   · 걸음마다 st0/st1 이 번갈아 바뀌고, 다리·팔이 그 사이를 transition 으로 흔듭니다
+     → 누르고 있으면 걷기 동작이 끊기지 않고 이어집니다.
+   · 방향 버튼·방향키·손가락 밀기 모두 "누르고 있으면 계속 걷기" (HOLD).
+     손가락은 touch 이벤트 대신 pointer 이벤트로 받습니다 — 화면을 다시 그려서 버튼/지도가
+     바뀌어도 손을 떼는 순간(pointerup)을 놓치지 않아 혼자 계속 걸어가는 일이 없습니다.
+   · 함께 다니는 포켓몬(FOL)은 하준이가 방금 있던 칸으로 한 칸 뒤에서 따라옵니다.
+   ========================================================= */
+const STEP_MS = 190;          /* 한 칸 걷는 시간 — 누르고 있을 때의 걸음 간격과 같습니다 */
+const STEP_MIN = 120;         /* 아주 빨리 연타해도 그림이 따라올 수 있는 최소 간격 */
+const HOLD_FIRST = 250;       /* 누르고 이만큼 지나면 계속 걷기 시작 (짧게 톡 누르면 한 칸) */
+const KID = {dir:'d', st:0, walk:false, wt:0};
+const FOL = {reg:-1, x:0, y:0, dir:'d', st:0, walk:false, wt:0};
+const HOLD = {dir:null, src:null, pid:null, t:0, t0:0, last:0, buf:null, bt:0, until:0, clickBlock:0, keys:[]};
+let FLD_LASTREG = -1;
+
+function worldTf(){
+  return `translate(${-camAt(S.px)*100/REG_W}%, ${-camAt(S.py)*100/REG_H}%)`;
+}
+function kidCls(){
+  const t = tileAt(S.reg, S.px, S.py);
+  return `f-${KID.dir} st${KID.st}${KID.walk ? ' walk' : ''}${t === ENC_TILE ? ' ing' : ''}`;
+}
+function folCls(){
+  const t = tileAt(S.reg, FOL.x, FOL.y);
+  return `f-${FOL.dir} st${FOL.st}${FOL.walk ? ' walk' : ''}${t === ENC_TILE ? ' ing' : ''}`;
+}
+/* 친구 자리 맞추기 — 지역이 바뀌었거나 너무 멀어졌으면(집·불러오기 등) 하준이 옆 빈칸으로 */
+function folSync(){
+  const d = Math.abs(FOL.x - S.px) + Math.abs(FOL.y - S.py);
+  if(FOL.reg === S.reg && d <= 1) return;
+  FOL.reg = S.reg; FOL.dir = 'd'; FOL.walk = false;
+  const opts = [[0,-1],[-1,0],[1,0],[0,1]];
+  for(const [dx, dy] of opts){
+    const x = S.px + dx, y = S.py + dy;
+    if(walkable(S.reg, x, y) && tileAt(S.reg, x, y) !== GATE_TILE){ FOL.x = x; FOL.y = y; return; }
+  }
+  FOL.x = S.px; FOL.y = S.py;
+}
+/* 걸음 하나 — move() 가 S.px/S.py 를 바꾼 직후 부릅니다 (ox,oy = 떠난 칸) */
+function kidStep(dir, ox, oy){
+  KID.dir = dir; KID.st ^= 1; KID.walk = true;
+  clearTimeout(KID.wt);
+  KID.wt = setTimeout(()=>{ KID.walk = false; kidClsApply(); }, STEP_MS + 90);
+  if(FOL.reg === S.reg && Math.abs(FOL.x - ox) + Math.abs(FOL.y - oy) <= 1){
+    const dx = ox - FOL.x, dy = oy - FOL.y;
+    if(dx || dy){
+      FOL.dir = dx > 0 ? 'r' : dx < 0 ? 'l' : dy > 0 ? 'd' : 'u';
+      FOL.x = ox; FOL.y = oy; FOL.st ^= 1; FOL.walk = true;
+      clearTimeout(FOL.wt);
+      FOL.wt = setTimeout(()=>{ FOL.walk = false; kidClsApply(); }, STEP_MS + 90);
+    }
+  }
+  /* 풀숲을 지나가면 풀이 흔들립니다 */
+  if(tileAt(S.reg, S.px, S.py) === ENC_TILE && document.querySelectorAll){
+    const tl = document.querySelectorAll('#world > .tile')[S.py*REG_W + S.px];
+    if(tl && tl.classList){ tl.classList.remove('rs'); void tl.offsetWidth; tl.classList.add('rs'); setTimeout(()=>tl.classList.remove('rs'), 600); }
+  }
+}
+/* 막힌 쪽으로 눌러도 그쪽을 바라봅니다 */
+function kidFace(dir){
+  if(KID.dir === dir) return;
+  KID.dir = dir; kidClsApply();
+}
+function kidClsApply(){
+  const p = document.getElementById('player'); if(p && p.isConnected !== false) p.className = kidCls();
+  const f = document.getElementById('fol'); if(f && f.isConnected !== false) f.className = folCls();
+}
+/* 따라오는 친구 html */
+function folHtml(){
+  if(S.partner == null || !MONS[S.partner]) return '';
+  return `<div id="fol" class="${folCls()}" style="transform:translate(${FOL.x*100}%, ${FOL.y*100}%);z-index:${3*FOL.y + 11}" aria-hidden="true">
+    <i class="fsh"></i><div class="fimg">${artBoxA(pActive(), 0, '', S.partner)}</div>${feetFx()}</div>`;
+}
+/* 풀숲에 서 있으면 발 앞에 풀이 겹치고, 얕은 물이면 물결 고리 */
+function feetFx(){
+  const rk = curReg().key;
+  if(rk === 'water') return `<i class="kft"><svg viewBox="0 0 40 20" aria-hidden="true"><ellipse class="rp1" cx="20" cy="12" rx="15" ry="5" fill="none" stroke="#fff" stroke-width="1.6"/><ellipse cx="20" cy="12" rx="11" ry="3.4" fill="rgba(255,255,255,.35)"/></svg></i>`;
+  if(rk === 'cave') return `<i class="kft"><svg viewBox="0 0 40 20" aria-hidden="true"><ellipse cx="11" cy="15" rx="7" ry="4" fill="#5FB27E"/><ellipse cx="29" cy="15" rx="8" ry="4.4" fill="#6CC08A"/></svg></i>`;
+  const c = rk === 'peak' ? ['#C9772F','#E09A48','#F2BE6A'] : ['#3E9A46','#58B655','#6CC65F'];
+  return `<i class="kft"><svg viewBox="0 0 40 20" preserveAspectRatio="none" aria-hidden="true">${bladeSet(41, 9, c, 2, 38, 8, 15, 20)}</svg></i>`;
+}
+/* 화면을 다시 그려도 걷던 그림·카메라가 이어서 움직이게:
+   그리기 전 지금 위치(계산된 transform)를 재 두었다가, 새 요소를 그 자리에 놓고 목표로 다시 미끄러뜨립니다 */
+function fieldKeep(){
+  if(S.screen !== 'field' || typeof getComputedStyle !== 'function') return null;
+  const w = document.getElementById('world');
+  if(!w || !w.isConnected || w.getAttribute('data-r') !== String(S.reg)) return null;
+  const k = {};
+  ['world','player','fol'].forEach(id=>{ const el = document.getElementById(id); if(el) k[id] = getComputedStyle(el).transform; });
+  return k;
+}
+function fieldRestore(k){
+  if(!k) return;
+  const list = [];
+  Object.keys(k).forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el || !k[id] || k[id] === 'none') return;
+    list.push([el, el.style.transform]);
+    el.style.transition = 'none'; el.style.transform = k[id];
+  });
+  if(!list.length) return;
+  void document.body.offsetWidth;
+  list.forEach(([el, tgt])=>{ el.style.transition = ''; el.style.transform = tgt; });
+}
+/* 바닥 캔버스를 새 지도에 붙입니다 (캔버스는 지역마다 한 장, 옮겨 붙여도 그림은 그대로) */
+function fieldMount(){
+  const ph = document.querySelector('#world > .terrph');
+  const cv = TERR[S.reg];
+  if(ph && cv && ph.appendChild) ph.appendChild(cv);
+}
+
+/* ---------- 누르고 있으면 계속 걷기 ---------- */
+function stepTry(dir){
+  const now = performance.now();
+  if(now < HOLD.until) return;
+  const gap = now - HOLD.last;
+  if(gap < STEP_MIN){
+    HOLD.buf = dir;
+    if(!HOLD.bt) HOLD.bt = setTimeout(()=>{ HOLD.bt = 0; const d = HOLD.buf; HOLD.buf = null; if(d) stepTry(d); }, STEP_MIN - gap);
+    return;
+  }
+  HOLD.last = now;
+  move(dir);
+}
+function holdCanWalk(){
+  return S.screen === 'field' && !S.travel && !S.bag && S.unlockShow == null && !S.stampOpen && !S.cosBox && S.detail == null;
+}
+function holdStart(dir, src, pid){
+  if(!holdCanWalk()) return;
+  HOLD.dir = dir; HOLD.src = src; HOLD.pid = pid == null ? null : pid;
+  HOLD.t0 = performance.now();
+  const m = document.getElementById('map'); if(m) m.classList.add('hold');
+  stepTry(dir);
+  clearTimeout(HOLD.t);
+  HOLD.t = setTimeout(holdTick, HOLD_FIRST);
+}
+function holdTick(){
+  HOLD.t = 0;
+  if(!HOLD.dir) return;
+  if(!holdCanWalk()){ holdStop(); return; }
+  const now = performance.now();
+  if(now >= HOLD.until){
+    /* 막힌 쪽이면 "삑" 을 계속 내지 않고 그쪽을 바라보기만 합니다 */
+    let nx = S.px, ny = S.py, d = HOLD.dir;
+    if(d === 'u') ny--; else if(d === 'd') ny++; else if(d === 'l') nx--; else nx++;
+    if(nx < 0 || nx >= REG_W || ny < 0 || ny >= REG_H || BLOCKED.indexOf(tileAt(S.reg, nx, ny)) >= 0) kidFace(d);
+    else { HOLD.last = 0; stepTry(d); }
+  }
+  HOLD.t = setTimeout(holdTick, STEP_MS);
+}
+function holdStop(){
+  HOLD.dir = null; HOLD.src = null; HOLD.pid = null;
+  clearTimeout(HOLD.t); HOLD.t = 0;
+  const m = document.getElementById('map'); if(m && m.classList) m.classList.remove('hold');
+}
+
+/* ★ 23차: 배틀 배경 — 지금 있는 지역 그림 (하늘 그라데이션 + 원경 + 땅). 로켓단 배틀도 같은 배경 위에서 합니다 */
+function battleBgSvg(rk){
+  const W = 400, H = 300;
+  const grad = (id, a, b, c) => `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/>${c ? `<stop offset=".6" stop-color="${b}"/><stop offset="1" stop-color="${c}"/>` : `<stop offset="1" stop-color="${b}"/>`}</linearGradient>`;
+  const cloud = (x, y, s, cls) => `<g class="${cls}"><g transform="translate(${x} ${y}) scale(${s})" fill="#fff" opacity=".92"><ellipse cx="0" cy="0" rx="26" ry="11"/><ellipse cx="-16" cy="3" rx="16" ry="9"/><ellipse cx="18" cy="3" rx="17" ry="9"/><ellipse cx="2" cy="-7" rx="15" ry="10"/></g></g>`;
+  let defs = '', body = '';
+  if(rk === 'water'){
+    defs = grad('bgS', '#8ED6F5', '#D4F1FB') + grad('bgSea', '#4DAAE0', '#2A7CC0') + grad('bgSand', '#FBEBBE', '#E9CF8E');
+    body = `<rect width="${W}" height="${H}" fill="url(#bgS)"/>
+      <circle cx="70" cy="50" r="46" fill="#FFF6C8" opacity=".55"/><circle cx="70" cy="50" r="22" fill="#FFF3B0"/>
+      ${cloud(250, 46, 1.1, 'cl')}${cloud(120, 82, .7, 'cl cl2')}
+      <rect y="128" width="${W}" height="90" fill="url(#bgSea)"/>
+      <path d="M290 130 Q312 112 336 130 Z" fill="#7FBF7A"/><path d="M314 122 Q312 104 318 96" stroke="#9A6A3C" stroke-width="3" fill="none"/>
+      <path d="M318 96 q-12 -4 -20 4 M318 96 q12 -5 20 2 M318 96 q-4 -10 -12 -12 M318 96 q6 -10 14 -10" stroke="#3FA552" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+      <g class="sp"><path d="M40 150 h26 M150 166 h34 M260 152 h22 M330 176 h30 M90 190 h24" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/></g>
+      <path d="M0 200 Q50 192 100 200 T200 200 T300 200 T400 200 V${H} H0 Z" fill="url(#bgSand)"/>
+      <path d="M0 200 Q50 192 100 200 T200 200 T300 200 T400 200" stroke="#fff" stroke-width="5" fill="none" opacity=".85"/>
+      <g fill="#D9BC7A" opacity=".6"><circle cx="60" cy="240" r="2"/><circle cx="150" cy="262" r="2.4"/><circle cx="300" cy="236" r="2"/><circle cx="350" cy="270" r="2.4"/><circle cx="220" cy="284" r="2"/></g>`;
+  }else if(rk === 'cave'){
+    defs = grad('bgS', '#4A3E66', '#2E2645') + grad('bgF', '#958AA8', '#6A5F82') + `<radialGradient id="bgL" cx=".5" cy=".55" r=".6"><stop offset="0" stop-color="#FFF6D8" stop-opacity=".28"/><stop offset="1" stop-color="#FFF6D8" stop-opacity="0"/></radialGradient>`;
+    body = `<rect width="${W}" height="${H}" fill="url(#bgS)"/>
+      <path d="M0 0 H${W} V40 Q380 58 360 38 Q340 70 318 40 Q300 52 280 36 Q250 76 226 40 Q200 56 180 38 Q150 72 128 40 Q110 54 90 36 Q66 66 44 40 Q22 54 0 36 Z" fill="#2A223D"/>
+      <path d="M60 140 Q90 80 130 130 Q160 70 210 128 Q250 86 290 132 Q330 90 370 140 V170 H60 Z" fill="#3A3054" opacity=".8"/>
+      <g class="tw"><path d="M80 150 l10 -30 l10 30 Z" fill="#8FE8F5" stroke="#2A223D" stroke-width="2"/></g>
+      <g class="tw tw2"><path d="M320 152 l8 -24 l8 24 Z" fill="#F5A8E0" stroke="#2A223D" stroke-width="2"/><path d="M336 154 l6 -16 l6 16 Z" fill="#8FE8F5" stroke="#2A223D" stroke-width="2"/></g>
+      <rect y="160" width="${W}" height="140" fill="url(#bgF)"/>
+      <path d="M0 160 Q100 150 200 160 T400 160" stroke="#B3A9C4" stroke-width="3" fill="none" opacity=".6"/>
+      <rect width="${W}" height="${H}" fill="url(#bgL)"/>
+      <g class="sp"><circle cx="150" cy="96" r="3" fill="#FFF9C4"/><circle cx="250" cy="70" r="2.4" fill="#FFF9C4"/></g>
+      <g class="sp" style="animation-delay:-1.4s"><circle cx="200" cy="120" r="2.6" fill="#E6FFD8"/><circle cx="60" cy="100" r="2.2" fill="#FFF9C4"/><circle cx="340" cy="100" r="2.6" fill="#E6FFD8"/></g>
+      <g fill="#7D7290" opacity=".7"><ellipse cx="70" cy="250" rx="16" ry="5"/><ellipse cx="320" cy="270" rx="20" ry="6"/><ellipse cx="200" cy="232" rx="10" ry="3.4"/></g>`;
+  }else if(rk === 'peak'){
+    defs = grad('bgS', '#FFB98A', '#FFE3C0', '#FFF1DE') + grad('bgG', '#DDAA86', '#B97F5D');
+    body = `<rect width="${W}" height="${H}" fill="url(#bgS)"/>
+      <circle cx="320" cy="56" r="30" fill="#FFF0C8" opacity=".85"/>
+      ${cloud(110, 50, .9, 'cl')}
+      <path d="M90 170 L170 66 Q182 56 196 58 L212 58 Q226 56 236 66 L320 170 Z" fill="#8A5E4E"/>
+      <path d="M170 66 Q182 56 196 58 L212 58 Q226 56 236 66 L222 74 Q204 64 186 74 Z" fill="#FF8A3A"/>
+      <path d="M196 70 Q200 96 190 120 M214 72 Q212 92 222 112" stroke="#FF9A44" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>
+      <g class="sm"><circle cx="198" cy="44" r="13" fill="#F4ECE6" opacity=".9"/><circle cx="214" cy="34" r="11" fill="#F4ECE6" opacity=".8"/><circle cx="204" cy="22" r="9" fill="#F4ECE6" opacity=".7"/></g>
+      <path d="M0 176 Q60 150 120 168 Q160 150 220 170 Q300 146 400 172 V${H} H0 Z" fill="#A9735A"/>
+      <rect y="190" width="${W}" height="110" fill="url(#bgG)"/>
+      <path d="M0 190 Q100 182 200 190 T400 190" stroke="#E9C2A2" stroke-width="3" fill="none" opacity=".7"/>
+      <g class="sp"><circle cx="70" cy="150" r="2.4" fill="#FFD24A"/><circle cx="330" cy="140" r="2" fill="#FFD24A"/></g>
+      <g fill="#8E5E45" opacity=".5"><ellipse cx="60" cy="250" rx="14" ry="4"/><ellipse cx="340" cy="264" rx="18" ry="5"/></g>`;
+  }else{
+    defs = grad('bgS', '#8ED8F5', '#DDF4FB') + grad('bgG', '#86D06A', '#4FA54E');
+    body = `<rect width="${W}" height="${H}" fill="url(#bgS)"/>
+      <circle cx="64" cy="48" r="44" fill="#FFF6C8" opacity=".55"/><circle cx="64" cy="48" r="20" fill="#FFF3B0"/>
+      ${cloud(260, 44, 1.1, 'cl')}${cloud(150, 80, .7, 'cl cl2')}
+      <path d="M0 150 Q70 104 150 140 Q220 100 300 136 Q350 112 400 130 V180 H0 Z" fill="#9CCF8A"/>
+      <path d="M0 170 Q90 136 180 164 Q270 132 400 160 V200 H0 Z" fill="#6DB863"/>
+      <g fill="#3E8E45"><circle cx="40" cy="160" r="12"/><circle cx="56" cy="156" r="14"/><circle cx="340" cy="150" r="12"/><circle cx="356" cy="152" r="10"/></g>
+      <rect y="186" width="${W}" height="114" fill="url(#bgG)"/>
+      <path d="M0 186 Q100 178 200 186 T400 186" stroke="#A6E08A" stroke-width="3" fill="none" opacity=".7"/>
+      <g stroke="#3C9145" stroke-width="2.4" stroke-linecap="round" fill="none"><path d="M40 260 q2 -10 6 -14 M48 262 q0 -12 0 -16 M56 260 q-2 -10 -6 -14"/><path d="M340 240 q2 -10 6 -14 M348 242 q0 -12 0 -16 M356 240 q-2 -10 -6 -14"/><path d="M190 286 q2 -8 5 -11 M198 288 q0 -10 0 -13"/></g>
+      <g><circle cx="110" cy="232" r="3.4" fill="#F2679B"/><circle cx="290" cy="276" r="3.4" fill="#FFD23C"/><circle cx="250" cy="224" r="3" fill="#fff"/></g>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>${defs}</defs>${body}</svg>`;
 }
 
 /* =========================================================
@@ -4714,9 +5654,11 @@ function render(){
     closet: ['👕 옷장', viewCloset]
   }[S.screen];
   topTitle.textContent = V[0];
+  const fkeep = fieldKeep();            /* 23차: 걷던 그림·카메라가 다시 그려도 이어서 움직이게 */
   screenEl.innerHTML = V[1]();
   fxClipTop();                          /* 22차: 배틀에서만 이펙트가 상단바를 덮지 않게 */
-  if(S.screen === 'field') placePlayer();
+  if(S.screen === 'field'){ fieldMount(); placePlayer(); fieldRestore(fkeep); }
+  else if(HOLD.dir) holdStop();
   if(S.screen === 'write') wrMount();   /* 17차: 캔버스는 화면을 다시 그릴 때마다 붙입니다 */
   if(S.screen === 'set') xfMount();     /* 21차 C: 카메라 영상 다시 붙이기 */
   renderModal();
@@ -4759,12 +5701,17 @@ function viewPick(){
 
 function viewField(){
   const reg = curReg();
-  const art = TILE_ART[reg.key] || TILE_ART.grass;
+  /* 23차: 바닥은 캔버스 한 장(terrCanvas), 칸에는 장식만. 나무·바위 칸은 줄마다 z-index 가 달라 앞뒤가 겹칩니다 */
+  const terr = terrCanvas(S.reg);
+  folSync();
   let tiles = '';
   for(let i=0;i<REG_W*REG_H;i++){
-    const t = reg.map[i];
-    tiles += `<div class="tile t${t}">${t === GATE_TILE ? gateArt(reg,i) : (art[t] || '')}</div>`;
+    const t = reg.map[i], x = i % REG_W, y = (i / REG_W) | 0;
+    tiles += `<div class="tile t${t}"${t === 2 ? ` style="z-index:${3*y + 10}"` : ''}>${t === GATE_TILE ? gateArt(reg,i) : tileDecor(reg.key, t, x, y)}</div>`;
   }
+  const enter = FLD_LASTREG !== S.reg && FLD_LASTREG !== -1;
+  FLD_LASTREG = S.reg;
+  const ph = -((typeof performance !== 'undefined' ? performance.now() : 0) / 1000 % 48);
   /* 바닥에 떨어진 아이템 */
   const drops = dropsOf(S.reg).map(o=>{
     const it = ITEM_BY_K[o.k]; if(!it) return '';
@@ -4794,8 +5741,8 @@ function viewField(){
       ? `<button class="btn rkbtn" data-act="rkfight" aria-label="로켓단과 싸우기">💥<span class="rr">R</span></button>` : ''}
     <button class="btn bagbtn" data-act="bag" aria-label="가방">🎒<span class="cnt">${bag}</span></button>
   </div>
-  <div id="map" class="r-${reg.key}">
-    <div id="world">${tiles}${drops}<div id="player">${kidSvg()}</div></div>
+  <div id="map" class="r-${reg.key} t23${terr ? ' tok' : ''}${enter ? ' enter' : ''}${HOLD.dir ? ' hold' : ''}" style="--ph:${ph.toFixed(2)}s;--stp:${STEP_MS}ms">
+    <div id="world" data-r="${S.reg}" style="transform:${worldTf()}"><div class="terrph"></div>${tiles}${drops}${folHtml()}<div id="player" class="${kidCls()}" style="transform:translate(${S.px*100}%, ${S.py*100}%);z-index:${3*S.py + 12}">${trainerSvg()}${feetFx()}</div>${worldFx(S.reg)}</div>
     ${/* 17차: ✏️ 글씨 쓰기 — 지도 위에 얹어서 지역줄·지도 크기를 하나도 건드리지 않습니다.
          배틀·포획과 완전히 따로 도는 길이라 언제 눌러도 손해가 없습니다 */''}
     <button class="btn wrfab" data-act="write" aria-label="글씨 쓰기">✏️<span class="wt">글씨</span></button>
@@ -4840,12 +5787,20 @@ function evoSlotHtml(){
    지도 밖으로는 안 밀리므로 가장자리에서도 빈 곳이 보이지 않습니다 */
 function placePlayer(){
   const p = document.getElementById('player');
-  if(p) p.style.transform = `translate(${S.px*100}%, ${S.py*100}%)`;
-  const w = document.getElementById('world');
-  if(w){
-    const cx = camAt(S.px), cy = camAt(S.py);
-    w.style.transform = `translate(${-cx*100/REG_W}%, ${-cy*100/REG_H}%)`;
+  if(p){
+    p.style.transform = `translate(${S.px*100}%, ${S.py*100}%)`;
+    p.style.zIndex = String(3*S.py + 12);    /* 23차: 아래 줄 나무 뒤로 가면 가려집니다 */
+    p.className = kidCls();
   }
+  folSync();
+  const f = document.getElementById('fol');
+  if(f){
+    f.style.transform = `translate(${FOL.x*100}%, ${FOL.y*100}%)`;
+    f.style.zIndex = String(3*FOL.y + 11);
+    f.className = folCls();
+  }
+  const w = document.getElementById('world');
+  if(w) w.style.transform = worldTf();
   const pos = document.querySelector('.regbar .pos');
   if(pos) pos.textContent = `📍${S.px+1},${S.py+1}`;
 }
@@ -4870,16 +5825,19 @@ function viewBattle(){
     </button>`;
   }).join('');
   return `
-  <div class="arena">
+  <div class="arena bgr bg-${curReg().key}">
+    <div class="abg">${battleBgSvg(curReg().key)}</div>
     <div class="turnbar ${foeTurnNow?'foe':'me'}">${foeTurnNow?'👾 상대 차례':'😀 내 차례'}</div>
     ${/* 15차: 로켓단전이면 지금 누구랑 싸우는지 이름을 크게 (읽기 연습) */''}
     ${S.rk ? rkBadgeHtml() : ''}
     <div class="slot foe">
+      <i class="platbox"></i>
       <div class="nameplate">${wm.n} ${TYPE_EMOJI[wm.t]||''}</div>
       <div class="statline">${hpBar(w.hp,w.max,'foe')}<span class="pw">⚔️${theirs}</span></div>
       ${artBox(wm,0,'')}
     </div>
     <div class="slot me${S.megaOn?' mega':''}">
+      <i class="platbox"></i>
       ${artBoxA(me,0,'',S.partner)}
       <div class="nameplate${S.megaOn?' m':''}">${me.n} Lv.${pLv()}</div>
       <div class="statline">${hpBar(S.hp,S.maxHp,'me')}<span class="pw ${powClass(mine,theirs)}">⚔️${mine}</span></div>
@@ -5982,14 +6940,15 @@ function move(dir){
   const reg = curReg();
   const idx = ny*REG_W+nx;
   const tile = reg.map[idx];
-  if(BLOCKED.indexOf(tile) >= 0){ tone(150,0.08,'square',0.04); return; }
-  S.px=nx; S.py=ny; SFX.step(); placePlayer();
+  if(BLOCKED.indexOf(tile) >= 0){ kidFace(dir); tone(150,0.08,'square',0.04); return; }
+  const ox = S.px, oy = S.py;
+  S.px=nx; S.py=ny; SFX.step(); kidStep(dir, ox, oy); placePlayer();
 
   /* ① 관문을 밟았다 — 다른 지역으로 */
   if(tile === GATE_TILE){
     const g = reg.gates[idx];
     if(g){
-      if(regOpen(g.to)){ save(); setTimeout(()=>gotoRegion(g.to, g.at), 170); return; }
+      if(regOpen(g.to)){ save(); HOLD.until = performance.now() + 420; setTimeout(()=>gotoRegion(g.to, g.at), 170); return; }
       /* 아직 안 열린 곳 — 막지는 않고 얼마나 더 모으면 되는지 알려 줍니다 */
       const d = REGIONS[g.to];
       const left = Math.max(1, d.need - S.dex.length);
@@ -6025,12 +6984,13 @@ function move(dir){
      도감 8마리부터, 그리고 한 번 만나면 22걸음은 다시 안 나옵니다 (파밍 방지) */
   S.rkStep = (S.rkStep || 0) + 1;
   if(S.rkStep >= RK_STEP_GAP && Math.random() < RK_CHANCE && rkCanMeet()){
+    HOLD.until = performance.now() + 420;
     setTimeout(rkMeet, 200);
     return;
   }
 
   /* ⑤ 야생 포켓몬 */
-  if(tile === ENC_TILE && Math.random() < 0.24) setTimeout(startBattle, 190);
+  if(tile === ENC_TILE && Math.random() < 0.24){ HOLD.until = performance.now() + 420; setTimeout(startBattle, 190); }
 }
 
 /* 지역 옮기기 — 관문을 밟았을 때와 지도 창에서 고를 때 둘 다 이걸로 옵니다 */
@@ -12137,7 +13097,8 @@ function act(a){
     /* 6차: 쓰러진 채로 풀숲에 나가지 않게 — 쓰러짐 화면으로 돌아갑니다 */
     case 'resume': S.screen = partnerKo() ? 'ko' : 'field'; S.msg=''; SFX.open(); render(); break;
     case 'pick':   choose(+arg); break;
-    case 'mv':     move(arg); break;
+    case 'mv':     if(performance.now() < HOLD.clickBlock) break;   /* 23차: 누르고 있기로 이미 걸었으면 뒤따르는 click 은 무시 */
+                   move(arg); break;
     case 'dex':    S.swapping=false; S.screen='dex'; SFX.open(); render(); say(`포켓몬 ${S.dex.length}마리를 잡았어!`); break;
     case 'back':   S.swapping=false; S.screen = partnerKo() ? 'ko' : 'field'; S.msg=''; render(); break;
     /* 6차: 쓰러짐 — 교체 / 기운 차리기 */
@@ -12316,22 +13277,63 @@ modalEl.addEventListener('click', e=>{
 });
 
 const KEYMAP = {ArrowUp:'u',ArrowDown:'d',ArrowLeft:'l',ArrowRight:'r',w:'u',s:'d',a:'l',d:'r'};
+/* 23차: 방향키를 누르고 있으면 계속 걷습니다 (자동 반복 키는 무시하고 우리 걸음 간격으로) */
 window.addEventListener('keydown', e=>{
   const dir = KEYMAP[e.key];
-  if(dir && S.screen === 'field'){ e.preventDefault(); move(dir); }
+  if(!dir || S.screen !== 'field') return;
+  e.preventDefault();
+  if(e.repeat && HOLD.dir) return;
+  HOLD.keys = HOLD.keys.filter(k=>k !== dir); HOLD.keys.push(dir);
+  holdStart(dir, 'key');
 });
+window.addEventListener('keyup', e=>{
+  const dir = KEYMAP[e.key];
+  if(!dir) return;
+  HOLD.keys = HOLD.keys.filter(k=>k !== dir);
+  if(HOLD.src !== 'key') return;
+  if(HOLD.keys.length) HOLD.dir = HOLD.keys[HOLD.keys.length - 1];
+  else holdStop();
+});
+window.addEventListener('blur', ()=>{ HOLD.keys = []; holdStop(); });
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ HOLD.keys = []; holdStop(); } });
 
-let tsx=0, tsy=0;
-document.addEventListener('touchstart', e=>{
-  if(S.screen !== 'field' || !e.target.closest('#map')) return;
-  tsx = e.touches[0].clientX; tsy = e.touches[0].clientY;
-}, {passive:true});
-document.addEventListener('touchend', e=>{
-  if(S.screen !== 'field' || !e.target.closest('#map')) return;
-  const dx = e.changedTouches[0].clientX - tsx, dy = e.changedTouches[0].clientY - tsy;
+/* 방향 버튼 누르고 있기 · 지도 위 손가락 밀기 — pointer 이벤트 하나로 받습니다.
+   (화면을 다시 그려 버튼이 새로 생겨도 pointerup 은 window 까지 올라옵니다) */
+const SWP = {pid:null, x:0, y:0};
+window.addEventListener('pointerdown', e=>{
+  if(S.screen !== 'field' || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  const b = e.target.closest && e.target.closest('[data-act^="mv:"]');
+  if(b){
+    if(b.hasAttribute('disabled')) return;
+    HOLD.clickBlock = performance.now() + 100000;      /* 손을 뗄 때까지 click 은 무시 (걸음은 여기서 이미 걸었음) */
+    holdStart(b.getAttribute('data-act').slice(3), 'btn', e.pointerId);
+    return;
+  }
+  if(e.target.closest && e.target.closest('#map') && !e.target.closest('button')){
+    SWP.pid = e.pointerId; SWP.x = e.clientX; SWP.y = e.clientY;
+  }
+});
+window.addEventListener('pointermove', e=>{
+  if(SWP.pid !== e.pointerId || S.screen !== 'field') return;
+  const dx = e.clientX - SWP.x, dy = e.clientY - SWP.y;
   if(Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
-  move(Math.abs(dx) > Math.abs(dy) ? (dx>0?'r':'l') : (dy>0?'d':'u'));
-}, {passive:true});
+  const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'r' : 'l') : (dy > 0 ? 'd' : 'u');
+  if(HOLD.src === 'swipe' && HOLD.pid === e.pointerId){
+    if(dir !== HOLD.dir){ HOLD.dir = dir; SWP.x = e.clientX; SWP.y = e.clientY; }   /* 손가락을 다른 쪽으로 밀면 방향만 바꿈 */
+    return;
+  }
+  SWP.x = e.clientX; SWP.y = e.clientY;
+  holdStart(dir, 'swipe', e.pointerId);
+});
+function ptrEnd(e){
+  if(SWP.pid === e.pointerId) SWP.pid = null;
+  if(HOLD.pid === e.pointerId){
+    if(HOLD.src === 'btn') HOLD.clickBlock = performance.now() + 400;
+    holdStop();
+  }else if(HOLD.clickBlock > performance.now() + 1000) HOLD.clickBlock = performance.now() + 400;
+}
+window.addEventListener('pointerup', ptrEnd);
+window.addEventListener('pointercancel', ptrEnd);
 document.addEventListener('gesturestart', e=>e.preventDefault());
 
 /* =========================================================
