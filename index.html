@@ -5413,7 +5413,7 @@ function wipe(){
   S.drops = [[],[],[],[]];
   S.unlockShow = null; S.travel = false; S.bag = false;
   S.wild = null; S.quiz = null; S.megaOn = false; S.msg = '';
-  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.wrb = null;
+  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.ultSolo = false; S.wrb = null;
   S.qRecent = []; S.qHist = []; S.wRecent = [];
   S.learn = freshLearn();
   S.stars = 0; S.lastStars = 0; S.evoWas = null; S.evoing = false;
@@ -5873,7 +5873,7 @@ const SET_BATTLE = [
   {n:'어려움', hp:1.28, dmg:1.30}
 ];
 const SET_WEAK = [ {n:'낮음', p:0.15}, {n:'보통', p:0.30}, {n:'높음', p:0.45} ];
-function freshSet(){ return {koStage:0, numStage:0, battle:1, want:0, weak:1, jamo:1, combo:1}; }   /* 25차: combo 연타 전투 0 끄기 · 1 가끔 · 2 자주 */
+function freshSet(){ return {koStage:0, numStage:0, battle:1, want:0, weak:1, jamo:1, combo:1, solo:1}; }   /* 27-A: solo 혼자 한 번 더 1 켜기 · 0 끄기 */   /* 25차: combo 연타 전투 0 끄기 · 1 가끔 · 2 자주 */
 /* 저장에서 읽어 온 값 다듬기 — 이상하면 조용히 자동으로 돌아갑니다 */
 function saneSet(d){
   const s = freshSet();
@@ -5888,6 +5888,8 @@ function saneSet(d){
   const jm = int(d.jamo,0,1);             if(jm != null) s.jamo = jm;
   /* 25차: 연타 전투. 이 값이 없는 옛 저장은 "가끔" 으로 열립니다 */
   const cb = int(d.combo,0,2);            if(cb != null) s.combo = cb;
+  /* 27-A: 혼자 한 번 더. 이 값이 없는 옛 저장은 "켜기" 로 열립니다 */
+  const so = int(d.solo,0,1);             if(so != null) s.solo = so;
   return s;
 }
 function setOf(){
@@ -7275,6 +7277,8 @@ function viewSet(){
            그것도 필요 없으면 여기서 끄면 음절만 나옵니다 */''}
       <div class="setlab">✏️ 낱자 워밍업<small>지금: ${st.jamo ? '켜기 — 처음 보는 자모만 한 번 연습하고 바로 음절' : '끄기 — 완성된 글자(음절)만'}</small></div>
       ${segHtml('jamo', [{v:1,t:'켜기'},{v:0,t:'끄기'}], st.jamo, 2)}
+      <div class="setlab">✨ 혼자 한 번 더<small>가이드를 보고 쓴 글자는 바로 빈 칸에 한 번 더 혼자 씁니다 · 막히면 그 획만 다시 도와줍니다 · 다 배운 글자는 한 번만</small></div>
+      ${segHtml('solo', [{v:1,t:'켜기'},{v:0,t:'끄기'}], st.solo === 0 ? 0 : 1, 2)}
       <div class="setlab">👊 연타 전투<small>기술을 고른 뒤 2초 동안 화면을 톡톡 누르면 최대 1.5배로 세집니다 · 안 눌러도 기본 위력 그대로 · 가끔 = 공격 ${CB_EVERY[1]}번에 한 번 · 자주 = ${CB_EVERY[2]}번에 한 번 · 필살기에는 안 나옵니다</small></div>
       ${segHtml('combo', [{v:0,t:'끄기'},{v:1,t:'가끔'},{v:2,t:'자주'}], st.combo == null ? 1 : st.combo, 3)}
       <div class="setnote">⚠️ 어떻게 맞춰도 두 번 연달아 헤매면 저절로 제일 쉬운 문제가 나옵니다.
@@ -7584,7 +7588,7 @@ function startBattle(){
   hpReset('foe');                 /* 12차: 새 상대의 막대는 가득 찬 채로 시작합니다 */
   S.megaOn = false;
   /* 10차: 배틀마다 새로 — 필살기 2번, 문제는 4개까지 */
-  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.wrb = null;
+  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.ultSolo = false; S.wrb = null;
   S.turn = 'me'; S.acting = false;
   S.mvI = Math.floor(Math.random()*2);
   const ga = josa(m.n,['이','가']);
@@ -9623,8 +9627,11 @@ function attackGo(mv, forced, mult){
   S.acting = true; S.turn = 'me';
   S.msg = mv.ult ? `💥 ${me.n}의 필살기! ${mv.n}! ${mv.e}` : `${me.n}의 ${mv.n}! ${mv.e}`;
   if(cbUp) S.msg = (cbMax ? '⚡최대 파워! ' : '💪파워 업! ') + S.msg;
+  /* 27-A: 혼자 한 번 더를 깨끗하게 쓰고 낸 필살기 */
+  const soloUp = mv.ult && S.ultSolo; S.ultSolo = false;
+  if(soloUp) S.msg = '✨혼자 썼다! 파워 업! ' + S.msg;
   render();
-  say(mv.ult ? `필살기! ${mv.n}!` : (cbMax ? `최대 파워! ${mv.n}!` : mv.n), {rate:0.95});
+  say(mv.ult ? `${soloUp ? '파워 업! ' : ''}필살기! ${mv.n}!` : (cbMax ? `최대 파워! ${mv.n}!` : mv.n), {rate:0.95});
   /* 근접 기술은 몸으로 부딪히니까 더 크게 돌진합니다 */
   bump('.slot.me .artbox', mv.k === 'dash' ? 'charge-me' : 'lunge-me');
   SFX.shoot();
@@ -9735,7 +9742,7 @@ function run(){
   if(S.rk){ rkFlee('휴~ 도망쳤다! 언제든 다시 도전할 수 있어'); return; }
   S.screen = 'field'; S.msg = '휴~ 도망쳤다!'; S.wild = null; S.megaOn = false;
   S.turn = 'me'; S.acting = false;
-  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.wrb = null;
+  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.ultSolo = false; S.wrb = null;
   SFX.open(); render(); say('도망쳤다!');
 }
 
@@ -10150,7 +10157,7 @@ function rkBegin(team){
   };
   S.rkEnd = null;
   S.megaOn = false;
-  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.wrb = null;
+  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.ultSolo = false; S.wrb = null;
   S.turn = 'me'; S.acting = false; S.catching = false; S.quiz = null;
   S.mvI = Math.floor(Math.random()*2);
   S.screen = 'battle';
@@ -10407,7 +10414,7 @@ function rkRestore(levelUp){
   hpReset('me'); hpReset('foe');
   S.wild = null; S.quiz = null;
   S.turn = 'me'; S.acting = false; S.catching = false;
-  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.wrb = null;
+  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.ultSolo = false; S.wrb = null;
 }
 /* 도망 · 중간에 빠져나오기 — 어떤 경로로도 갇히지 않습니다 */
 function rkFlee(msg){
@@ -10418,7 +10425,7 @@ function rkFlee(msg){
   S.rk = null; S.rkPick = null; S.rkEnd = null;
   S.wild = null; S.quiz = null; S.megaOn = false;
   S.turn = 'me'; S.acting = false; S.catching = false;
-  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.wrb = null;
+  S.actQ = 0; S.ultUsed = 0; S.ultCool = 0; S.ultBoost = 0; S.ultSolo = false; S.wrb = null;
   S.rkStep = 0;
   S.screen = 'field';
   S.msg = msg || '휴~ 도망쳤다! 언제든 다시 도전할 수 있어';
@@ -12354,7 +12361,9 @@ const WR = {cv:null, ctx:null, size:280, tmpl:[], drawn:[], cur:[],
             drawing:false, ghost:null, cheer:0, token:0, raf:0,
             /* 21차: pid 지금 따라가는 포인터 · penSeen 펜이 들어왔나(펜 잠금) · demo 시범 · fb 틀림 알림
                hint 초록 시작점 · auto 유령 손이 그리는 중 · lastAct 마지막 입력(멈춤 재기) */
-            pid:null, ptype:'', penSeen:false, demo:null, fb:null, hint:null, auto:0, autoTok:0, lastAct:0};
+            pid:null, ptype:'', penSeen:false, demo:null, fb:null, hint:null, auto:0, autoTok:0, lastAct:0,
+            /* 27-A: cover 쓴 글씨 가리기 연출 · soloTok 혼자 한 번 더 타이머 표 */
+            cover:null, soloTok:0};
 
 const WR_INK  = '#26331F';   /* 다 쓴 획 */
 const WR_NOW  = '#57BADF';   /* 지금 쓸 획 (안내선) */
@@ -12517,6 +12526,8 @@ function wrLetterDone(w){
                 auto:auto, perfect:(!miss && !auto), clean:(guide === 'blank' && !miss && !help),
                 purpose:w.bat ? w.purpose : 'practice', step:(w.step | 0)};
   const now = Date.now();
+  w.p1 = info;                                  /* 27-A: 혼자 한 번 더가 1차 결과를 봅니다 */
+  w.jb = {};
   if(w.kind === 'syl' && decomp(w.ch)){
     if(!S.wrm) S.wrm = {};
     const start = (w.start != null) ? w.start : wrStartOf(w.ch);
@@ -12529,6 +12540,7 @@ function wrLetterDone(w){
      (w.kind === 'jamo' && JAMO_PARTS[w.ch])){
     if(!S.wrj) S.wrj = {};
     wrPieces(w.ch).forEach(j=>{
+      w.jb[j] = wrjOf(j);
       const bad = w.jmiss ? !!w.jmiss[j] : (miss || auto);
       S.wrj[j] = wrjApply(S.wrj[j], bad, !!w.helped, now);
     });
@@ -12536,6 +12548,98 @@ function wrLetterDone(w){
   WR_DONE_HOOKS.forEach(f=>{ try{ f(info); }catch(e){} });
   return info;
 }
+/* =========================================================
+   27-A: 혼자 한 번 더 — "보고 따라 쓰기 → 가리고 혼자 쓰기" 를 한 번의 쓰기 안에서.
+   가이드를 보고 쓴 글자(G0~G2, 또는 쓰는 중에 힌트·보여줘·같이 쓰기·틀림으로 가이드가 돌아온 글자)는
+   다 쓰고 나면 쓴 글씨가 살짝 가려지고, 같은 글자를 **빈 칸**(번호·가이드·흐린 글자 없음)에 한 번 더 씁니다.
+   막히면 22-B 그대로 **그 획만** 도움이 돌아옵니다 (멈춤 → 시작점, 틀림 → 그 획 진하게 / 태블릿은 초록 시작점).
+   G3·다 배운 글자를 도움 없이 쓴 경우는 지금처럼 한 번만. 어른 설정에서 끌 수 있습니다 (끄면 26차와 똑같음).
+   어디서: ✏️ 연습 화면 · 필살기 쓰기(ult) · 잡을 때 쓰기(cw). 19차 포획 문제(catch)는 지금 그대로.
+   ★ 손해 없음: 혼자 쓰기에서 틀려도 숙련도 · 도장 · 별 · 필살기 배율 모두 1차 몫 그대로입니다.
+   숙련도 규칙 (한 번의 쓰기에서 최대 한 단계만 오릅니다):
+     혼자 쓰기를 깨끗하게(틀림·힌트·보여줘·같이 쓰기 없이) →
+       1차에 틀림이 없었으면  lv = max(지금, min(G3, 쓰기 전 + 1))
+       1차에 틀렸으면         lv = max(지금, 쓰기 전)   (1차에서 내려간 한 칸만 되돌림)
+     다 배움(4)은 처음부터 빈 칸에서 쓴 글자만 — 방금 본 글자를 바로 따라 쓴 건 G3 까지만 올립니다.
+     혼자 쓰기에서 틀리면 아무 변화 없음 (이미 1차에서 반영).
+   도장: WR_DONE_HOOKS 는 지금처럼 글자마다 **한 번만**(1차). 혼자 쓰기가 끝나면 WR_SOLO_HOOKS 가 한 번 불립니다.
+   ========================================================= */
+const WR_SOLO_HOOKS = [];
+const WR_SOLO_POWER = 0.5;       /* 혼자 쓰기 깨끗하면 필살기 배율 +0.5 (2배 → 2.5배) */
+const WR_COVER_MS = 750;         /* 쓴 글씨가 가려지는 연출 */
+function wrSoloWant(w, info){
+  if(!w || !info || w.solo || !soloOn()) return false;
+  if(w.kind !== 'syl' || !decomp(w.ch)) return false;
+  if(w.bat && w.purpose !== 'ult' && w.purpose !== 'cw') return false;
+  return (w.step | 0) <= 2 || !!info.help || !!info.miss;
+}
+/* 혼자 쓰기 결과로 숙련도를 옮깁니다 (순수 함수) — before 는 이번 쓰기 전 단계, miss1 은 1차에 틀렸나 */
+function wrmSoloApply(rec, before, miss1, clean, now){
+  if(!rec) return rec;
+  const r = Object.assign({}, rec);
+  if(!clean) return r;
+  r.t = now || Date.now();
+  r.ok++; r.s = (r.s | 0) + 1;
+  const b = Math.max(0, Math.min(WRM_TOP, before | 0));
+  const target = miss1 ? b : Math.min(WRM_TOP - 1, b + 1);
+  if(r.lv < target) r.lv = target;
+  return r;
+}
+/* 혼자 쓰기를 끝까지 썼다 — 숙련도(위 규칙) + WR_SOLO_HOOKS. 글자마다 한 번만 */
+function wrSoloDone(w){
+  if(!w || !w.solo || w.soloRec) return null;
+  w.soloRec = true;
+  const p1 = w.p1 || {};
+  const clean = !!w.clean && !w.helped && !w.forced;
+  const info = {ch:w.ch, kind:w.kind, solo:true, clean:clean, miss:!w.clean, help:!!w.helped || !!w.forced,
+                purpose:w.bat ? w.purpose : 'practice', first:p1};
+  const now = Date.now();
+  if(w.kind === 'syl' && decomp(w.ch) && S.wrm && S.wrm[w.ch]){
+    info.before = (p1.before != null) ? p1.before : S.wrm[w.ch].lv;
+    S.wrm[w.ch] = wrmSoloApply(S.wrm[w.ch], info.before, !!p1.miss, clean, now);
+    info.after = S.wrm[w.ch].lv;
+    /* 자모도 같은 규칙 — 1차에 그 자모에서 틀리지 않았으면 쓰기 전 + 1 (G3 까지) */
+    if(clean && S.wrj){
+      const m1 = w.jm1 || {};
+      wrPieces(w.ch).forEach(j=>{
+        const r = S.wrj[j];
+        if(!r || m1[j]) return;
+        const b = (w.jb && w.jb[j] != null) ? w.jb[j] : r.lv;
+        r.lv = Math.max(r.lv, Math.min(WRM_TOP - 1, b + 1)); r.t = now;
+      });
+    }
+  }
+  WR_SOLO_HOOKS.forEach(f=>{ try{ f(info); }catch(e){} });
+  return info;
+}
+/* 1차가 끝났다 → 쓴 글씨를 살짝 가리고(약 0.75초) 빈 칸으로 */
+function wrSoloBegin(w){
+  if(!w || w.solo || !w.soloNext) return;
+  const my = ++WR.soloTok;
+  WR.cover = {t0:(typeof performance !== 'undefined') ? performance.now() : 0, ms:WR_COVER_MS};
+  w.tip = '✨ 이번엔 혼자!';
+  wrDots();
+  tone(620,0.1,'triangle',0.05); setTimeout(()=>tone(880,0.12,'triangle',0.05), 160);
+  setTimeout(()=>{
+    if(WR.soloTok !== my) return;
+    if(!wrLive() || wrState() !== w || !w.soloNext){ WR.cover = null; return; }
+    wrSoloStart(w);
+  }, WR_COVER_MS);
+}
+function wrSoloStart(w){
+  WR.cover = null;
+  w.jm1 = w.jmiss || {};
+  w.soloNext = false; w.solo = true; w.soloRec = false;
+  w.si = 0; w.fail = 0; w.done = false; w.clean = true; w.forced = false; w.tip = '';
+  w.helped = false; w.stuck = 0; w.jmiss = {};
+  w.step = 3; w.steps = WR.tmpl.map(()=>3); w.guide = 'blank';
+  WR.drawn = []; WR.cur = []; WR.ghost = null; WR.demo = null; WR.fb = null; WR.hint = null; WR.auto = 0;
+  /* 안내 말("이번엔 혼자 써 볼까?")이 끝날 때까지는 멈춤으로 세지 않습니다 (+1.5초) */
+  WR.lastAct = ((typeof performance !== 'undefined') ? performance.now() : 0) + 1500;
+  render();
+  say('이번엔 혼자 써 볼까?', {rate:0.85});
+}
+
 /* 지금 획에서 틀렸다 · 대신 그려 줬다 → 그 획의 자모에 표시 (자모 숙련도용) */
 function wrJMiss(w){
   const t = WR.tmpl[w.si];
@@ -12626,6 +12730,7 @@ function cwPick(name, rnd, now){
    같은 자모로 계속 워밍업하면 결국 낱자만 쓰게 되므로 한 번이면 충분합니다 */
 const WR_JAMO_SEEN = {};
 function jamoOn(){ return setOf().jamo !== 0; }
+function soloOn(){ return setOf().solo !== 0; }    /* 27-A: 혼자 한 번 더 */
 function wrJamosOf(ch){
   const d = decomp(ch);
   if(!d) return [];
@@ -12712,6 +12817,8 @@ function wrPrep(w){
   w.start = (w.kind === 'syl' && S.wrm && S.wrm[w.ch]) ? null : P.step;   /* 처음 쓰는 글자의 출발 단계 */
   w.guide = P.step >= 3 ? 'blank' : 'trace';
   w.helped = false; w.recorded = false; w.forced = false; w.stuck = 0; w.jmiss = {};
+  w.solo = false; w.soloNext = false; w.soloRec = false; w.p1 = null;   /* 27-A */
+  WR.cover = null; WR.soloTok++;
   /* G0 이면 시범부터 (약 2초). 펜 · 손가락을 대는 순간 끝납니다 */
   WR.demo = (w.kind === 'syl' && P.step === 0) ? {t0:0} : null;
   WR.fb = null; WR.hint = null; WR.auto = 0;
@@ -12734,6 +12841,7 @@ function viewWrite(){
   const w = wrSync();
   const n = WR.tmpl.length;
   const t1 = w.kind === 'num' ? '숫자를 써 보자!'
+           : w.solo ? '✨ 혼자 한 번 더!'
            : w.kind === 'syl' ? `「${w.word}」 의 ${w.ch}`
            : '한글 낱자를 써 보자!';
   const dots = WR.tmpl.map((_,i)=>
@@ -12900,9 +13008,14 @@ function wrbPanel(){
   const t1 = (w.kind === 'syl' && w.word) ? `「${w.word}」 의 ${w.ch}` : '한글 낱자를 써 보자!';
   const ult = (w.purpose === 'ult');
   const cw = (w.purpose === 'cw');            /* 21차 A5: 잡을 때마다 한 글자 */
-  const banner = ult ? '💥 글자를 쓰면 필살기가 나간다!'
+  const solo = !!w.solo;                      /* 27-A: 혼자 한 번 더 */
+  const banner = solo ? (ult ? '✨ 혼자 한 번 더! 쓰면 파워 업!' : '✨ 혼자 한 번 더! 다 쓰면 볼!')
+               : ult ? '💥 글자를 쓰면 필살기가 나간다!'
                : cw  ? '✏️ 다 쓰면 볼을 던져서 꼭 잡아!' : '✏️ 글자를 쓰면 잡을 수 있어!';
-  const prize = ult
+  const prize = solo
+    ? (ult ? `<span class="hot">혼자 쓰면 ⚡더 세게</span><span>막히면 도와줄게</span><span>틀려도 괜찮아</span>`
+           : `<span class="hot">혼자 쓰면 ⭐+1</span><span>막히면 도와줄게</span><span>그래도 꼭 잡혀!</span>`)
+    : ult
     ? `<span class="hot">한 번에 ⚡2배 ⭐+3</span><span>도와주면 1.5배</span><span>못 써도 발동</span>`
     : cw
     ? `<span class="hot">다 쓰면 꼭 잡혀!</span><span>한 번에 ⭐+3</span><span>같이 써도 ⭐+1</span>`
@@ -12912,6 +13025,7 @@ function wrbPanel(){
     ? `<button class="btn btn-white" data-act="wrbout"><span class="e">🚪</span>나가기</button>`
     : cw
     ? `<button class="btn btn-yellow" data-act="wrhelp"><span class="e">🤝</span>같이 쓰기</button>`
+      + (solo ? `<button class="btn btn-white" data-act="wrbout"><span class="e">⚪</span>바로 던지기</button>` : '')
     : `<button class="btn btn-white" data-act="wrbout"><span class="e">🔙</span>다른 문제</button>`;
   const skipBtn = ult
     ? `<button class="btn btn-yellow" data-act="wrbskip"><span class="e">⚡</span>그냥 쏘기</button>` : '';
@@ -12943,7 +13057,9 @@ function wrbPanel(){
 function wrbDone(){
   const w = S.wrb;
   if(!w) return;
+  if(w.solo){ wrbSoloDone(w); return; }        /* 27-A: 혼자 한 번 더까지 끝났다 */
   const tier = wrbTier(w), T = WRB_TIER[tier];
+  w.p1tier = tier;
   const ult = (w.purpose === 'ult');
   /* 포획 쪽은 별을 조금 더 넉넉하게 (데미지 보너스가 없으니까) */
   const star = ult ? T.star : (tier === 'perfect' ? 3 : (tier === 'help' ? 2 : 1));
@@ -12955,16 +13071,52 @@ function wrbDone(){
   if(box){ box.textContent = tier === 'perfect' ? '완벽해! 🎉' : '잘했어! 🎉';
            box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
   wrDots();
-  say(ult ? T.s : T.cs, {rate:0.9});
   if(S.learn) S.learn.q = (S.learn.q || 0) + 1;
-  save();
   const mine = w;
   /* 21차 A5: 잡을 때 쓰기를 끝냈다 — 이번 볼은 반드시 잡힙니다 */
   if(w.purpose === 'cw' && S.wild) S.wild.sure = true;
+  /* 27-A: 가이드를 보고 썼으면 → 잠깐 축하하고 빈 칸에 혼자 한 번 더 (필살기 · 볼은 그 다음) */
+  if(w.soloNext){
+    w.tip = got ? `${head}  ⭐+${got}` : head;
+    wrDots();
+    say('잘했어!', {rate:0.9});
+    save();
+    setTimeout(()=>{ if(S.wrb === mine && mine.soloNext) wrSoloBegin(mine); }, 1250);
+    return;
+  }
+  say(ult ? T.s : T.cs, {rate:0.9});
+  save();
   setTimeout(()=>{
     if(S.wrb !== mine) return;                 /* 그 사이 나갔으면 아무 일도 안 합니다 */
     S.wrb = null;
     if(ult){ S.ultBoost = T.mul; runAction('ult'); }
+    else   { wrbToCatch(); }
+  }, 1250);
+}
+/* 27-A: 혼자 한 번 더까지 다 썼다 — 깨끗하면 필살기 파워 업 · 별 +1. 틀려도 1차 몫 그대로 (손해 없음) */
+function wrbSoloDone(w){
+  const ult = (w.purpose === 'ult');
+  const ok = !!w.clean && !w.helped && !w.forced;
+  const T = WRB_TIER[w.p1tier || 'help'];
+  const mul = T.mul + (ok ? WR_SOLO_POWER : 0);
+  const got = ok ? starPop(1) : 0;
+  const head = ult ? (ok ? '혼자 썼다! ⚡ 파워 업!' : '다 썼다! 💥 필살기 간다!')
+                   : (ok ? '혼자 썼다! 🎉' : '다 썼다! 잘했어! 🎉');
+  w.tip = got ? `${head}  ⭐+${got}` : head;
+  SFX.good(); confetti();
+  const box = document.getElementById('wrcheer');
+  if(box){ box.textContent = ok ? '혼자 썼다! ✨' : '잘했어! 🎉';
+           box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
+  wrDots();
+  say(ult ? (ok ? '혼자 썼다! 파워 업!' : '좋아, 간다!') : (ok ? '혼자 썼다! 이제 볼을 던지자!' : '잘했어! 이제 볼을 던지자!'),
+      {rate:0.9});
+  save();
+  if(w.purpose === 'cw' && S.wild) S.wild.sure = true;
+  const mine = w;
+  setTimeout(()=>{
+    if(S.wrb !== mine) return;
+    S.wrb = null;
+    if(ult){ S.ultBoost = mul; S.ultSolo = ok; runAction('ult'); }
     else   { wrbToCatch(); }
   }, 1250);
 }
@@ -12982,7 +13134,8 @@ function wrbSkip(){
   const w = S.wrb;
   if(!w || w.purpose !== 'ult') return;
   S.wrb = null;
-  S.ultBoost = 1;
+  /* 27-A: 혼자 한 번 더 중이면 1차에서 얻은 배율 그대로 (손해 없음) */
+  S.ultBoost = (w.solo || w.soloNext) ? WRB_TIER[w.p1tier || 'help'].mul : 1;
   S.msg = '좋아! 그냥 간다! 💥';
   SFX.open();
   runAction('ult');
@@ -13290,23 +13443,44 @@ function wrDone(){
   const w = wrState();
   w.done = true;
   WR.auto = 0; WR.hint = null; WR.demo = null;
-  wrLetterDone(w);                     /* 21차: 숙련도 기록 (21-B 도장도 여기에 붙습니다) */
+  /* 27-A: 혼자 한 번 더 — 1차를 다 쓰면 숙련도·도장(WR_DONE_HOOKS) 기록 후, 가이드를 봤으면 빈 칸으로 한 번 더 */
+  if(w.solo) wrSoloDone(w);
+  else if(wrSoloWant(w, wrLetterDone(w))) w.soloNext = true;   /* 21차: 숙련도 기록 (21-B 도장도 여기에 붙습니다) */
   /* 19차 A-1: 배틀 위 덮개면 여기서 갈라집니다 (필살기 발동 · 포획 문제) */
   if(w.bat){ wrbDone(); return; }
-  const got = gainStars((w.kind === 'syl' ? 2 : 1) + (w.clean ? 1 : 0));
+  if(w.soloNext){ wrPracFirst(w); return; }
+  const soloOk = w.solo && w.clean && !w.helped && !w.forced;
+  const got = w.solo ? gainStars(soloOk ? 2 : 1)                 /* 27-A: 혼자 한 번 더 몫 (1차 별은 이미 받음) */
+                     : gainStars((w.kind === 'syl' ? 2 : 1) + (w.clean ? 1 : 0));
   starNum.textContent = String(S.stars);
   starChip.classList.remove('up'); void starChip.offsetWidth; starChip.classList.add('up');
   /* 19차 A-4: 연습이 배틀에 도움이 된다는 게 보이게 — 아이템도 가끔 나옵니다 */
   const prize = wrPrize(w);
   w.tip = prize ? `⭐+${got}  ${prize.e} ${prize.n} 얻었다!` : `⭐+${got}  ${w.ch} 완성!`;
+  if(soloOk && !prize) w.tip = `✨ 혼자 썼다!  ⭐+${got}`;
   SFX.good(); confetti(); setTimeout(()=>SFX.star(), 420);
   save();
   const box = document.getElementById('wrcheer');
-  if(box){ box.textContent = '잘했어! 🎉'; box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
-  say(`${w.ch}, 잘했어!`, {rate:0.85});
+  if(box){ box.textContent = soloOk ? '혼자 썼다! ✨' : '잘했어! 🎉'; box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
+  say(soloOk ? '혼자 썼다! 잘했어!' : `${w.ch}, 잘했어!`, {rate:0.85});
   wrDots();
   const my = ++WR.cheer;
   setTimeout(()=>{ if(my === WR.cheer && S.screen === 'write'){ wrNewTarget(); render(); } }, 1900);
+}
+/* 27-A: 연습 화면 1차 끝 — 별은 지금처럼 주고, 잠깐 축하한 뒤 빈 칸으로 (아이템은 혼자 쓰기 끝에 한 번) */
+function wrPracFirst(w){
+  const got = gainStars((w.kind === 'syl' ? 2 : 1) + (w.clean ? 1 : 0));
+  starNum.textContent = String(S.stars);
+  starChip.classList.remove('up'); void starChip.offsetWidth; starChip.classList.add('up');
+  w.tip = `⭐+${got}  잘했어! 이번엔 혼자 ✨`;
+  SFX.good(); setTimeout(()=>SFX.star(), 420);
+  save();
+  const box = document.getElementById('wrcheer');
+  if(box){ box.textContent = '잘했어! 🎉'; box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
+  say('잘했어!', {rate:0.9});
+  wrDots();
+  const my = ++WR.cheer;
+  setTimeout(()=>{ if(my === WR.cheer && S.screen === 'write' && !S.wrb && wrState() === w) wrSoloBegin(w); }, 1300);
 }
 /* 유령 획 — 템플릿이 스스로 그려지는 걸 보여 줍니다 */
 function wrGhost(ms){
@@ -13633,11 +13807,28 @@ function wrPaint(){
   }
 
   /* ② 다 쓴 획 — 하준이가 그은 그대로 (대신 그려 준 획은 초록) */
+  const cvf = WR.cover ? Math.max(0, Math.min(1, (now - WR.cover.t0) / WR.cover.ms)) : 0;
+  ctx.save();
+  if(WR.cover) ctx.globalAlpha = 1 - cvf;            /* 27-A: 쓴 글씨가 살짝 사라집니다 */
   for(let i=0;i<WR.drawn.length;i++){
     const d = WR.drawn[i];
     ctx.strokeStyle = d.auto ? '#63C266' : WR_INK;
     ctx.lineWidth = bw;
     wrPath(ctx, d.pts, k); ctx.stroke();
+  }
+  ctx.restore();
+  /* 27-A: 위에서 하얀 종이가 내려와 덮습니다 — "이번엔 가리고 혼자!" */
+  if(WR.cover){
+    const y = k * cvf;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fillRect(0, 0, k, y);
+    ctx.strokeStyle = '#FFC93C'; ctx.lineWidth = 4; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(k, y); ctx.stroke();
+    const s = Math.round(k*0.12);
+    ctx.font = `${s}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('✨', k/2, Math.max(s*0.6, y - s*0.1));
+    ctx.restore();
   }
 
   /* ③ 지금 그려야 할 획 — 점선 안내 + 번호 + 화살표 + 시작점 반짝임 */
@@ -13714,7 +13905,7 @@ function wrPaint(){
   /* ⑤ 획 번호 — ① 어디서 시작해 어디로.
      ㅅ ㅈ ㅊ 처럼 시작점이 같은 획은 번호가 겹치므로 자기 획 위로 조금 밀어 줍니다 */
   wrTabOver(ctx, k, w, now, bw);          /* 시범 · 초록 시작점 (폰도). 틀림 알림(fb)은 태블릿에서만 생깁니다 */
-  if(demo) return;
+  if(demo || WR.cover) return;           /* 27-A: 가리는 동안에는 번호도 숨깁니다 */
   const br = Math.max(10, k*0.048);
   const placed = [];
   for(let i=0;i<WR.tmpl.length;i++){
@@ -13923,6 +14114,7 @@ function act(a){
       else if(key === 'weak' && v >= 0 && v <= 2) st.weak = v;
       else if(key === 'jamo' && v >= 0 && v <= 1) st.jamo = v;
       else if(key === 'combo' && v >= 0 && v <= 2) st.combo = v;   /* 25차 */
+      else if(key === 'solo' && v >= 0 && v <= 1) st.solo = v;     /* 27-A */
       else break;
       SFX.open(); save(); render();
       break;
@@ -14143,6 +14335,16 @@ function stampAdd(n){
   return filled;
 }
 WR_DONE_HOOKS.push(info=>{ stampAdd(stampGain(info)); });
+/* 27-A: 혼자 한 번 더를 깨끗하게 → 도장 +1. 1차도 틀림·도움 없이 썼으면 +2 (한 글자 합계 최대 3).
+   혼자 쓰기에서 틀리면 0 — 1차 몫(1개)은 그대로 남습니다 */
+const STAMP_LETTER_MAX = 3;
+function stampSoloGain(info){
+  if(!info || !info.solo || !info.clean) return 0;
+  const f = info.first || {};
+  const want = (f.perfect && !f.help) ? 2 : 1;
+  return Math.max(0, Math.min(want, STAMP_LETTER_MAX - stampGain(f)));
+}
+WR_SOLO_HOOKS.push(info=>{ stampAdd(stampSoloGain(info)); });
 
 /* "참 잘했어요" 도장 그림 */
 function stampSvg(){
