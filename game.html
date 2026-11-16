@@ -7126,7 +7126,7 @@ function setWriteCard(){
       <div class="setline">써 본 글자 <span class="r">${all.length}자 · 다 배움 ${done.length}자</span></div>
       <div class="setlab">🏅 다 배운 글자<small>가이드 없이 빈 칸에서도 도움 없이 쓴 글자 · 가끔 복습으로 나옵니다</small></div>
       ${done.length ? `<div class="setjamo">${chips(done, false)}</div>` : `<div class="setnote">아직 없어요</div>`}
-      <div class="setlab">✏️ 연습 중 글자<small>자주 틀린 순 · G0 시범+진한 가이드 → G1 흐린 가이드 → G2 시작 부분만 → G3 빈 칸</small></div>
+      <div class="setlab">✏️ 연습 중 글자<small>자주 틀린 순 · G0 시범+진한 가이드 → G1 흐린 가이드 → G2 아주 흐린 점선 → G3 빈 칸</small></div>
       ${prac.length ? `<div class="setjamo">${chips(prac, true)}</div>` : `<div class="setnote">아직 없어요</div>`}
       <div class="setlab">🔤 자모 숙련도<small>0 처음 ~ 4 다 배움 · 처음 보는 글자는 이걸로 출발 단계를 정합니다</small></div>
       <div class="setnote setjl">${jl || '아직 없어요'}</div>
@@ -12742,11 +12742,10 @@ function wrCost(u, t){
      "ㄱ자 획" 과 "ㅡ 획" 을 자리보다 모양으로 가려냅니다 */
   return (s*0.5 + k)/12;
 }
-/* ★ 게임이 실제로 쓰는 판정 — 지금 쓸 획 si 기준. 'ok' | 'order' | judgeStroke 결과 */
-function wrJudgeAt(raw, si){
+/* 한 틀(F) 안에서의 판정 — 22차 wrJudgeAt 그대로, 템플릿만 틀로 옮겨서 봅니다. 'ok' | 'order' | judgeStroke 결과 */
+function wrJudgeIn(raw, si, F){
   const T = WR.tmpl, t = T[si], size = WR.size;
-  if(!t) return 'ok';
-  const tp = wrScaled(t);
+  const tp = wrFrameAt(t, F);
   const res = judgeStroke(raw, tp, size);
   if(res === 'tiny' || T.length < 2) return res;
   const u = wrSmooth(raw);
@@ -12756,20 +12755,220 @@ function wrJudgeAt(raw, si){
     const near = wrTol(tp, size, R_START)*0.2;
     if(c0 <= near) return 'ok';
     for(let j=si+1;j<T.length;j++){
-      const tj = wrScaled(T[j]);
+      const tj = wrFrameAt(T[j], F);
       if(wrCost(u, tj) < c0*0.6 && judgeStroke(raw, tj, size) === 'ok') return 'order';
     }
     return 'ok';
   }
   if(res !== 'start' && res !== 'end') return res;           /* 방향 틀림은 그대로 잡습니다 */
+  /* 28-B: "대충 맞나" — 모양 · 방향 · 대강의 자리 (정확한 자리 · 길이는 묻지 않습니다. 다른 획이 더 닮았으면 아님) */
+  if(WR_ROUGH && wrRough(raw, si, F)) return 'ok';
   /* ① 살려 주기 — 다른 어떤 획(앞 획 다시 긋기 포함)보다 지금 획이 확실히 더 닮았나 */
   for(let j=0;j<T.length;j++){
     if(j === si) continue;
-    if(wrCost(u, wrScaled(T[j])) < c0*1.3) return res;
+    if(wrCost(u, wrFrameAt(T[j], F)) < c0*1.3) return res;
   }
   /* 늘린 반경(R_SAVE 배)으로 다시 봅니다. 방향 검사는 judgeStroke 와 똑같이 */
-  const big = tp.map(p=>p.slice()); big.cell = (t.cell || 0.5)*R_SAVE;
+  const big = tp.map(p=>p.slice()); big.cell = (t.cell || 0.5)*F.s*R_SAVE;
   return judgeStroke(raw, big, size) === 'ok' ? 'ok' : res;
+}
+
+/* =========================================================
+   28-B  글자 틀 맞추기 — 아빠 "획과 큰 모양이 맞으면 너무 엄격할 필요는 없을 것 같아"
+   ---------------------------------------------------------
+   6살은 글자를 칸 한가운데 딱 맞춰 쓰지 못합니다. 작게 · 크게 · 한쪽으로 치우쳐 써도
+   **순서 · 방향 · 대강의 모양과 획끼리의 자리**가 맞으면 통과입니다.
+     · 틀 F = {s, dx, dy}: 템플릿(0~1)을 p' = s·(p − 0.5) + 0.5 + d 로 옮깁니다 (크기 + 자리, 돌리기 없음)
+     · 첫 획: 그 획 하나로 틀을 맞춰 봅니다 (모양 · 방향만 보는 셈)
+     · 둘째 획부터: 이미 쓴 획들로 틀을 맞춰서 "아이가 쓰고 있는 글자 크기 · 자리" 에서 다음 획을 봅니다
+     · 그래도 빗나가면 wrRough — 획 방향 · 모양 · 대강의 자리(ㅣ 는 ㄱ 오른쪽, 받침은 아래)만
+   순서 틀림 · 거꾸로 긋기 · (태블릿) 동그라미 방향은 그대로 잡습니다.
+   ========================================================= */
+const WRF_S = [0.55, 1.45];   /* 글자 크기 — 템플릿의 55% ~ 145% */
+const WRF_D = 0.3;            /* 글자 자리 — 캔버스의 30% 까지 치우쳐도 */
+const WRF_ID = {s:1, dx:0, dy:0};
+let WR_JF = WRF_ID;
+let WR_ROUGH = true;           /* 마지막 판정에 쓴 틀 (태블릿 "왜 틀렸나" 가 같은 틀로 봅니다) */
+function wrFrameAt(t, F){
+  const size = WR.size, s = F.s;
+  const tp = t.map(p=>[(s*(p[0]-0.5)+0.5+F.dx)*size, (s*(p[1]-0.5)+0.5+F.dy)*size]);
+  tp.cell = (t.cell || 0.5)*s;
+  return tp;
+}
+/* 짝지은 점들(템플릿 0~1 ↔ 아이 0~1)로 틀을 맞춥니다. lam 이 클수록 크기를 1 쪽으로 당깁니다 */
+function wrFitFrame(pairs, lam){
+  const n = pairs.length;
+  if(n < 2) return null;
+  let ax=0, ay=0, bx=0, by=0;
+  pairs.forEach(q=>{ ax += q[0][0]-0.5; ay += q[0][1]-0.5; bx += q[1][0]-0.5; by += q[1][1]-0.5; });
+  ax/=n; ay/=n; bx/=n; by/=n;
+  let num = 0, den = 0;
+  pairs.forEach(q=>{
+    const a0 = q[0][0]-0.5-ax, a1 = q[0][1]-0.5-ay, b0 = q[1][0]-0.5-bx, b1 = q[1][1]-0.5-by;
+    num += a0*b0 + a1*b1; den += a0*a0 + a1*a1;
+  });
+  const L = (lam || 0)*n;
+  let s = (num + L)/(den + L || 1);
+  s = Math.max(WRF_S[0], Math.min(WRF_S[1], isFinite(s) ? s : 1));
+  const cl = v => Math.max(-WRF_D, Math.min(WRF_D, v));
+  const F = {s:s, dx:cl(bx - s*ax), dy:cl(by - s*ay)};
+  /* 맞춘 뒤 남는 어긋남(평균, 캔버스 비율) — 모양이 얼마나 다른가 */
+  let r = 0;
+  pairs.forEach(q=>{ r += Math.hypot(s*(q[0][0]-0.5)+0.5+F.dx - q[1][0], s*(q[0][1]-0.5)+0.5+F.dy - q[1][1]); });
+  F.res = r/n;
+  return F;
+}
+/* 획 하나의 짝 점 — 곧은 획은 길 따라 8점, 동그라미는 가운데만(시작 위치 · 방향이 제각각이라) */
+function wrPairs(t, u, out){
+  if(!t || !u || u.length < 2) return out;
+  if(wrClosed(t)){
+    const a = wrMid(t), b = wrMid(u);
+    for(let k=0;k<4;k++) out.push([a, b]);
+    return out;
+  }
+  const a = wrResample(t, 8), b = wrResample(u, 8);
+  for(let k=0;k<8;k++) out.push([a[k], b[k]]);
+  return out;
+}
+const WRF_LAM = 0.004;
+let WRF_SWAP = 0.06;
+let WRF_RES = 3;              /* 첫 획 순서: 모양 어긋남의 무게 */
+let WRF_SHAPE = 0.2;          /* 첫 획: 맞춘 뒤 어긋남이 획 길이의 이만큼을 넘으면 모양이 다른 획 */          /* 첫 획 순서: 다음 획 쪽 틀이 이만큼(캔버스 비율) 더 가까워야 "순서 틀림" */
+/* 이미 쓴 획들로 맞춘 틀 (없으면 null) */
+function wrFrameFromDrawn(si){
+  const T = WR.tmpl, D = WR.drawn || [], pairs = [];
+  for(let k=0;k<Math.min(si, D.length);k++) wrPairs(T[k], D[k] && D[k].pts, pairs);
+  return pairs.length >= 4 ? wrFitFrame(pairs, WRF_LAM) : null;
+}
+/* 지금 획 하나로 맞춘 틀 — 첫 획에서 씁니다 */
+function wrFrameSelf(raw, si){
+  const t = WR.tmpl[si], size = WR.size;
+  const u = wrSmooth(raw).map(p=>[p[0]/size, p[1]/size]);
+  if(wrClosed(t)){
+    const a = wrMid(t), b = wrMid(u), r0 = wrRadius(t), r1 = wrRadius(u);
+    const s = Math.max(WRF_S[0], Math.min(WRF_S[1], r0 > 0 ? r1/r0 : 1));
+    const cl = v => Math.max(-WRF_D, Math.min(WRF_D, v));
+    const F = {s:s, dx:cl(b[0]-0.5 - s*(a[0]-0.5)), dy:cl(b[1]-0.5 - s*(a[1]-0.5))};
+    F.res = Math.hypot(s*(a[0]-0.5)+0.5+F.dx - b[0], s*(a[1]-0.5)+0.5+F.dy - b[1]) + Math.abs(r1 - s*r0);
+    return F;
+  }
+  return wrFitFrame(wrPairs(t, u, []), WRF_LAM*3);
+}
+/* 대충 맞나 — 틀 F 안에서 지금 획 si 와 견줍니다.
+   방향(시작→끝) · 모양(각자 가운데로 옮겨 견줌) · 대강의 자리(획 가운데가 획 길이만큼 안쪽)만 봅니다.
+   다른 획(앞 획 다시 긋기 · 다음 획 먼저)이 더 닮았으면 통과시키지 않습니다 (순서는 그대로 잡힘) */
+function wrRoughCost(u, tp, anyPos){
+  const size = WR.size;
+  const ul = wrLen(u), tl = Math.max(wrLen(tp), size*0.04);
+  if(ul < tl*0.3 || ul > tl*2.6) return null;
+  if(wrClosed(tp)){
+    const r0 = wrRadius(tp), r1 = wrRadius(u);
+    if(r1 < r0*0.45 || r1 > r0*2.2) return null;
+    if(wrDist(u[0], u[u.length-1]) > Math.max(r1*1.3, size*0.06)) return null;
+    if(typeof tabOn === 'function' && tabOn()){
+      const ua = wrArea(u), ta = wrArea(tp);
+      if(Math.abs(ua) > Math.abs(ta)*0.25 && ua*ta < 0) return null;
+    }
+    const d = anyPos ? 0 : wrDist(wrMid(u), wrMid(tp));
+    const lim = Math.max(r0*1.6, size*0.12);
+    return d > lim ? null : {pos:d/lim, shape:Math.abs(r1-r0)/r0*0.3};
+  }
+  const t0 = tp[0], t1 = tp[tp.length-1], u0 = u[0], u1 = u[u.length-1];
+  const tx = t1[0]-t0[0], ty = t1[1]-t0[1], tc = Math.hypot(tx,ty);
+  const ux = u1[0]-u0[0], uy = u1[1]-u0[1], uc = Math.hypot(ux,uy);
+  if(tc > tl*0.4){
+    if(uc < tc*0.3) return null;
+    if((tx*ux + ty*uy)/(tc*uc) < 0.55) return null;        /* 방향 — 약 57도까지 */
+  }
+  /* 모양: 각자 가운데로 옮기고 길이로 나눠 12점씩 견줌 */
+  const a = wrResample(u, 12), b = wrResample(tp, 12), ma = wrMid(a), mb = wrMid(b);
+  const ka = tl/Math.max(ul, 1);
+  let k = 0;
+  for(let i=0;i<12;i++) k += Math.hypot((a[i][0]-ma[0])*ka - (b[i][0]-mb[0]), (a[i][1]-ma[1])*ka - (b[i][1]-mb[1]));
+  const shape = k/12/tl;
+  if(shape > WRR.shape) return null;
+  if(anyPos) return {pos:0, shape:shape};
+  /* 대강의 자리 — 획을 따라 미끄러진 건 많이, 옆으로 비킨 건 조금만 봐 줍니다 */
+  const ex = ma[0]-mb[0], ey = ma[1]-mb[1];
+  const hx = tc > 1 ? tx/tc : 1, hy = tc > 1 ? ty/tc : 0;
+  const along = Math.abs(ex*hx + ey*hy), side = Math.abs(-ex*hy + ey*hx);
+  const cell = (tp.cell || 0.5)*size;
+  const lA = Math.max(size*WRR.al, tl*WRR.alT, cell*WRR.alC), lS = Math.max(size*WRR.side, cell*WRR.sideC);
+  if(along > lA || side > lS) return null;
+  return {pos:Math.max(along/lA, side/lS), shape:shape};
+}
+const wrFDist = F => Math.hypot(F.dx, F.dy) + Math.abs(F.s - 1)*0.25;
+function wrFirstSwap(raw, si, F){
+  const T = WR.tmpl, size = WR.size, me = wrFDist(F) + F.res*WRF_RES;
+  for(let j=si+1;j<T.length;j++){
+    const Fj = wrFrameSelf(raw, j);
+    if(!Fj || wrFDist(Fj) + Fj.res*WRF_RES > me - WRF_SWAP) continue;
+    if(Fj.res > F.res + 0.015) continue;                 /* 모양은 지금 획 쪽이 더 닮았으면 순서 틀림 아님 (ㅅ 의 ↙ ↘) */
+    if(judgeStroke(raw, wrFrameAt(T[j], Fj), size) === 'ok') return true;
+  }
+  return false;
+}
+let WRR_K = 0.9, WRR_J0 = 0;
+/* 대강의 자리 · 모양 한계 — side 옆으로(캔버스 비율 · 칸 비율), al 획 따라(캔버스 · 획 길이 · 칸), shape 모양 어긋남(획 길이 비율) */
+const WRR = {side:0.18, sideC:0.25, al:0.22, alT:0.7, alC:0.35, shape:0.3};
+function wrRough(raw, si, F){
+  const T = WR.tmpl;
+  const u = wrSmooth(raw);
+  const me = wrRoughCost(u, wrFrameAt(T[si], F));
+  if(!me) return false;
+  const sc = me.pos*0.5 + me.shape*4;
+  for(let j=WRR_J0 ? 0 : si+1;j<T.length;j++){
+    if(j === si) continue;
+    const o = wrRoughCost(u, wrFrameAt(T[j], F));
+    if(o && o.pos*0.5 + o.shape*4 < sc*WRR_K) return false;
+  }
+  /* 이미 쓴 획을 다시 덧그은 것이면 아닙니다 (아이가 실제로 쓴 자리와 견줌) */
+  const D = WR.drawn || [], size = WR.size;
+  for(let k=0;k<Math.min(si, D.length);k++){
+    const d = D[k] && D[k].pts;
+    if(!d || d.length < 2) continue;
+    const dp = d.map(p=>[p[0]*size, p[1]*size]); dp.cell = (T[k].cell || 0.5)*F.s;
+    const o = wrRoughCost(u, dp);
+    if(o && o.pos < 0.35 && o.pos*0.5 + o.shape*4 < sc*WRR_K) return false;
+  }
+  return true;
+}
+/* ★ 게임이 실제로 쓰는 판정 — 지금 쓸 획 si 기준. 'ok' | 'order' | judgeStroke 결과
+   ① 템플릿 자리 그대로(22차) ② 아이 글자 틀(이미 쓴 획 · 첫 획이면 그 획 자신)에서 — 어느 쪽이든 맞으면 통과.
+   순서 틀림은 아이 틀 기준으로 봅니다(첫 획은 템플릿 자리 기준) */
+/* 지금 획을 빈 칸(또는 아주 흐린 G2 밑그림)에서 쓰고 있나 — 받아쓰기 · 혼자 한 번 더 · G2 이상 */
+function wrBlankAt(si){
+  const w = (typeof wrState === 'function') ? wrState() : null;
+  if(!w) return false;
+  if(w.dict && !w.reveal) return true;
+  return wrStepAt(w, si) >= 2;
+}
+function wrJudgeAt(raw, si){
+  const T = WR.tmpl, t = T[si];
+  WR_JF = WRF_ID;
+  if(!t) return 'ok';
+  const r0 = wrJudgeIn(raw, si, WRF_ID);                 /* ① 템플릿 자리 그대로 (22차 판정) */
+  if(r0 === 'tiny') return r0;
+  /* 첫 획: 템플릿 자리에서 맞거나 순서 틀림이면 그대로 (첫 획은 견줄 앞 획이 없습니다) */
+  if(si === 0 && (r0 === 'ok' || r0 === 'order')) return r0;
+  /* 가이드를 보고 쓰는 중(G0 · G1)이면 템플릿 자리 판정이 분명할 때 그대로 — 아이 틀은 "살려 주기" 에만 */
+  const blank = wrBlankAt(si);
+  if(!blank && (r0 === 'ok' || r0 === 'order')) return r0;
+  /* ② 아이 글자 틀 — 둘째 획부터는 이미 쓴 획들로, 첫 획은 그 획 하나로 맞춥니다 */
+  const F = si > 0 ? wrFrameFromDrawn(si) : wrFrameSelf(raw, si);
+  if(!F) return r0;
+  if(si === 0 && F.res > wrLen(t)*WRF_SHAPE) return r0;  /* 첫 획 모양부터 다르면(ㅅ 의 ↙ 자리에 ↘) 틀을 쓰지 않습니다 */
+  const r1 = wrJudgeIn(raw, si, F);
+  if(r1 === 'ok'){
+    /* 첫 획 — ㅂ ㅅ ㄷ 처럼 닮은 획이 둘이면, 템플릿 자리에 훨씬 가까운 다음 획 쪽이 맞으면 순서 틀림 */
+    if(si === 0 && wrFirstSwap(raw, si, F)) return 'order';
+    return 'ok';
+  }
+  if(r1 === 'order'){ WR_JF = F; return 'order'; }
+  if(r0 === 'ok') return 'ok';
+  if(r0 === 'order' || r0 === 'dir') return r0;
+  WR_JF = F;
+  return r1;
 }
 
 /* =========================================================
@@ -12808,7 +13007,7 @@ function wrNote(ch){ WR_RECENT.unshift(ch); if(WR_RECENT.length > 8) WR_RECENT.l
    22-B: 가이드를 점점 없애기 — 글자(음절)마다 숙련도 S.wrm[ch] = {lv, ok, miss, s, t}
      lv 0  G0  시범(손이 먼저 그려 보임) → 진한 가이드 위에 따라 쓰기
      lv 1  G1  시범 없이 흐린 가이드 (불투명도 약 35%)
-     lv 2  G2  지금 쓸 획의 시작점 · 첫 부분만 살짝 (나머지는 빈 칸)
+     lv 2  G2  글자 전체가 아주 흐린 점선 + 시작점 (28-B — 예전엔 지금 획의 첫 30% 만이라 글자가 반쯤 그려진 것처럼 보였음)
      lv 3  G3  빈 칸. 4초 멈추면 시작점 + 화살표만 살짝
      lv 4  다 배운 글자 — 빈 칸으로 쓰고, 가끔 복습으로만 나옵니다
      ok   틀림·대신 그리기 없이 끝낸 횟수   miss 틀린 적이 있던 횟수
@@ -13188,7 +13387,7 @@ function wrPickSyl(rnd, now){
 }
 /* =========================================================
    27-B ① 받아쓰기 — 글자를 보여 주지 않고 소리로만 ("사과의 사, 써 볼까?") → 빈 칸에 쓰기.
-   · G2 이상(시작 부분만 보고 쓸 수 있는 글자)만 냅니다 — 모르는 글자로 받아쓰기를 시키지 않습니다.
+   · G2 이상(아주 흐린 점선만 보고 쓸 수 있는 글자)만 냅니다 — 모르는 글자로 받아쓰기를 시키지 않습니다.
      그런 글자가 하나도 없으면 연습 화면은 "가나다에서 조금 더 써 보자" 안내만 (막힘 없이 바로 가나다로).
    · 🔊 다시 듣기는 언제든, 몇 번이든. 4초 멈추면 한 번 더 들려줍니다(도움 아님).
    · 다른 글자를 쓰기 시작하면(첫 틀린 획) 그 획은 조용히 지우고 **정답 글자를 살짝(흐린 가이드) 보여 주며 같이** —
@@ -14080,14 +14279,25 @@ function wrScaled(t){
   tp.cell = t.cell;                       /* 칸 크기(관대함 기준)를 같이 넘깁니다 */
   return tp;
 }
-/* 21차 A4: 틀린 종류 — 'order'(다른 획을 먼저 그음) · 'rev'(거꾸로 그음) · 그 밖은 judgeStroke 결과 그대로 */
+/* 21차 A4: 틀린 종류 — 'order'(다른 획을 먼저 그음) · 'rev'(거꾸로 그음) · 그 밖은 judgeStroke 결과 그대로.
+   28-B: 판정에 쓴 틀(아이 글자 크기 · 자리, WR_JF)에서 봅니다 */
 function wrWhy(raw, res, w){
+  const F = WR_JF || WRF_ID;
   for(let j=w.si+1;j<WR.tmpl.length;j++){
-    if(judgeStroke(raw, wrScaled(WR.tmpl[j]), WR.size) === 'ok') return 'order';
+    if(judgeStroke(raw, wrFrameAt(WR.tmpl[j], F), WR.size) === 'ok') return 'order';
   }
   const t = WR.tmpl[w.si];
-  if(t && !wrClosed(t) && judgeStroke(raw.slice().reverse(), wrScaled(t), WR.size) === 'ok') return 'rev';
+  if(t && !wrClosed(t)){
+    const rv = raw.slice().reverse();
+    if(judgeStroke(rv, wrFrameAt(t, F), WR.size) === 'ok' || wrRough(rv, w.si, F)) return 'rev';
+  }
   return res;
+}
+/* 28-B: 자리만 빗나갔나 — 방향 · 모양은 지금 획과 맞는데 자리(또는 크기)만 어긋남 → "모양 좋아!" 로 부드럽게 */
+function wrShapeOnly(raw, si){
+  const t = WR.tmpl[si];
+  if(!t || !raw || raw.length < 2) return false;
+  return !!wrRoughCost(wrSmooth(raw), wrFrameAt(t, WR_JF || WRF_ID), true);
 }
 /* 21차 A4: 태블릿 판정 처리 — 틀린 종류마다 다르게 알려 주고, 같은 획에서 세 번 막히면
    유령 손이 그 획을 그려 주고 넘어갑니다 (막힘 없음). 벌·감점 문구는 없습니다 */
@@ -14105,7 +14315,9 @@ function wrAfterJudgeTab(res, raw){
     w.tip = '이거 먼저! 👉';
   }else{
     WR.hint = {si:w.si};                       /* 초록 시작점 + 화살표 — 다음 획을 그을 때까지 남습니다 */
-    w.tip = (res === 'rev' || res === 'start') ? '여기서 시작! 🟢' : '여기서 시작해서 이쪽으로! 🟢';
+    /* 28-B: 방향 · 모양은 맞고 자리만 빗나갔으면 "모양 좋아!" (다시 쓰라는 느낌 없이) */
+    w.tip = (res === 'start' || res === 'end') && wrShapeOnly(raw, w.si) ? '모양 좋아! 여기에 그어 볼까? 🟢'
+      : (res === 'rev' || res === 'start') ? '여기서 시작! 🟢' : '여기서 시작해서 이쪽으로! 🟢';
   }
   tone(300,0.1,'sine',0.04);
   if(w.stuck >= 3){ w.tip = '같이 그려 보자! ✍️'; wrAutoStroke(); }
@@ -14145,6 +14357,7 @@ function wrAfterJudge(res, raw){
     w.tip = res === 'order' ? '파란 줄부터 먼저 그어 볼까? 💫'
       : res === 'dir'
       ? (tc && wrClosed(tc) ? '위에서 왼쪽으로 빙글 돌려 볼까? 💫' : '이쪽 방향으로 그어 볼까? 💫')
+      : wrShapeOnly(raw, w.si) ? '모양 좋아! 이 자리에 그어 볼까? 💫'
       : '이쪽에서 시작해 볼까? 💫';
     tone(300,0.1,'sine',0.04);
     wrDots();
@@ -14310,7 +14523,7 @@ function wrBadge(ctx, p, k, n, kind, r){
    21차 A3 · A4: 태블릿 모드 전용 그리기 (폰에서는 한 번도 불리지 않습니다)
    ========================================================= */
 const WR_STALL_MS = 4000;
-/* 22-B: 획 i 를 이번에 어떤 단계로 보여 줄까 (0 진한 가이드 · 1 흐린 가이드 · 2 시작 부분만 · 3+ 빈 칸).
+/* 22-B: 획 i 를 이번에 어떤 단계로 보여 줄까 (0 진한 가이드 · 1 흐린 가이드 · 2 아주 흐린 점선 글자 · 3+ 빈 칸).
    지금 쓸 획에서 막히면 그 획만 다시 진하게: 두 번 막힘(stuck), 흐린 가이드에서 한 번 틀림,
    폰은 한 번 틀리면(폰의 "이쪽에서 시작해 볼까?" 안내가 가리킬 선이 있어야 합니다) */
 const WR_FADE = 0.35;
@@ -14494,9 +14707,10 @@ function wrTabOver(ctx, k, w, now, bw){
   if(WR.hint && WR.hint.si === w.si && !w.done && WR.tmpl[w.si]){
     const t = WR.tmpl[w.si];
     const pu = 0.5 + 0.5*Math.sin(now/220);
-    /* 동그라미도 앞부분 화살표를 보여 줍니다 — 어느 쪽으로 도는지가 중요합니다 */
+    /* 동그라미도 화살표를 보여 줍니다 — 어느 쪽으로 도는지가 중요합니다.
+       28-B: 획 전체를 점선으로 (예전엔 앞 42% 만 — 반쯤 그려진 획처럼 보였습니다) */
     {
-      const seg = wrPartial(t, 0.42);
+      const seg = wrClosed(t) ? wrPartial(t, 0.8) : t.slice();
       if(seg.length > 1){
         ctx.save();
         ctx.globalAlpha = 0.75; ctx.strokeStyle = '#3DBE5A'; ctx.lineWidth = bw*0.55;
@@ -14515,6 +14729,33 @@ function wrTabOver(ctx, k, w, now, bw){
   }
 }
 
+/* 28-B G2: 아직 안 쓴 획 가운데 G2 인 획을 **끝까지 전부** 아주 흐린 점선으로 (G1 의 35% 보다 흐리게).
+   예전 G2 는 "지금 획의 시작점 + 첫 30%" 만 보여서, 처음 보는 글자(획마다 단계가 다름)에서는
+   어떤 획은 진하게 · 어떤 획은 안 보이고 · 지금 획은 3분의 1만 — 글자가 중간까지만 그려진 것처럼 보였습니다.
+   이제는 G0~G2 인 동안 글자 모양 전체가 늘 보이고, G3 · 혼자 한 번 더 · 받아쓰기만 빈 칸입니다 */
+const WR_G2_ALPHA = 0.22;
+function wrGhostLetter(ctx, k, w, bw){
+  const T = WR.tmpl;
+  ctx.save();
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  for(let i=w.si;i<T.length;i++){
+    if(wrStepAt(w, i) !== 2) continue;
+    ctx.globalAlpha = WR_G2_ALPHA;
+    ctx.strokeStyle = '#5F8FA8'; ctx.lineWidth = Math.max(3, bw*0.42);
+    ctx.setLineDash([0.1, Math.max(7, bw*0.75)]);
+    wrPath(ctx, T[i], k); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  for(let i=w.si;i<T.length;i++){
+    if(wrStepAt(w, i) !== 2) continue;
+    const now = i === w.si;
+    ctx.globalAlpha = now ? 0.55 : 0.28;
+    ctx.beginPath();
+    ctx.arc(T[i][0][0]*k, T[i][0][1]*k, Math.max(4, bw*(now ? 0.42 : 0.3)), 0, Math.PI*2);
+    ctx.fillStyle = now ? WR_NOW : '#5F8FA8'; ctx.fill();
+  }
+  ctx.restore();
+}
 function wrPaint(){
   const ctx = WR.ctx, k = WR.size, w = wrState();
   if(!ctx) return;
@@ -14543,8 +14784,9 @@ function wrPaint(){
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
   const bw = Math.max(9, k*0.05);       /* 획 굵기 */
 
-  /* ① 아직 안 쓴 획 — 흐린 밑그림 (G0 그대로 · G1 더 흐리게 · G2 부터 안 보임) */
+  /* ① 아직 안 쓴 획 — 흐린 밑그림 (G0 그대로 · G1 더 흐리게 · G2 아주 흐린 점선 글자 · G3 부터 안 보임) */
   ctx.setLineDash([]);
+  if(!demo && !WR.cover && !w.done) wrGhostLetter(ctx, k, w, bw);
   for(let i=w.si+1;i<WR.tmpl.length;i++){
     const s = wrStepAt(w, i);
     if(s >= 2) continue;
@@ -14585,21 +14827,7 @@ function wrPaint(){
     const t = WR.tmpl[w.si];
     const strong = w.fail >= 1;                       /* 1회 실패하면 더 또렷하게 */
     const sNow = wrStepAt(w, w.si);
-    /* 22-B G2: 지금 쓸 획의 시작점과 첫 부분만 살짝 */
-    if(sNow === 2 && !demo){
-      const seg = wrPartial(t, 0.3);
-      ctx.save();
-      ctx.globalAlpha = 0.5;
-      if(seg.length > 1){
-        ctx.setLineDash([bw*0.9, bw*0.85]);
-        ctx.strokeStyle = WR_NOW; ctx.lineWidth = bw*0.8;
-        wrPath(ctx, seg, k); ctx.stroke();
-      }
-      ctx.beginPath();
-      ctx.arc(t[0][0]*k, t[0][1]*k, Math.max(8, k*0.03), 0, Math.PI*2);
-      ctx.fillStyle = WR_NOW; ctx.fill();
-      ctx.restore();
-    }
+    /* 22-B G2 → 28-B: 글자 전체가 아주 흐린 점선으로 보입니다 (wrGhostLetter). 지금 쓸 획은 시작점만 조금 더 또렷하게 */
     if(sNow <= 1 && !demo){
     ctx.save();
     const fa = sNow === 1 ? WR_FADE : 1;              /* 22-B G1: 흐린 가이드 (모든 그리기를 이 비율로) */
