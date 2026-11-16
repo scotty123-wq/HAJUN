@@ -359,38 +359,60 @@ body.tab .xfqr{width:min(100%,440px,60vh);}
 .wfx .glint{width:2.2%;height:2.2%;background:radial-gradient(circle, #fff 0 18%, rgba(255,255,255,0) 60%);opacity:0;
   animation-name:wGlint;animation-duration:4s;animation-timing-function:ease-in-out;}
 @keyframes wGlint{0%,70%,100%{opacity:0;transform:scale(.4);}80%{opacity:1;transform:scale(1.2);}90%{opacity:.4;transform:scale(.8);}}
-/* 하준이 — 칸보다 조금 크게, 발이 칸 아래쪽에 닿게 */
+/* ★ 28차: 하준이 — 만화 주인공. 칸보다 크게(가로 약 1.25배, 키는 칸 위로 넘침), 발이 칸 아래쪽에 닿게.
+   g.kb 는 몸 전체: 서 있으면 숨쉬기, 걸음마다 찌그러졌다(squash) 늘어나며(stretch) 통통, 멈추면(.land) 살짝 찌그러졌다 펴짐.
+   다리·팔은 걸음 절반 시간에 짧게 흔들고, 발밑에서 먼지가 퐁퐁(.kdust). 앞모습 눈은 가끔 두리번·깜빡 */
 #map.t23 #player{transition:transform var(--stp,.19s) cubic-bezier(.33,.12,.45,1);}
-#player .kid{position:absolute;left:-7.5%;width:115%;height:161%;top:-64%;overflow:visible;}
+#player .kid{position:absolute;left:-14%;width:128%;height:179.2%;top:-73%;overflow:visible;}
 #player .tv{display:none;}
 #player.f-d .tv-f, #player.f-u .tv-b, #player.f-l .tv-s, #player.f-r .tv-s{display:inline;}
-#player.f-l .kid{transform:scaleX(-1);}
+#player .kflip{transform-origin:50px 0;}
+#player.f-l .kflip{transform:scaleX(-1);}
 #player .dk{filter:brightness(.8);}
-#player .kl, #player .ka{transition:transform var(--stp,.19s) ease-in-out;}
-#player .tv-s .kl{transform-origin:50.5px 98px;}
-#player .tv-s .ka{transform-origin:50px 62px;}
-#player .tv-f .ka1, #player .tv-b .ka1{transform-origin:34px 61px;}
-#player .tv-f .ka2, #player .tv-b .ka2{transform-origin:66px 61px;}
-#player.walk.st0 .tv-s .kl1, #player.walk.st1 .tv-s .kl2{transform:rotate(-24deg);}
-#player.walk.st0 .tv-s .kl2, #player.walk.st1 .tv-s .kl1{transform:rotate(22deg);}
-#player.walk.st0 .tv-s .ka1, #player.walk.st1 .tv-s .ka2{transform:rotate(28deg);}
-#player.walk.st0 .tv-s .ka2, #player.walk.st1 .tv-s .ka1{transform:rotate(-26deg);}
+#player .kb{transform-origin:50px 132px;animation:kBreath 2.6s ease-in-out infinite;animation-delay:var(--ph,0s);}
+#player.walk .kb{animation:kHopA var(--stp,.19s) ease-out;animation-delay:0s;}
+#player.walk.st1 .kb{animation-name:kHopB;}
+#player.land .kb{animation:kLand .3s ease-out;animation-delay:0s;}
+@keyframes kBreath{0%,100%{transform:scale(1,1);}50%{transform:scale(1.012,1.026);}}
+@keyframes kHopA{0%{transform:translateY(0) scale(1.08,.9);}35%{transform:translateY(-7px) scale(.94,1.07);}72%{transform:translateY(-1.5px) scale(1,1);}100%{transform:translateY(0) scale(1.03,.97);}}
+@keyframes kHopB{0%{transform:translateY(0) scale(1.08,.9);}35%{transform:translateY(-7px) scale(.94,1.07);}72%{transform:translateY(-1.5px) scale(1,1);}100%{transform:translateY(0) scale(1.03,.97);}}
+@keyframes kLand{0%{transform:scale(1.1,.88);}55%{transform:scale(.97,1.04);}100%{transform:scale(1,1);}}
+#player .kl, #player .ka{transition:transform calc(var(--stp,.19s) * .55) cubic-bezier(.3,1.5,.6,1);}
+#player .tv-s .kl{transform-origin:50px 105px;}
+#player .tv-s .ka{transform-origin:50.5px 73px;}
+#player .tv-f .ka1, #player .tv-b .ka1{transform-origin:36px 72px;}
+#player .tv-f .ka2, #player .tv-b .ka2{transform-origin:64px 72px;}
+#player .tv-f .kl, #player .tv-b .kl{transform-origin:50px 131px;}
+#player.walk.st0 .tv-s .kl1, #player.walk.st1 .tv-s .kl2{transform:rotate(-32deg);}
+#player.walk.st0 .tv-s .kl2, #player.walk.st1 .tv-s .kl1{transform:rotate(28deg);}
+#player.walk.st0 .tv-s .ka1, #player.walk.st1 .tv-s .ka2{transform:rotate(36deg);}
+#player.walk.st0 .tv-s .ka2, #player.walk.st1 .tv-s .ka1{transform:rotate(-34deg);}
 #player.walk.st0 .tv-f .kl1, #player.walk.st1 .tv-f .kl2,
-#player.walk.st0 .tv-b .kl2, #player.walk.st1 .tv-b .kl1{transform:translateY(-3.5px) scaleY(.94);}
-#player.walk.st0 .tv-f .ka1, #player.walk.st1 .tv-b .ka2{transform:rotate(9deg);}
-#player.walk.st1 .tv-f .ka2, #player.walk.st0 .tv-b .ka1{transform:rotate(-9deg);}
-#player.walk.st0 .tv-f .ka2, #player.walk.st1 .tv-b .ka1{transform:rotate(-3deg);}
-#player.walk.st1 .tv-f .ka1, #player.walk.st0 .tv-b .ka2{transform:rotate(3deg);}
-#player.walk .kid{animation:kBobA var(--stp,.19s) ease-in-out;}
-#player.walk.st1 .kid{animation-name:kBobB;}
-#player.walk.f-l .kid{animation-name:kBobAL;}
-#player.walk.f-l.st1 .kid{animation-name:kBobBL;}
-@keyframes kBobA{0%,100%{transform:translateY(0);}50%{transform:translateY(-3%);}}
-@keyframes kBobB{0%,100%{transform:translateY(0);}50%{transform:translateY(-3%);}}
-@keyframes kBobAL{0%,100%{transform:scaleX(-1) translateY(0);}50%{transform:scaleX(-1) translateY(-3%);}}
-@keyframes kBobBL{0%,100%{transform:scaleX(-1) translateY(0);}50%{transform:scaleX(-1) translateY(-3%);}}
-#player .ksh{transform-box:fill-box;transform-origin:50% 50%;transition:transform var(--stp,.19s);}
-#player.walk .ksh{transform:scaleX(.88);}
+#player.walk.st0 .tv-b .kl2, #player.walk.st1 .tv-b .kl1{transform:translateY(-6px) scaleY(.9);}
+#player.walk.st0 .tv-f .ka1, #player.walk.st1 .tv-b .ka2{transform:rotate(22deg);}
+#player.walk.st1 .tv-f .ka2, #player.walk.st0 .tv-b .ka1{transform:rotate(-22deg);}
+#player.walk.st0 .tv-f .ka2, #player.walk.st1 .tv-b .ka1{transform:rotate(-6deg);}
+#player.walk.st1 .tv-f .ka1, #player.walk.st0 .tv-b .ka2{transform:rotate(6deg);}
+#player .keye{transform-origin:50px 49.5px;}
+#player:not(.walk) .tv-f .keye{animation:kLook 7s ease-in-out infinite;animation-delay:var(--ph,0s);}
+@keyframes kLook{0%,30%,100%{transform:translateX(0) scaleY(1);}32%{transform:translateX(0) scaleY(.1);}34%,62%{transform:translateX(0) scaleY(1);}67%,75%{transform:translateX(-2px) scaleY(1);}81%,90%{transform:translateX(2px) scaleY(1);}95%{transform:translateX(0) scaleY(1);}}
+#player .ksh{transform-box:fill-box;transform-origin:50% 50%;}
+#player.walk .ksh{animation:kShA var(--stp,.19s) ease-out;}
+#player.walk.st1 .ksh{animation-name:kShB;}
+@keyframes kShA{0%,100%{transform:scale(1.06,1);}35%{transform:scale(.78,.85);}}
+@keyframes kShB{0%,100%{transform:scale(1.06,1);}35%{transform:scale(.78,.85);}}
+/* 발밑 먼지 퐁퐁 — 발을 디딜 때마다 번갈아 한쪽씩 (물가는 물보라 색) */
+#player .kdust{position:absolute;left:-10%;right:-10%;bottom:-6%;height:34%;pointer-events:none;}
+#player .kdust b{position:absolute;bottom:0;width:34%;height:70%;border-radius:50%;opacity:0;
+  background:radial-gradient(circle at 42% 40%, rgba(255,255,255,.95), rgba(236,226,204,.75) 52%, rgba(236,226,204,0) 72%);}
+#player .kdust b:nth-child(1){left:6%;}
+#player .kdust b:nth-child(2){right:6%;}
+#map.r-water #player .kdust b{background:radial-gradient(circle at 42% 40%, #fff, rgba(190,232,255,.8) 52%, rgba(190,232,255,0) 72%);}
+#map.r-cave #player .kdust b{background:radial-gradient(circle at 42% 40%, rgba(240,236,255,.9), rgba(180,170,210,.6) 52%, rgba(180,170,210,0) 72%);}
+#player.walk.st0 .kdust b:nth-child(1){animation:kDustL .45s ease-out;}
+#player.walk.st1 .kdust b:nth-child(2){animation:kDustR .45s ease-out;}
+@keyframes kDustL{0%{opacity:.95;transform:translate(30%,0) scale(.3);}100%{opacity:0;transform:translate(-40%,-30%) scale(1.15);}}
+@keyframes kDustR{0%{opacity:.95;transform:translate(-30%,0) scale(.3);}100%{opacity:0;transform:translate(40%,-30%) scale(1.15);}}
 /* 풀숲·물에 서 있으면 발 앞에 겹치는 풀/물결 */
 .kft{display:none;position:absolute;left:4%;width:92%;bottom:-4%;height:42%;pointer-events:none;}
 .kft svg{width:100%;height:100%;display:block;overflow:visible;}
@@ -401,8 +423,13 @@ body.tab .xfqr{width:min(100%,440px,60vh);}
 /* 따라오는 친구 */
 #fol{position:absolute;left:0;top:0;width:8.3333%;height:8.3333%;pointer-events:none;
   transition:transform var(--stp,.19s) cubic-bezier(.33,.12,.45,1);}
-#fol .fsh{position:absolute;left:18%;right:18%;bottom:2%;height:18%;border-radius:50%;background:rgba(0,0,0,.24);}
-#fol .fimg{position:absolute;left:4%;width:92%;height:92%;bottom:6%;transform-origin:50% 100%;
+/* ★ 28차: 친구를 칸의 1.5~1.8배로 크게 (작은 친구 zS · 보통 zM · 큰 친구 zL — folSize).
+   발(아래)을 칸 아래쪽에 맞추고 가운데 정렬, 위·옆으로 칸 밖까지 넘칩니다 */
+#fol{--fk:1.65;}
+#fol.zS{--fk:1.5;}
+#fol.zL{--fk:1.8;}
+#fol .fsh{position:absolute;left:calc(50% - var(--fk) * 30%);width:calc(var(--fk) * 60%);bottom:1%;height:20%;border-radius:50%;background:rgba(0,0,0,.24);}
+#fol .fimg{position:absolute;left:calc(50% - var(--fk) * 50%);width:calc(var(--fk) * 100%);height:calc(var(--fk) * 100%);bottom:4%;transform-origin:50% 100%;
   animation:folIdle 2.4s ease-in-out infinite;animation-delay:var(--ph,0s);}
 #fol .fimg .artbox{width:100%;height:100%;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25));}
 #fol.f-r .fimg .artbox{transform:scaleX(-1);}
@@ -2165,6 +2192,61 @@ body.tab .wrprize span{font-size:14px;padding:3px 8px;}
 .clfoot{flex:0 0 auto;align-self:center;text-align:center;font-weight:800;font-size:12px;color:var(--ink);background:rgba(255,255,255,.8);border-radius:10px;padding:1px 10px;}
 .clrow{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .clrow .btn{min-height:54px;font-size:16px;}
+/* ★ 28차: 옷장 "🧒 나" — 얼굴·머리 꾸미기 단추 */
+.claved{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:92px;min-height:92px;padding:4px;
+  font-size:13px;line-height:1.15;flex:0 0 auto;}
+.claved .e{font-size:30px;line-height:1;}
+.claved .t{font-weight:900;word-break:keep-all;}
+/* ★ 28차: 나를 꾸며요 화면 */
+.avstage{flex:0 0 auto;display:flex;align-items:center;justify-content:center;min-height:150px;
+  background:radial-gradient(circle at 50% 55%, #FFF8D8 0 38%, rgba(255,248,216,0) 62%), linear-gradient(180deg,#DFF3FF,#EAF9E4);
+  border:4px solid var(--edge);border-radius:20px;padding:4px;}
+.avkid{width:118px;height:150px;}
+.avkid svg{width:100%;height:100%;display:block;overflow:visible;}
+.avcats{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.avcat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:52px;padding:3px 2px;
+  background:#fff;border:3px solid var(--edge);border-radius:14px;box-shadow:0 3px 0 var(--edge);cursor:pointer;
+  font-family:inherit;color:var(--ink,#26331F);}
+.avcat:active{transform:translateY(3px);box-shadow:none;}
+.avcat .e{font-size:22px;line-height:1.05;}
+.avcat .t{font-weight:900;font-size:11.5px;line-height:1.1;white-space:nowrap;}
+.avcat.on{background:var(--sun);border-width:4px;}
+.avcat.avrnd{background:linear-gradient(160deg,#FFF6C8,#FFE1EC 55%,#DDF1FF);}
+.avopts{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;align-content:start;
+  padding:8px;background:var(--cream);border:4px solid var(--edge);border-radius:20px;-webkit-overflow-scrolling:touch;}
+.avopt{position:relative;display:flex;align-items:center;justify-content:center;min-height:84px;padding:4px;
+  background:#fff;border:3px solid var(--edge);border-radius:16px;box-shadow:0 3px 0 var(--edge);cursor:pointer;font-family:inherit;}
+.avopt:active{transform:translateY(3px);box-shadow:none;}
+.avopt.on{background:#E3F8DA;border-color:#2E8A46;border-width:4px;}
+.avopt .ic{width:72px;height:72px;display:block;}
+.avopt .ic svg{width:100%;height:100%;display:block;overflow:visible;}
+.avopt .ck{position:absolute;right:3px;top:2px;font-size:15px;}
+.avrow{flex:0 0 auto;display:grid;grid-template-columns:1fr 1.4fr;gap:8px;}
+.avrow.one{grid-template-columns:1fr;}
+.avrow .btn{min-height:54px;font-size:17px;}
+@media (max-height:780px){
+  .avstage{min-height:120px;}
+  .avkid{width:94px;height:120px;}
+  .avcat{min-height:48px;}
+  .avcat .e{font-size:19px;}
+  .avopts{grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;padding:6px;}
+  .avopt{min-height:72px;}
+  .avopt .ic{width:60px;height:60px;}
+  .avrow .btn{min-height:48px;font-size:16px;}
+  .claved{width:84px;min-height:84px;}
+  .claved .e{font-size:26px;}
+}
+@media (max-height:600px){
+  /* 28차: 꾸미기 다음 바로 오는 친구 고르기 — 320×568 에서 19px 넘치던 것 */
+  .pick-grid{gap:8px;}
+  .pick-card .artbox{width:64px !important;height:64px !important;flex-basis:64px;}   /* artBox 가 인라인 92px 을 넣어서 !important */
+  .avstage{min-height:100px;}
+  .avkid{width:78px;height:100px;}
+  .avcat{min-height:46px;}
+  .avcat .t{font-size:10.5px;}
+  .avopt{min-height:64px;}
+  .avopt .ic{width:54px;height:54px;}
+}
 @media (max-height:780px){
   #map .stfab{width:46px;min-height:46px;font-size:19px;right:6px;top:58px;}
   #map .stfab .wt{font-size:9px;}
@@ -3306,242 +3388,443 @@ function ballSvg(cls){
     <path d="M30 26 Q38 18 50 17" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55"/>
   </svg>`;
 }
-/* 지도 위 하준이 — 21차 B: 옷장에서 고른 모자·옷·가방을 입습니다.
-   ★ 23차: 아빠 "트레이너도 더 현실성 있게" — 2.9등신 어린이 모험가로 다시 그렸습니다.
-   빛은 왼쪽 위 하나. 머리카락 결·옷 주름·명암 · 앞/뒤/옆 세 방향(왼쪽은 옆모습을 뒤집음).
-   다리·팔은 묶음(g.kl / g.ka)이라 CSS 가 걸음마다 흔듭니다. 모자·옷·가방은 세 방향 모두에 그립니다.
-   kidSvg(look) 은 옷장·코스튬 그림용 앞모습 한 장, trainerSvg(look) 는 지도용 세 방향 묶음입니다. */
-const KID_SKIN = '#F7D2AE', KID_SKIN_D = '#E0A982', KID_HAIR = '#4B2F22', KID_HAIR_L = '#7E5440',
-      KID_PANTS = '#C9A26B', KID_PANTS_D = '#9F7B4C', KID_SHOE = '#D9483B', KID_LINE = '#3A2A22';
-const KID_SHIRT0 = {c:'#3D7FD6', d:'#2A5FA8'};   /* 아무것도 안 입었을 때 윗옷 */
+/* =========================================================
+   ★ 28차: 지도 위 하준이 — 만화 주인공 모험가 + 하준이 닮게 꾸미기
+   ---------------------------------------------------------
+   아빠: "걷는 게 그래도 만화인데 너무 사실 같지 않아?" → 23차 3등신 사실풍을 2.2등신 만화풍으로.
+   큰 머리 · 크고 반짝이는 눈(하이라이트 2개) · 굵은 외곽선 · 선명한 단색 + 그림자 한 단(빛은 왼쪽 위).
+   특정 만화 주인공을 닮지 않게: 모자에 마크 없음, 조끼 없음 — 청록 모자 · 주황 티셔츠 · 남색 반바지가 기본.
+   · 세 방향(앞 tv-f · 뒤 tv-b · 옆 tv-s, 왼쪽은 g.kflip 을 CSS 가 뒤집음)
+   · 몸 전체는 g.kb — CSS 가 걸음마다 통통 튀고(squash & stretch), 서 있으면 숨쉬기
+   · 다리 g.kl · 팔 g.ka 는 걸음마다 짧게 흔들고, 앞모습 눈(g.keye)은 가끔 두리번·깜빡
+   · 얼굴·머리는 S.av(꾸미기)를 따릅니다. 모자(21-B 코스튬 또는 기본 모자)를 쓰면 모자 아래 머리카락만 보입니다.
+     왕관은 머리 위에 얹는 거라 머리 모양이 다 보입니다.
+   kidSvg(look, av) 은 옷장·코스튬·꾸미기 그림용 앞모습 한 장, trainerSvg(look) 는 지도용 세 방향 묶음입니다.
+   ========================================================= */
+const KID_LINE = '#2B1D18';
+const KST  = `stroke="${KID_LINE}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"`;
+const KST2 = `stroke="${KID_LINE}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"`;
+const KID_PANTS = '#34508F', KID_PANTS_D = '#22376B', KID_SHOE = '#E5483A', KID_SHOE_D = '#A82E24';
+const KID_SHIRT0 = {c:'#FF9F2E', d:'#D46F12'};   /* 아무것도 안 입었을 때 윗옷 */
 const KID_CAP0   = {c:'#2FA39A', d:'#1E746D'};   /* 아무것도 안 썼을 때 모자 */
-const KST = `stroke="${KID_LINE}" stroke-width="1.5" stroke-linejoin="round"`;
-function kidRes(look){
-  const L = look || kidLook();
+
+/* ---------- 꾸미기 고르기 (S.av) — 값은 모두 짧은 글자라 저장·QR 이 작습니다 ---------- */
+const AV_HAIR = [
+  {k:'short', n:'짧은 머리'}, {k:'bowl', n:'바가지 머리'}, {k:'spiky', n:'삐죽삐죽 머리'},
+  {k:'curly', n:'곱슬머리'}, {k:'swoop', n:'옆으로 넘긴 머리'}];
+const AV_HC = [
+  {k:'black', n:'까만 머리', c:'#2A2321', l:'#5C4D44'},
+  {k:'brown', n:'갈색 머리', c:'#5A3A26', l:'#8A6241'},
+  {k:'chestnut', n:'밤색 머리', c:'#7C3F22', l:'#B0683C'},
+  {k:'light', n:'밝은 갈색 머리', c:'#A8743F', l:'#D8A86A'}];
+const AV_SKIN = [
+  {k:'s1', n:'밝은 피부', c:'#FFE6D2', d:'#F0BE9E'},
+  {k:'s2', n:'보통 피부', c:'#F8D0A8', d:'#E2A77B'},
+  {k:'s3', n:'구릿빛 피부', c:'#E0A877', d:'#BF8351'},
+  {k:'s4', n:'갈색 피부', c:'#B47A4E', d:'#8C5833'}];
+const AV_EYE = [{k:'round', n:'동그란 눈'}, {k:'calm', n:'가는 눈'}, {k:'smile', n:'웃는 눈'}];
+const AV_GL  = [{k:'none', n:'안경 안 쓰기'}, {k:'round', n:'동그란 안경'}, {k:'square', n:'네모 안경'}];
+const AV_BL  = [{k:'on', n:'발그레한 볼'}, {k:'off', n:'그냥 볼'}];
+const AV_HAT = [{k:'on', n:'모자 쓰기'}, {k:'off', n:'모자 벗기'}];
+const AV_CATS = [
+  {k:'h',   e:'💇', n:'머리 모양', opts:AV_HAIR},
+  {k:'hc',  e:'🎨', n:'머리색',    opts:AV_HC},
+  {k:'sk',  e:'✋', n:'피부색',    opts:AV_SKIN},
+  {k:'ey',  e:'👀', n:'눈',        opts:AV_EYE},
+  {k:'gl',  e:'👓', n:'안경',      opts:AV_GL},
+  {k:'bl',  e:'😊', n:'볼',        opts:AV_BL},
+  {k:'hat', e:'🧢', n:'모자',      opts:AV_HAT}];
+const AV_DEF = {h:'short', hc:'black', sk:'s2', ey:'round', gl:'none', bl:'on', hat:'on'};
+/* 예전 저장(값 없음)·이상한 값 → 기본 모습. 언제나 7칸이 다 찬 새 객체를 돌려줍니다 */
+function saneAv(d){
+  const a = {};
+  AV_CATS.forEach(c=>{
+    const v = d && typeof d === 'object' ? d[c.k] : null;
+    a[c.k] = c.opts.some(o => o.k === v) ? v : AV_DEF[c.k];
+  });
+  return a;
+}
+const avOpt = (list, k) => list.find(o => o.k === k) || list[0];
+
+function kidRes(look, av){
+  const L = look || kidLook(), A = saneAv(av || S.av);
   const cap = L.cap && COS_BY_ID[L.cap], shirt = L.shirt && COS_BY_ID[L.shirt], bag = L.bag && COS_BY_ID[L.bag];
   const sc = shirt ? COS_COL[shirt.col] : KID_SHIRT0;
   const p = shirt ? cosPaint(sc) : {defs:'', f:sc.c};
-  return { hat: cap ? cap.kind : 'cap', hc: cap ? COS_COL[cap.col] : KID_CAP0,
-           sk: shirt ? shirt.kind : 'tee', sc, sf: p.f, defs: p.defs, bag: bag ? COS_COL[bag.col] : null };
+  const skin = avOpt(AV_SKIN, A.sk), hc = avOpt(AV_HC, A.hc);
+  const hat = cap ? cap.kind : (A.hat === 'on' ? 'cap' : 'none');
+  return { hat, hatC: cap ? COS_COL[cap.col] : KID_CAP0,
+           cover: hat === 'cap' || hat === 'beanie' || hat === 'straw',   /* 머리를 덮는 모자 */
+           shirt: shirt ? shirt.kind : 'tee', sc, sf: p.f, defs: p.defs, bag: bag ? COS_COL[bag.col] : null,
+           skin: skin.c, skinD: skin.d, hair: hc.c, hairL: hc.l, hs: A.h, ey: A.ey, gl: A.gl, bl: A.bl === 'on' };
 }
+
+/* ---------- 몸 ---------- */
 /* 다리 — 앞/뒤 (x = 다리 왼쪽 끝) */
-function kLegFB(x, cls, back){
+function kLegFB(R, x, cls, back){
   return `<g class="kl ${cls}">
-    <rect x="${x}" y="97" width="8" height="25" rx="3.6" fill="${KID_SKIN}" ${KST}/>
-    <path d="M${x+5.6} 100 V117" stroke="${KID_SKIN_D}" stroke-width="2" opacity=".55"/>
-    <rect x="${x-.3}" y="116.5" width="8.6" height="6" rx="2" fill="#FBFAF4" ${KST}/>
-    <path d="M${x-2} 128 Q${x-2} 121.5 ${x+4} 121.5 Q${x+10} 121.5 ${x+10} 128 Q${x+10} 132 ${x+4} 132 Q${x-2} 132 ${x-2} 128 Z" fill="${KID_SHOE}" ${KST}/>
-    ${back ? `<path d="M${x-1.6} 129.6 H${x+9.6}" stroke="#7A2A22" stroke-width="2" stroke-linecap="round"/>`
-           : `<path d="M${x-1.4} 129.4 H${x+9.4}" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M${x+1} 124.6 Q${x+4} 123.4 ${x+7} 124.6" stroke="#fff" stroke-width="1.1" fill="none"/>`}
+    <rect x="${x}" y="103" width="7" height="16" rx="3.2" fill="${R.skin}" ${KST2}/>
+    <rect x="${x-.3}" y="115.5" width="7.6" height="5" rx="1.8" fill="#FBFAF4" ${KST2}/>
+    <path d="M${x-3} 126.5 Q${x-3} 120 ${x+3.5} 120 Q${x+10} 120 ${x+10} 126.5 Q${x+10} 131.6 ${x+3.5} 131.6 Q${x-3} 131.6 ${x-3} 126.5 Z" fill="${KID_SHOE}" ${KST}/>
+    <path d="M${x-2.2} 129 H${x+9.2}" stroke="${back ? KID_SHOE_D : '#fff'}" stroke-width="2" stroke-linecap="round"/>
+    ${back ? '' : `<path d="M${x-.6} 123.8 Q${x+1.4} 121.9 ${x+4} 121.7" stroke="rgba(255,255,255,.6)" stroke-width="1.6" fill="none" stroke-linecap="round"/>`}
   </g>`;
 }
 /* 다리 — 옆 (오른쪽을 봄) */
-function kLegS(cls, dark){
+function kLegS(R, cls, dark){
   const x = 46.5;
   return `<g class="kl ${cls}${dark ? ' dk' : ''}">
-    <rect x="${x}" y="96" width="8" height="26" rx="3.6" fill="${KID_SKIN}" ${KST}/>
-    <rect x="${x-.3}" y="116.5" width="8.6" height="6" rx="2" fill="#FBFAF4" ${KST}/>
-    <path d="M${x-1.6} 127.5 Q${x-1.6} 122 ${x+3} 122 L${x+7.5} 122 Q${x+13.5} 123 ${x+13.5} 128 Q${x+13.5} 132 ${x+8.5} 132 H${x+1} Q${x-1.6} 132 ${x-1.6} 129.5 Z" fill="${KID_SHOE}" ${KST}/>
-    <path d="M${x-1} 129.6 H${x+13}" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/>
+    <rect x="${x}" y="103" width="7" height="16" rx="3.2" fill="${R.skin}" ${KST2}/>
+    <rect x="${x-.3}" y="115.5" width="7.6" height="5" rx="1.8" fill="#FBFAF4" ${KST2}/>
+    <path d="M${x-3} 127 Q${x-3} 120.5 ${x+2} 120.5 L${x+7} 120.5 Q${x+14} 121.5 ${x+14} 127 Q${x+14} 131.6 ${x+8.5} 131.6 H${x-.5} Q${x-3} 131.6 ${x-3} 129 Z" fill="${KID_SHOE}" ${KST}/>
+    <path d="M${x-2.2} 129.2 H${x+13.2}" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <path d="M${x+5} 123 Q${x+8} 122 ${x+11} 123.4" stroke="rgba(255,255,255,.6)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
   </g>`;
 }
-/* 팔 — 앞/뒤 왼쪽 팔 모양 (오른팔은 거울) */
+/* 팔 — 앞/뒤 왼쪽 팔 (오른팔은 거울) */
 function kArmIn(R){
-  const stripe = R.sk === 'stripe' ? `<path d="M30.4 68.4 L36.9 69" stroke="#fff" stroke-width="2.2" opacity=".9"/>` : '';
-  return `<path d="M37.6 59.6 Q31.4 60.8 30 67 L29.2 72.6 Q33 74.4 36.8 73.3 Z" fill="${R.sf}" ${KST}/>${stripe}
-    <path d="M33.5 61.4 Q31.2 64 30.6 70" stroke="rgba(255,255,255,.25)" stroke-width="1.6" fill="none"/>
-    <rect x="29.5" y="71.5" width="6.5" height="15" rx="3.2" fill="${KID_SKIN}" ${KST}/>
-    <circle cx="32.7" cy="88" r="3.9" fill="${KID_SKIN}" ${KST}/>
-    <path d="M31 85.6 Q33 84.6 34.8 85.6" stroke="${KID_SKIN_D}" stroke-width="1" fill="none"/>`;
+  const stripe = R.shirt === 'stripe' ? `<path d="M29.6 79.6 L36.2 80.2" stroke="#fff" stroke-width="2.2" opacity=".9"/>` : '';
+  return `<path d="M37 71 Q31 72 29.2 78.5 L28.4 83.6 Q32.6 85.4 36.6 84 Z" fill="${R.sf}" ${KST2}/>${stripe}
+    <rect x="29.4" y="82.2" width="6.4" height="10.5" rx="3" fill="${R.skin}" ${KST2}/>
+    <circle cx="32.6" cy="94.2" r="4.4" fill="${R.skin}" ${KST2}/>
+    <path d="M31 92 Q32.8 91 34.6 92" stroke="${R.skinD}" stroke-width="1.1" fill="none"/>`;
 }
-function kArmFB(cls, right){
-  return `<g class="ka ${cls}">${right ? `<g transform="matrix(-1 0 0 1 100 0)">${kArmIn(this.R)}</g>` : kArmIn(this.R)}</g>`;
+function kArmFB(R, cls, right){
+  return `<g class="ka ${cls}">${right ? `<g transform="matrix(-1 0 0 1 100 0)">${kArmIn(R)}</g>` : kArmIn(R)}</g>`;
 }
 /* 팔 — 옆 */
 function kArmS(R, cls, dark){
-  const stripe = R.sk === 'stripe' ? `<path d="M47.6 68.6 L55 68.9" stroke="#fff" stroke-width="2.2" opacity=".9"/>` : '';
-  return `<g class="ka ${cls}${dark ? ' dk' : ''}"><path d="M45.5 59.8 Q52.8 58.8 54.6 64 L55.6 72.6 Q51.6 74.2 47.4 73.1 Z" fill="${R.sf}" ${KST}/>${stripe}
-    <rect x="47.8" y="71.5" width="6.5" height="15" rx="3.2" fill="${KID_SKIN}" ${KST}/>
-    <circle cx="51" cy="88" r="3.8" fill="${KID_SKIN}" ${KST}/></g>`;
+  const stripe = R.shirt === 'stripe' ? `<path d="M46.8 79.8 L55.2 80" stroke="#fff" stroke-width="2.2" opacity=".9"/>` : '';
+  return `<g class="ka ${cls}${dark ? ' dk' : ''}"><path d="M45.2 71.6 Q53 70 55 76 L55.8 83.6 Q51.8 85.2 47.4 84 Z" fill="${R.sf}" ${KST2}/>${stripe}
+    <rect x="47.8" y="82.2" width="6.4" height="10.5" rx="3" fill="${R.skin}" ${KST2}/>
+    <circle cx="51" cy="94.2" r="4.3" fill="${R.skin}" ${KST2}/></g>`;
 }
 /* 윗옷 무늬 */
 function kShirtDeco(R, side){
-  if(R.sk === 'stripe') return side
-    ? `<path d="M41.4 67 H59.6 M40.8 74 H60.2 M40.3 81 H60.8" stroke="#fff" stroke-width="2.5" opacity=".9"/>`
-    : `<path d="M37.6 67 H62.4 M36.9 74 H63.1 M36.2 81 H63.8" stroke="#fff" stroke-width="2.6" opacity=".9"/>`;
-  if(R.sk === 'starry') return `<polygon points="${starPts(side ? 44.6 : 50, side ? 69 : 72, side ? 4.2 : 6.5, side ? 1.8 : 2.8)}" fill="#FFD23C" stroke="${KID_LINE}" stroke-width="1" stroke-linejoin="round"/>`;
+  if(R.shirt === 'stripe') return side
+    ? `<path d="M39 79 H61 M38.6 86 H61.6 M38.2 92.4 H62" stroke="#fff" stroke-width="2.6" opacity=".9"/>`
+    : `<path d="M34.8 79 H65.2 M34.3 86 H65.7 M33.8 92.4 H66.2" stroke="#fff" stroke-width="2.6" opacity=".9"/>`;
+  if(R.shirt === 'starry') return `<polygon points="${starPts(side ? 46 : 50, side ? 82 : 83, side ? 5 : 7, side ? 2.1 : 3)}" fill="#FFD23C" stroke="${KID_LINE}" stroke-width="1.2" stroke-linejoin="round"/>`;
   return '';
 }
-/* 모자 — v: f 앞 · b 뒤 · s 옆 */
+const K_TORSO_F = 'M35.5 71 Q50 66.5 64.5 71 L67 95.5 Q50 99 33 95.5 Z';
+const K_SHORTS_F = 'M34.5 93.5 H65.5 L67.5 106.5 Q59.5 109 52 107 L50 101 L48 107 Q40.5 109 32.5 106.5 Z';
+function kTorsoF(R, back){
+  return `<path d="${K_SHORTS_F}" fill="${KID_PANTS}" ${KST}/>
+    <path d="M58 94 H65.5 L67.5 106.5 Q63 108.2 58.6 108 Z" fill="rgba(0,0,0,.18)"/><path d="M34.6 96.6 H65.4" stroke="${KID_PANTS_D}" stroke-width="1.6"/>
+    ${back ? `<path d="M40 99 h5 v4.6 h-5 Z M55 99 h5 v4.6 h-5 Z" fill="none" stroke="${KID_PANTS_D}" stroke-width="1.2"/>` : ''}
+    <path d="${K_TORSO_F}" fill="${R.sf}" ${KST}/>
+    ${kShirtDeco(R)}
+    <path d="M58.5 69.4 Q63.6 70 64.5 71 L67 95.5 Q63 96.8 59.5 97.2 Q61.6 82 58.5 69.4 Z" fill="rgba(0,0,0,.15)"/>
+    <path d="M39 74 Q41 72.2 44 71.6 L42.8 89 Q40 88 39 85 Z" fill="rgba(255,255,255,.2)"/>
+    ${back ? `<path d="M50 72 Q49 84 50.5 96" stroke="rgba(0,0,0,.12)" stroke-width="1.2" fill="none"/>`
+           : `<path d="M43 68.6 Q50 75 57 68.6" stroke="${KID_LINE}" stroke-width="1.6" fill="${R.skinD}"/>`}`;
+}
+
+/* ---------- 머리카락 ----------
+   앞모습: 머리 뒤(hb · 얼굴 뒤에 그림) + 앞머리(hf · 얼굴 위). 모자를 쓰면 hb 대신 귀밑 머리(K_HB_HAT) + 모자 아래로 삐져나온 머리(hl)
+   뒷모습: 뒤통수 전체(hk) / 모자 쓰면 목덜미(K_HK_HAT + hkl)
+   옆모습: hs / 모자 쓰면 K_HS_HAT + hsl */
+/* 곱슬머리는 동그라미를 겹쳐 그립니다 — 외곽선 동그라미를 먼저, 같은 동그라미를 선 없이 위에 덮어 속 선을 지웁니다 */
+function kBumps(list, c, extra){
+  const a = list.map(([x,y,r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" ${KST}/>`).join('');
+  const b = list.map(([x,y,r]) => `<circle cx="${x}" cy="${y}" r="${r - 1.3}" fill="${c}"/>`).join('');
+  return a + (extra || '') + b;
+}
+function kArc(cx, cy, rx, ry, a0, a1, n, r){
+  const out = [];
+  for(let i=0;i<n;i++){ const a = (a0 + (a1 - a0) * i / (n - 1)) * Math.PI / 180; out.push([+(cx + rx*Math.cos(a)).toFixed(1), +(cy + ry*Math.sin(a)).toFixed(1), r]); }
+  return out;
+}
+const K_HB = {
+  short: 'M21.5 50 Q18 14 50 12 Q82 14 78.5 50 Q76.5 42 75 38 L25 38 Q23.5 42 21.5 50 Z',
+  bowl:  'M20.5 55 Q16.5 12 50 10.5 Q83.5 12 79.5 55 Q77.5 57 75.4 55.6 L75 40 L25 40 L24.6 55.6 Q22.5 57 20.5 55 Z',
+  spiky: 'M21.5 50 Q19 27 24 20 L18.5 11.5 L31 14 L33 3.5 L42 10.5 L50 1.5 L58 10.5 L67 3.5 L69 14 L81.5 11.5 L76 20 Q81 27 78.5 50 Q76.5 42 75 38 L25 38 Q23.5 42 21.5 50 Z',
+  swoop: 'M21.5 49 Q18 14 50 12 Q82 14 78.5 49 Q76.5 42 75 38 L25 38 Q23.5 42 21.5 49 Z'
+};
+const K_HF = {
+  short: 'M24 41 Q23 15.5 50 14.5 Q77 15.5 76 41 Q73.5 34.5 69 32 Q67 37.5 61.5 38.6 Q61.5 33 58.5 30.5 Q54.5 37.5 47 39 Q48 33 46 30.5 Q41 36.5 34 37.8 Q34.4 33 32 31.6 Q27.5 34.6 24 41 Z',
+  bowl:  'M22.5 46 Q21 13.5 50 13 Q79 13.5 77.5 46 Q76.5 41 75 39 Q50 36.6 25 39 Q23.5 41 22.5 46 Z',
+  spiky: 'M24 42 Q22.5 16 50 15 Q77.5 16 76 42 Q73 36 70 33 L66.5 39 L61 31.5 L56 39.5 L50 31 L44 39.5 L39 31.5 L33.5 39 L30 33 Q27 36 24 42 Z',
+  swoop: 'M24 42 Q23 15 50 14 Q77 15 76 42 Q74.5 37 72 35 Q70 38.5 64 39.6 Q58 34 46 31 Q36 29.6 30 34 Q26.5 37 24 42 Z'
+};
+const K_HB_HAT = 'M21.5 50 Q20.5 40 22.5 34 H77.5 Q79.5 40 78.5 50 Q76.5 42 75 38.5 L25 38.5 Q23.5 42 21.5 50 Z';
+const K_HL = {
+  short: 'M24.5 46 Q23.5 39 26 36.5 L31 36.5 Q30 41 32 44.5 Q28 42.5 24.5 46 Z M75.5 46 Q76.5 39 74 36.5 L69 36.5 Q70 41 68 44.5 Q72 42.5 75.5 46 Z M40 37.5 L44 42 L47 38.5 L51 42.5 L54 38.5 L58 41.5 L60.5 37.5 Z',
+  bowl:  'M27 37 H73 V41.4 Q50 42.8 27 41.4 Z M22.5 53 Q21.5 41 24 37 H28.2 L27.6 54 Q25 55.4 22.5 53 Z M77.5 53 Q78.5 41 76 37 H71.8 L72.4 54 Q75 55.4 77.5 53 Z',
+  spiky: 'M25 37 L17.5 41 L25.5 43 L21 49 L29 45 L29.5 37 Z M75 37 L82.5 41 L74.5 43 L79 49 L71 45 L70.5 37 Z M40 37.5 L43 43 L47 38.5 L50.5 44 L54 38.5 L57.5 43 L60.5 37.5 Z',
+  swoop: 'M24.5 46 Q23.5 39 26 36.5 L31 36.5 Q30 41 32 44.5 Q28 42.5 24.5 46 Z M75.5 46 Q76.5 39 74 36.5 L69 36.5 Q70 41 68 44.5 Q72 42.5 75.5 46 Z M54 37.5 Q63 38.6 70.5 43 Q69 37.8 66 37 Z'
+};
+const K_HK = {
+  short: 'M22 47 Q19.5 12.5 50 11.5 Q80.5 12.5 78 47 Q77.5 63 64 68.5 Q57 71.4 50 71 Q43 71.4 36 68.5 Q22.5 63 22 47 Z',
+  bowl:  'M20.5 53 Q17 11 50 10 Q83 11 79.5 53 Q78.5 64 64 68.5 Q50 72 36 68.5 Q21.5 64 20.5 53 Z',
+  swoop: 'M22 47 Q19.5 12.5 50 11.5 Q80.5 12.5 78 47 Q77.5 63 64 68.5 Q57 71.4 50 71 Q43 71.4 36 68.5 Q22.5 63 22 47 Z'
+};
+const K_HK_SPIKE = 'M24 22 L18.5 11.5 L31 14 L33 3.5 L42 10.5 L50 1.5 L58 10.5 L67 3.5 L69 14 L81.5 11.5 L76 22 Z';
+const K_HK_HAT = 'M22.5 35 H77.5 Q79.4 50 74 60 Q63 69.6 50 70.4 Q37 69.6 26 60 Q20.6 50 22.5 35 Z';
+const K_HS = {
+  short: 'M24.5 52 Q20 16 50 12.5 Q73 12.5 78.5 33 Q74 31 70.5 33.5 Q68.5 29 63 31 Q60 37 54 37.5 Q51.5 44 50.5 52 Q44 47.5 39 53.5 Q35 58.5 30.5 58 Q25.5 56 24.5 52 Z',
+  bowl:  'M23 55 Q19 15 50 11.5 Q74 11.5 79 38.5 Q70 39.6 60 38.6 Q55 41 52.5 51 Q45 47 39 53.5 Q34 59 29 58.6 Q23.6 57.6 23 55 Z',
+  swoop: 'M24.5 52 Q20 16 50 12.5 Q74 12.5 79 36 Q74.5 33 70 34 Q66 30.5 60 31.6 Q57.5 37 54 37.5 Q51.5 44 50.5 52 Q44 47.5 39 53.5 Q35 58.5 30.5 58 Q25.5 56 24.5 52 Z'
+};
+const K_HS_SPIKE = 'M28 25 L19 19 L30 15.5 L29 5.5 L40.5 11 L46 1.5 L53.5 10.5 L62.5 5 L63 14 L73 13 L69 21 Z';
+const K_HS_HAT = 'M25.5 36 H59 Q54 41 51.5 51 Q44 47.5 39 53.5 Q35 58.5 30.5 58 Q25 56 24.5 50 Q24 42 25.5 36 Z';
+/* 머리카락 빛 (반짝 띠) */
+function kHairShine(R, v){
+  if(v === 's') return `<path d="M33 25 Q38 18.5 46 17" stroke="${R.hairL}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+  if(v === 'b') return `<path d="M32 25 Q39 17.4 50 16.6" stroke="${R.hairL}" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <path d="M38 26 Q42 40 40 56 M50 22 Q51.5 40 50 64 M62 26 Q58 40 60 56" stroke="${R.hairL}" stroke-width="1.3" fill="none" opacity=".7"/>`;
+  return `<path d="M31 25 Q36 19.5 43 18.4" stroke="${R.hairL}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+}
+/* 앞모습: 얼굴 뒤에 그리는 머리 */
+function kHairBackF(R){
+  const c = R.hair;
+  if(R.cover){
+    let s = `<path d="${K_HB_HAT}" fill="${c}" ${KST}/>`;
+    if(R.hs === 'curly') s = kBumps([[22.5,40,5.4],[21.6,47.6,5],[77.5,40,5.4],[78.4,47.6,5]], c, s);
+    return s;
+  }
+  if(R.hs === 'curly') return kBumps(kArc(50,36,27.5,23.5,150,390,13,7.6), c, `<ellipse cx="50" cy="36" rx="27" ry="23" fill="${c}" ${KST}/>`);
+  return `<path d="${K_HB[R.hs] || K_HB.short}" fill="${c}" ${KST}/>`;
+}
+/* 앞모습: 얼굴 위에 그리는 머리 (앞머리 / 모자 아래 삐져나온 머리) */
+function kHairFrontF(R){
+  const c = R.hair;
+  if(R.cover){
+    if(R.hs === 'curly') return kBumps([[25.5,38.6,4.2],[74.5,38.6,4.2],[43.5,39.6,3.4],[50,40.4,3.6],[56.5,39.6,3.4]], c);
+    return `<path d="${K_HL[R.hs] || K_HL.short}" fill="${c}" ${KST2}/>`;
+  }
+  if(R.hs === 'curly') return kBumps(kArc(50,33.5,22,6,180,360,7,6.2).concat([[50,20,13],[36,24,9],[64,24,9]]), c) + kHairShine(R,'f');
+  const strands = R.hs === 'bowl' ? `<path d="M34 30 L33 38 M42 27 L41.6 37.4 M50 26 V37 M58 27 L58.4 37.4 M66 30 L67 38" stroke="${R.hairL}" stroke-width="1.2" opacity=".7"/>` : '';
+  return `<path d="${K_HF[R.hs] || K_HF.short}" fill="${c}" ${KST}/>${strands}${kHairShine(R,'f')}`;
+}
+function kHairBack(R){
+  const c = R.hair;
+  if(R.cover){
+    let s = `<path d="${K_HK_HAT}" fill="${c}" ${KST}/>`;
+    if(R.hs === 'spiky') s = `<path d="M23 46 L15.5 50 L24 54 Z M77 46 L84.5 50 L76 54 Z M40 68 L44 74 L48 69.6 L52 74 L56 69.6 L60 68 Z" fill="${c}" ${KST2}/>` + s;
+    if(R.hs === 'curly') s = kBumps([[23,44,5.4],[24.5,53,5.2],[77,44,5.4],[75.5,53,5.2],[38,65.5,5],[50,68.4,5],[62,65.5,5]], c, s);
+    return s + `<path d="M38 50 Q40 58 39.4 64 M50 50 V68 M62 50 Q60 58 60.6 64" stroke="${R.hairL}" stroke-width="1.3" fill="none" opacity=".7"/>`;
+  }
+  if(R.hs === 'curly') return kBumps(kArc(50,40,27,27,0,360,16,7.6), c, `<ellipse cx="50" cy="40" rx="27" ry="27" fill="${c}" ${KST}/>`) + kHairShine(R,'b');
+  const spike = R.hs === 'spiky' ? `<path d="${K_HK_SPIKE}" fill="${c}" ${KST}/>` : '';
+  const swirl = R.hs === 'swoop' ? `<path d="M56 18 Q70 22 72 36" stroke="${R.hairL}" stroke-width="2" fill="none" stroke-linecap="round"/>` : '';
+  return `${spike}<path d="${K_HK[R.hs] || K_HK.short}" fill="${c}" ${KST}/>${kHairShine(R,'b')}${swirl}`;
+}
+function kHairSide(R){
+  const c = R.hair;
+  if(R.cover){
+    let s = `<path d="${K_HS_HAT}" fill="${c}" ${KST}/>`;
+    if(R.hs === 'spiky') s = `<path d="M26 40 L16.5 41.5 L25 47 L18.5 52.5 L27.5 52 Z" fill="${c}" ${KST2}/>` + s;
+    if(R.hs === 'curly') s = kBumps([[25,42,5.4],[26,51,5.2],[31.5,57,4.8]], c, s);
+    if(R.hs === 'bowl')  s += `<path d="M60 37 L71 37 L71.4 41.6 Q65 42.4 60.4 41.4 Z" fill="${c}" ${KST2}/>`;
+    else if(R.hs !== 'curly') s += `<path d="M62 37.5 L65.4 42 L68.2 38 L71 41 L72.4 37.2 Z" fill="${c}" ${KST2}/>`;
+    return s;
+  }
+  if(R.hs === 'curly') return kBumps(kArc(47,36,25,22,100,420,14,7.4).filter(p => !(p[0] > 60 && p[1] > 34)), c,
+    `<path d="M25 52 Q20 16 50 13 Q72 13 76 34 Q66 36 56 38 Q52 44 51 52 Q43 47 38 54 Q32 59 27 57 Z" fill="${c}" ${KST}/>`) + kHairShine(R,'s');
+  const spike = R.hs === 'spiky' ? `<path d="${K_HS_SPIKE}" fill="${c}" ${KST}/>` : '';
+  return `${spike}<path d="${K_HS[R.hs] || K_HS.short}" fill="${c}" ${KST}/>${kHairShine(R,'s')}`;
+}
+
+/* ---------- 얼굴 ---------- */
+const K_FACE_F = 'M24 45 Q23.5 18 50 17.5 Q76.5 18 76 45 Q75.5 62 63 68.5 Q50 73.5 37 68.5 Q24.5 62 24 45 Z';
+const K_FACE_S = 'M26 45 Q26 18 51 17.5 Q74 18 76.5 41 Q77.5 48 76.6 52.5 L78.6 56.4 Q78 59.4 75.6 60 Q73 67 64 70 Q51 73.6 40 69 Q26.5 63 26 45 Z';
+/* 눈 하나 — cx 가운데, side 면 옆모습(조금 좁게) */
+function kEye(R, cx, side){
+  const cy = 49.5, k = side ? .8 : 1;
+  if(R.ey === 'smile') return `<path d="M${(cx-5.4*k).toFixed(1)} 51 Q${cx} 44.6 ${(cx+5.4*k).toFixed(1)} 51" stroke="#2B1C16" stroke-width="2.8" fill="none" stroke-linecap="round"/>`;
+  if(R.ey === 'calm') return `<ellipse cx="${cx}" cy="${cy+1}" rx="${(5.2*k).toFixed(1)}" ry="4.3" fill="#2B1C16"/>
+    <ellipse cx="${cx}" cy="${cy+2.6}" rx="${(3.4*k).toFixed(1)}" ry="2.2" fill="#7A4E36"/>
+    <circle cx="${(cx+1.5*k).toFixed(1)}" cy="${cy-.4}" r="1.6" fill="#fff"/>
+    <path d="M${(cx-6.2*k).toFixed(1)} ${cy-1.2} Q${cx} ${cy-4.8} ${(cx+6.2*k).toFixed(1)} ${cy-1.2}" stroke="#2B1C16" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  return `<ellipse cx="${cx}" cy="${cy}" rx="${(5.3*k).toFixed(1)}" ry="6.9" fill="#2B1C16"/>
+    <ellipse cx="${cx}" cy="${cy+2.7}" rx="${(3.7*k).toFixed(1)}" ry="3.5" fill="#7A4E36"/>
+    <circle cx="${(cx+1.7*k).toFixed(1)}" cy="${cy-2.9}" r="2.2" fill="#fff"/>
+    <circle cx="${(cx-1.9*k).toFixed(1)}" cy="${cy+3.3}" r="1" fill="#fff"/>
+    <path d="M${(cx-6.2*k).toFixed(1)} ${cy-2.9} Q${cx} ${cy-9} ${(cx+6.2*k).toFixed(1)} ${cy-2.9}" stroke="#2B1C16" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+}
+function kGlassesF(R){
+  const st = `fill="rgba(220,240,255,.22)" stroke="#2B2A44" stroke-width="2" stroke-linejoin="round"`;
+  const arms = `<path d="M47 48.5 Q50 46.4 53 48.5 M33 48 L25.5 46.4 M67 48 L74.5 46.4" stroke="#2B2A44" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  if(R.gl === 'round') return `<circle cx="40" cy="49.5" r="7" ${st}/><circle cx="60" cy="49.5" r="7" ${st}/>${arms}
+    <path d="M36 45.6 L38.6 44.4 M56 45.6 L58.6 44.4" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>`;
+  if(R.gl === 'square') return `<rect x="32.6" y="43.4" width="14.8" height="12" rx="3.2" ${st}/><rect x="52.6" y="43.4" width="14.8" height="12" rx="3.2" ${st}/>${arms}
+    <path d="M35 46.4 L38 45.2 M55 46.4 L58 45.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>`;
+  return '';
+}
+function kGlassesS(R){
+  const st = `fill="rgba(220,240,255,.22)" stroke="#2B2A44" stroke-width="2" stroke-linejoin="round"`;
+  const arm = `<path d="M58.6 47.6 L47.5 46" stroke="#2B2A44" stroke-width="2" stroke-linecap="round"/>`;
+  if(R.gl === 'round') return `${arm}<circle cx="65.4" cy="49.5" r="6.4" ${st}/>`;
+  if(R.gl === 'square') return `${arm}<rect x="58.8" y="43.6" width="12.6" height="11.6" rx="3" ${st}/>`;
+  return '';
+}
+/* 앞모습 머리(얼굴·머리카락·모자) — 꾸미기 작은 그림에도 씁니다 */
+function kidHeadF(R){
+  return `${kHairBackF(R)}
+    <circle cx="24.6" cy="49.5" r="4.8" fill="${R.skin}" ${KST2}/><circle cx="75.4" cy="49.5" r="4.8" fill="${R.skin}" ${KST2}/>
+    <path d="M23.6 47.6 Q25.8 49.4 24 51.6 M76.4 47.6 Q74.2 49.4 76 51.6" stroke="${R.skinD}" stroke-width="1.3" fill="none"/>
+    <path d="${K_FACE_F}" fill="${R.skin}" ${KST}/>
+    <path d="M66 26 Q77 38 75 52 Q72.5 63.5 63 68.5 Q71 58 70.5 46 Q70 34 66 26 Z" fill="${R.skinD}" opacity=".55"/>
+    <path d="M35 41.4 Q40 39.4 44.6 41 M55.4 41 Q60 39.4 65 41.4" stroke="${R.hair}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <g class="keye">${kEye(R,40)}${kEye(R,60)}</g>
+    <path d="M50.2 55.4 Q51.6 56.8 50 57.8" stroke="${R.skinD}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    ${R.bl ? `<ellipse cx="32.4" cy="56.8" rx="4" ry="2.4" fill="#FF8A8A" opacity=".55"/><ellipse cx="67.6" cy="56.8" rx="4" ry="2.4" fill="#FF8A8A" opacity=".55"/>` : ''}
+    <path d="M44.8 60.4 Q50 66.6 55.2 60.4 Q50 62 44.8 60.4 Z" fill="#C2453A" stroke="#7A2A22" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M47.6 63.2 Q50 62 52.4 63.2 Q50 64.8 47.6 63.2 Z" fill="#F28C82"/>
+    ${kGlassesF(R)}
+    ${kHairFrontF(R)}
+    ${kHat(R,'f')}`;
+}
+
+/* ---------- 모자 — v: f 앞 · b 뒤 · s 옆 ---------- */
 function kHat(R, v){
-  const c = R.hc, k = R.hat;
-  const shadeF = `<path d="M57 14.5 Q68 17 68.5 32 Q63 31 59 30.8 Q61 22 57 14.5 Z" fill="rgba(0,0,0,.14)"/>`;
-  const hiF = `<path d="M38 18 Q42 15.4 46.4 15 Q41.4 20 40.2 26 Q37.6 23 38 18 Z" fill="rgba(255,255,255,.25)"/>`;
+  const c = R.hatC, k = R.hat;
+  if(k === 'none') return '';
+  const hi = `<path d="M30 18 Q36 11.5 44 10 Q36 16.5 34 26 Q29.4 23 30 18 Z" fill="rgba(255,255,255,.32)"/>`;
   if(k === 'beanie'){
-    const cx = v === 's' ? 49.5 : 50;
-    return `<path d="M31.5 35 Q31 12 ${cx} 11.5 Q69 12 68.5 35 Z" fill="${c.c}" ${KST}/>
-      <path d="M40 14.6 V31 M${cx} 12 V31 M60 14.6 V31" stroke="rgba(0,0,0,.13)" stroke-width="1.6"/>
-      ${v === 'b' ? '' : shadeF}${hiF}
-      <rect x="30" y="29" width="40" height="8" rx="4" fill="${c.d}" ${KST}/>
-      <path d="M33 31.2 H67" stroke="rgba(255,255,255,.25)" stroke-width="1.2"/>
-      <circle cx="${cx}" cy="9.6" r="5.2" fill="#fff" ${KST}/><circle cx="${cx + 1.6}" cy="11" r="2.4" fill="rgba(0,0,0,.08)"/>`;
+    const s = v === 's', x0 = s ? 22.5 : 20.5, x1 = s ? 76.5 : 79.5, cx = s ? 49.5 : 50;
+    return `<path d="M${x0} 41 Q${x0-1} 6 ${cx} 5.5 Q${x1+1} 6 ${x1} 41 Z" fill="${c.c}" ${KST}/>
+      <path d="M${cx-14} 9.5 V36 M${cx} 6 V36 M${cx+14} 9.5 V36" stroke="rgba(0,0,0,.13)" stroke-width="1.8"/>
+      ${v === 'b' ? '' : `<path d="M${cx+12} 8 Q${x1} 16 ${x1} 36 L${cx+14} 36 Q${cx+16} 20 ${cx+12} 8 Z" fill="rgba(0,0,0,.13)"/>`}${hi}
+      <rect x="${x0-2}" y="33" width="${x1-x0+4}" height="10" rx="5" fill="${c.d}" ${KST}/>
+      <path d="M${x0+2} 36.2 H${x1-2}" stroke="rgba(255,255,255,.25)" stroke-width="1.4"/>
+      <circle cx="${cx - (s ? 2 : 0)}" cy="5" r="6.4" fill="#fff" ${KST}/><circle cx="${cx + 1.5 - (s ? 2 : 0)}" cy="6.5" r="3" fill="rgba(0,0,0,.08)"/>`;
   }
   if(k === 'straw'){
-    const cx = v === 's' ? 49.5 : 50, ry = v === 's' ? 4.6 : 6.5;
-    const bow = v === 'b' ? `<path d="M50 29 L44.5 35 L47 36 L50 30.5 L53 36 L55.5 35 Z" fill="#E8412F" ${KST}/>` : '';
-    return `<ellipse cx="${cx}" cy="31" rx="28" ry="${ry}" fill="${c.c}" ${KST}/>
-      <ellipse cx="${cx}" cy="${31 + ry*.35}" rx="25" ry="${ry*.55}" fill="rgba(0,0,0,.12)"/>
-      <path d="M37 31 Q37 13.5 ${cx} 13.5 Q63 13.5 63 31 Q${cx} 33.4 37 31 Z" fill="${c.c}" ${KST}/>
-      <path d="M41 18 L43 30 M47 15 L48 30 M53 15 L52 30 M59 18 L57 30" stroke="${c.d}" stroke-width="1" opacity=".55"/>
-      <path d="M37.3 26.4 Q${cx} 29 62.7 26.4 L62.9 30 Q${cx} 32.6 37.1 30 Z" fill="#E8412F"/>${bow}
-      <path d="M41 17.5 Q44 14.8 48 14.6" stroke="rgba(255,255,255,.4)" stroke-width="1.6" fill="none"/>`;
+    const cx = v === 's' ? 49.5 : 50, ry = v === 's' ? 5.4 : 8;
+    const bow = v === 'b' ? `<path d="M50 32 L44 38.6 L46.8 39.6 L50 34 L53.2 39.6 L56 38.6 Z" fill="#E8412F" ${KST2}/>` : '';
+    return `<ellipse cx="${cx}" cy="37" rx="37" ry="${ry}" fill="${c.c}" ${KST}/>
+      <ellipse cx="${cx}" cy="${37 + ry*.32}" rx="33" ry="${(ry*.55).toFixed(1)}" fill="rgba(0,0,0,.12)"/>
+      <path d="M30 37 Q30 12 ${cx} 12 Q70 12 70 37 Q${cx} 40 30 37 Z" fill="${c.c}" ${KST}/>
+      <path d="M36 17 L38 35 M44 13.5 L45 36 M56 13.5 L55 36 M64 17 L62 35" stroke="${c.d}" stroke-width="1.2" opacity=".55"/>
+      <path d="M30.3 31 Q${cx} 34 69.7 31 L69.8 35.8 Q${cx} 38.8 30.2 35.8 Z" fill="#E8412F"/>${bow}
+      <path d="M35 17 Q39 13.4 45 13" stroke="rgba(255,255,255,.45)" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
   }
   if(k === 'kcrown'){
-    const s = v === 's';
-    return `<path d="M${s?35:33.5} 32 L${s?34.5:32.5} 14 L${s?43:41.5} 22 L50 9 L${s?57:58.5} 22 L${s?64.5:67.5} 14 L${s?64:66.5} 32 Q50 34 ${s?35:33.5} 32 Z" fill="${c.c}" ${KST}/>
-      <path d="M${s?35:33.4} 28 Q50 30 ${s?64:66.6} 28" stroke="${c.d}" stroke-width="2.4" fill="none"/>
-      <path d="M50 12 L54 21 L50 30 Z" fill="rgba(255,255,255,.25)"/>
-      <circle cx="${s?34.5:32.5}" cy="14" r="1.9" fill="${c.c}" ${KST}/><circle cx="50" cy="9" r="2.1" fill="${c.c}" ${KST}/><circle cx="${s?64.5:67.5}" cy="14" r="1.9" fill="${c.c}" ${KST}/>
-      ${v === 'b' ? '' : `<circle cx="50" cy="24.6" r="2.6" fill="#E8412F" ${KST}/><circle cx="${s?43:41.5}" cy="26" r="2" fill="#3D7FD6"/><circle cx="${s?57:58.5}" cy="26" r="2" fill="#3FAE5A"/>`}`;
+    /* 왕관은 머리 위에 얹습니다 (머리카락이 다 보여요) */
+    const s = v === 's', a = s ? 2 : 0;
+    return `<path d="M${33+a} 18 L${31+a} 5 L${40.5+a/2} 11 L50 2 L${59.5-a/2} 11 L${69-a} 5 L${67-a} 18 Q50 20.6 ${33+a} 18 Z" fill="${c.c}" ${KST}/>
+      <path d="M${33.4+a} 14.6 Q50 17 ${66.6-a} 14.6" stroke="${c.d}" stroke-width="2.4" fill="none"/>
+      <path d="M50 4.5 L53.6 11 L50 17 Z" fill="rgba(255,255,255,.3)"/>
+      <circle cx="${31+a}" cy="5" r="2.2" fill="${c.c}" ${KST2}/><circle cx="50" cy="2" r="2.4" fill="${c.c}" ${KST2}/><circle cx="${69-a}" cy="5" r="2.2" fill="${c.c}" ${KST2}/>
+      ${v === 'b' ? '' : `<circle cx="50" cy="12.4" r="2.8" fill="#E8412F" ${KST2}/><circle cx="${41.5+a/2}" cy="13.6" r="2" fill="#3D7FD6"/><circle cx="${58.5-a/2}" cy="13.6" r="2" fill="#3FAE5A"/>`}`;
   }
-  /* 야구모자 (기본) */
-  if(v === 's') return `<path d="M32 33.5 Q31.5 13.5 49.5 13 Q66 13.5 66.5 31.5 Q50 29.6 32 33.5 Z" fill="${c.c}" ${KST}/>
-    <path d="M56 14.6 Q66 17.5 66.5 31.5 Q61 30.6 58 30.4 Q60 21 56 14.6 Z" fill="rgba(0,0,0,.14)"/>${hiF}
-    <path d="M63 30.8 Q72 29.4 80.5 31.4 Q81 35 75 35.4 L63.4 35 Z" fill="${c.d}" ${KST}/>
-    <path d="M49.5 13.2 Q52 22 50.5 31" stroke="rgba(0,0,0,.18)" stroke-width="1.1" fill="none"/>
-    <circle cx="49.5" cy="13.3" r="1.9" fill="${c.d}"/>`;
-  if(v === 'b') return `<path d="M31.5 34 Q31 13.5 50 13 Q69 13.5 68.5 34 Q50 31.5 31.5 34 Z" fill="${c.c}" ${KST}/>
-    ${hiF}<path d="M50 13.2 V28" stroke="rgba(0,0,0,.18)" stroke-width="1.1"/>
-    <path d="M44.5 33.6 Q44.5 28.2 50 28.2 Q55.5 28.2 55.5 33.6 Z" fill="${KID_HAIR}" ${KST}/>
-    <path d="M44 31.4 H56" stroke="${c.d}" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="50" cy="13.4" r="2" fill="${c.d}"/>`;
-  return `<path d="M31.5 32.6 Q31 13.5 50 13 Q69 13.5 68.5 32.6 Q50 29.6 31.5 32.6 Z" fill="${c.c}" ${KST}/>
-    ${shadeF}${hiF}<path d="M50 13.2 V29.6" stroke="rgba(0,0,0,.18)" stroke-width="1.1"/>
-    <path d="M30.5 32 Q50 27.5 69.5 32 Q70.5 36 66 36.8 Q50 33.6 34 36.8 Q29.5 36 30.5 32 Z" fill="${c.d}" ${KST}/>
-    <path d="M34 33.4 Q50 30.4 66 33.4" stroke="rgba(255,255,255,.22)" stroke-width="1.2" fill="none"/>
-    <circle cx="50" cy="13.4" r="2" fill="${c.d}"/>`;
+  /* 야구모자 (기본) — 마크 없이 단색 */
+  if(v === 's') return `<path d="M24.5 41 Q22 9 49 8 Q73 9 76.5 35 Q50 32 24.5 41 Z" fill="${c.c}" ${KST}/>
+    <path d="M24.5 41 Q23 30 26 21 Q30 32 37 37 Z" fill="rgba(0,0,0,.14)"/>
+    <path d="M37 14 Q45 9.6 55 10.4 Q46 13 41 20 Z" fill="rgba(255,255,255,.32)"/>
+    <path d="M49 8.4 Q53 20 52 33" stroke="rgba(0,0,0,.2)" stroke-width="1.3" fill="none"/>
+    <path d="M70 33 Q83 30.5 94 34 Q95 39.5 88 40 L70.5 38.6 Z" fill="${c.d}" ${KST}/>
+    <circle cx="49" cy="8.4" r="2.3" fill="${c.d}"/>`;
+  if(v === 'b') return `<path d="M20.5 40 Q19 8.5 50 7.5 Q81 8.5 79.5 40 Q50 35.5 20.5 40 Z" fill="${c.c}" ${KST}/>
+    ${hi}<path d="M50 8 V30" stroke="rgba(0,0,0,.2)" stroke-width="1.3"/>
+    <path d="M43.5 39 Q43.5 31 50 31 Q56.5 31 56.5 39 Z" fill="${R.hair}" ${KST2}/>
+    <path d="M43 36.4 H57" stroke="${c.d}" stroke-width="2.4" stroke-linecap="round"/>
+    <circle cx="50" cy="8" r="2.4" fill="${c.d}"/>`;
+  return `<path d="M20.5 37 Q19 8.5 50 7.5 Q81 8.5 79.5 37 Q50 32 20.5 37 Z" fill="${c.c}" ${KST}/>
+    <path d="M62 9.8 Q78 15 79.5 37 Q74 35.4 68.5 34.6 Q70 20 62 9.8 Z" fill="rgba(0,0,0,.16)"/>${hi}
+    <path d="M50 8 V32.4" stroke="rgba(0,0,0,.2)" stroke-width="1.3"/>
+    <path d="M19 35.5 Q50 28 81 35.5 Q83.5 41 77.5 42.5 Q50 35.5 22.5 42.5 Q16.5 41 19 35.5 Z" fill="${c.d}" ${KST}/>
+    <path d="M24 37 Q50 31.4 76 37" stroke="rgba(255,255,255,.3)" stroke-width="1.6" fill="none"/>
+    <circle cx="50" cy="8" r="2.4" fill="${c.d}"/>`;
 }
-/* 가방 — 몸 뒤(back) 또는 앞에서 보이는 끈(straps) */
+/* 가방 — 몸 뒤(back) 또는 앞에서 보이는 끈(front) */
 function kBag(R, v, part){
   const b = R.bag; if(!b) return '';
   if(v === 'f'){
-    if(part === 'back') return `<rect x="33" y="61.5" width="34" height="23" rx="8" fill="${b.c}" ${KST}/>`;
-    return `<path d="M41.2 59.4 Q40.2 68 41.6 79.2 M58.8 59.4 Q59.8 68 58.4 79.2" stroke="${b.d}" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-      <rect x="39.6" y="72" width="4" height="3.4" rx="1" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/><rect x="56.4" y="72" width="4" height="3.4" rx="1" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/>`;
+    if(part === 'back') return `<rect x="29.5" y="72" width="41" height="22" rx="8" fill="${b.c}" ${KST}/>`;
+    return `<path d="M41.4 70 Q40.4 79 42 90 M58.6 70 Q59.6 79 58 90" stroke="${b.d}" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+      <rect x="39.6" y="81.4" width="4.2" height="3.6" rx="1" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/><rect x="56.2" y="81.4" width="4.2" height="3.6" rx="1" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/>`;
   }
   if(v === 'b'){
     if(part === 'back') return '';
-    return `<path d="M40 61.4 Q41 58.4 44 58.2 M60 61.4 Q59 58.4 56 58.2" stroke="${b.d}" stroke-width="3" stroke-linecap="round" fill="none"/>
-      <rect x="35.5" y="61.5" width="29" height="26" rx="7.5" fill="${b.c}" ${KST}/>
-      <path d="M57 62 Q64.5 62.5 64.5 69 L64.5 80 Q64.5 87.5 57.5 87.5 Q61 75 57 62 Z" fill="rgba(0,0,0,.14)"/>
-      <path d="M36 70 Q50 73.4 64 70 L64 67 Q64 62 59.5 62 H40.5 Q36 62 36 67 Z" fill="${b.d}" ${KST}/>
-      <rect x="42" y="75.5" width="16" height="9" rx="3" fill="${b.d}" opacity=".6"/>
-      <circle cx="50" cy="71.4" r="1.7" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/>
-      <path d="M39 64.6 Q41 63 44 63" stroke="rgba(255,255,255,.35)" stroke-width="1.5" fill="none"/>`;
+    return `<path d="M40 73 Q41 70 44 69.8 M60 73 Q59 70 56 69.8" stroke="${b.d}" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+      <rect x="34" y="72.5" width="32" height="27" rx="8.5" fill="${b.c}" ${KST}/>
+      <path d="M57 73 Q65.6 73.5 65.6 80.5 L65.6 91 Q65.6 99 58 99 Q62 86 57 73 Z" fill="rgba(0,0,0,.14)"/>
+      <path d="M34.5 82 Q50 85.6 65.5 82 L65.5 79 Q65.5 73 60 73 H40 Q34.5 73 34.5 79 Z" fill="${b.d}" ${KST2}/>
+      <rect x="41" y="87.5" width="18" height="9" rx="3" fill="${b.d}" opacity=".6"/>
+      <circle cx="50" cy="83.4" r="1.9" fill="#E9E4D4" stroke="${KID_LINE}" stroke-width="1"/>
+      <path d="M38 76 Q40 74.4 43 74.4" stroke="rgba(255,255,255,.35)" stroke-width="1.6" fill="none"/>`;
   }
   /* 옆 */
-  if(part === 'back') return `<rect x="30.4" y="61" width="13" height="24.5" rx="5.2" fill="${b.c}" ${KST}/>
-    <path d="M30.8 68.4 H43 V65 Q43 61.4 39.2 61.4 H34.6 Q30.8 61.4 30.8 65 Z" fill="${b.d}" ${KST}/>
-    <path d="M32.4 72 Q32 78 33.4 83" stroke="rgba(255,255,255,.3)" stroke-width="1.4" fill="none"/>`;
-  return `<path d="M42 61.6 Q49 59.4 55 63.2" stroke="${b.d}" stroke-width="3" stroke-linecap="round" fill="none"/>`;
+  if(part === 'back') return `<rect x="28.4" y="72" width="14" height="25" rx="5.4" fill="${b.c}" ${KST}/>
+    <path d="M28.8 79.6 H42 V76.4 Q42 72.4 38 72.4 H33 Q28.8 72.4 28.8 76.4 Z" fill="${b.d}" ${KST2}/>
+    <path d="M30.6 83 Q30.2 89 31.6 94" stroke="rgba(255,255,255,.3)" stroke-width="1.4" fill="none"/>`;
+  return `<path d="M41 72.6 Q49 70.4 55 74.4" stroke="${b.d}" stroke-width="3.2" stroke-linecap="round" fill="none"/>`;
 }
+
+/* ---------- 세 방향 ---------- */
 /* 앞모습 */
 function kidFront(R){
-  const ctx = {R};
   return `<g class="tv tv-f">
     ${kBag(R,'f','back')}
-    ${kLegFB(40.5,'kl1')}${kLegFB(51.5,'kl2')}
-    <path d="M35.5 84 H64.5 L66.5 102.6 Q59 105 51.6 103.4 L50 95 L48.4 103.4 Q41 105 33.5 102.6 Z" fill="${KID_PANTS}" ${KST}/>
-    <path d="M57 85 H64.5 L66.5 102.6 Q61.6 104.2 57.6 104 Z" fill="rgba(0,0,0,.13)"/><path d="M35.6 87 H64.4" stroke="${KID_PANTS_D}" stroke-width="1.4"/>
-    <path d="M37 60 Q50 55.5 63 60 L65.5 87 Q50 90.5 34.5 87 Z" fill="${R.sf}" ${KST}/>
-    ${kShirtDeco(R)}
-    <path d="M56.5 58.6 Q61 59 63 60 L65.5 87 Q61 88.4 57.5 88.8 Q59.6 74 56.5 58.6 Z" fill="rgba(0,0,0,.15)"/>
-    <path d="M40 63 Q42 61.5 45 61 L43.5 80 Q40.6 79 39.6 76 Z" fill="rgba(255,255,255,.16)"/>
-    <path d="M44 84.4 Q47 82.8 50 84.4 M55.4 70 Q57.2 72.4 56.2 75.4" stroke="rgba(0,0,0,.2)" stroke-width="1.1" fill="none"/>
+    ${kLegFB(R,40,'kl1')}${kLegFB(R,53,'kl2')}
+    ${kTorsoF(R)}
     ${kBag(R,'f','front')}
-    ${kArmFB.call(ctx,'ka1')}${kArmFB.call(ctx,'ka2',true)}
-    <rect x="46" y="53.5" width="8" height="6.5" fill="${KID_SKIN_D}"/>
-    <path d="M45.2 57.6 Q50 63.6 54.8 57.6" fill="${KID_SKIN_D}" ${KST}/>
-    <circle cx="32.4" cy="40" r="4" fill="${KID_SKIN}" ${KST}/><circle cx="67.6" cy="40" r="4" fill="${KID_SKIN}" ${KST}/>
-    <path d="M31.6 38.6 Q33.4 40 32.2 41.8 M68.4 38.6 Q66.6 40 67.8 41.8" stroke="${KID_SKIN_D}" stroke-width="1.1" fill="none"/>
-    <ellipse cx="50" cy="38" rx="17.5" ry="18.5" fill="${KID_SKIN}" ${KST}/>
-    <path d="M58 22 Q69 32 66 46 Q63 53 55 56 Q64 46 63 36 Q62 28 58 22 Z" fill="rgba(190,110,60,.16)"/>
-    <path d="M32.3 36 Q31 18.5 50 18 Q69 18.5 67.7 36 Q65 30 60.5 29.5 Q58 25 53 27.5 Q48 23.5 44 28 Q38 26.5 35.5 31.5 Q33.5 33 32.3 36 Z" fill="${KID_HAIR}" ${KST}/>
-    <path d="M40 22 Q45 20 49 21 M53 21.5 Q58 21 62 24 M37 27 Q39 24.4 42 23.6" stroke="${KID_HAIR_L}" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-    <path d="M32.6 35.4 Q32.2 39.6 33.6 42" stroke="${KID_HAIR}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M67.4 35.4 Q67.8 39.6 66.4 42" stroke="${KID_HAIR}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    <path d="M39.4 33.4 Q43 31.6 46 33 M54 33 Q57 31.6 60.6 33.4" stroke="${KID_HAIR}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-    <ellipse cx="43" cy="39.6" rx="2.5" ry="3.3" fill="#2B2018"/><ellipse cx="57" cy="39.6" rx="2.5" ry="3.3" fill="#2B2018"/>
-    <circle cx="43.9" cy="38.4" r="1" fill="#fff"/><circle cx="57.9" cy="38.4" r="1" fill="#fff"/>
-    <path d="M50 42.6 Q51.4 45 49.6 45.8" stroke="${KID_SKIN_D}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-    <ellipse cx="38.8" cy="45.6" rx="3" ry="1.8" fill="#F29A8A" opacity=".45"/><ellipse cx="61.2" cy="45.6" rx="3" ry="1.8" fill="#F29A8A" opacity=".45"/>
-    <path d="M45.8 48.8 Q50 53.6 54.2 48.8 Q50 50.4 45.8 48.8 Z" fill="#B5483A" stroke="#7A2E24" stroke-width="1.1" stroke-linejoin="round"/>
-    ${kHat(R,'f')}
+    ${kArmFB(R,'ka1')}${kArmFB(R,'ka2',true)}
+    ${kidHeadF(R)}
   </g>`;
 }
 /* 뒷모습 */
 function kidBack(R){
-  const ctx = {R};
   return `<g class="tv tv-b">
-    ${kLegFB(40.5,'kl1',true)}${kLegFB(51.5,'kl2',true)}
-    <path d="M35.5 84 H64.5 L66.5 102.6 Q59 105 51.6 103.4 L50 95 L48.4 103.4 Q41 105 33.5 102.6 Z" fill="${KID_PANTS}" ${KST}/>
-    <path d="M57 85 H64.5 L66.5 102.6 Q61.6 104.2 57.6 104 Z" fill="rgba(0,0,0,.13)"/><path d="M35.6 87 H64.4" stroke="${KID_PANTS_D}" stroke-width="1.4"/>
-    <path d="M42 91 h5 v5 h-5 Z M53 91 h5 v5 h-5 Z" fill="none" stroke="${KID_PANTS_D}" stroke-width="1"/>
-    <path d="M37 60 Q50 55.5 63 60 L65.5 87 Q50 90.5 34.5 87 Z" fill="${R.sf}" ${KST}/>
-    ${kShirtDeco(R)}
-    <path d="M56.5 58.6 Q61 59 63 60 L65.5 87 Q61 88.4 57.5 88.8 Q59.6 74 56.5 58.6 Z" fill="rgba(0,0,0,.15)"/>
-    <path d="M50 62 Q49 72 50.5 86" stroke="rgba(0,0,0,.12)" stroke-width="1.2" fill="none"/>
+    ${kLegFB(R,40,'kl1',true)}${kLegFB(R,53,'kl2',true)}
+    ${kTorsoF(R, true)}
+    ${kArmFB(R,'ka1')}${kArmFB(R,'ka2',true)}
+    <rect x="44.5" y="62" width="11" height="9" fill="${R.skin}" ${KST2}/>
     ${kBag(R,'b','front')}
-    ${kArmFB.call(ctx,'ka1')}${kArmFB.call(ctx,'ka2',true)}
-    <rect x="45.5" y="52" width="9" height="8" fill="${KID_SKIN}" ${KST}/>
-    <circle cx="32.4" cy="40" r="4" fill="${KID_SKIN}" ${KST}/><circle cx="67.6" cy="40" r="4" fill="${KID_SKIN}" ${KST}/>
-    <ellipse cx="50" cy="37.6" rx="17.6" ry="18.2" fill="${KID_HAIR}" ${KST}/>
-    <path d="M38 50 Q44 55.6 50 55.6 Q56 55.6 62 50 Q58 53 56 52 Q53 54 50 52.6 Q47 54 44 52 Q42 53 38 50 Z" fill="${KID_HAIR}"/>
-    <path d="M40 24 Q44 36 42 48 M50 21 Q51.2 36 50 51 M60 24 Q56 36 58 48 M45 22.6 Q47 34 46 49 M55 22.6 Q53.4 34 54.4 49" stroke="${KID_HAIR_L}" stroke-width="1.2" fill="none" opacity=".85"/>
-    <path d="M37.6 25 Q44 19 52 19.4" stroke="rgba(255,255,255,.25)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <circle cx="24.6" cy="49.5" r="4.8" fill="${R.skin}" ${KST2}/><circle cx="75.4" cy="49.5" r="4.8" fill="${R.skin}" ${KST2}/>
+    ${R.cover ? `<path d="${K_FACE_F}" fill="${R.skin}" ${KST}/>` : ''}
+    ${kHairBack(R)}
     ${kHat(R,'b')}
   </g>`;
 }
-/* 옆모습 (오른쪽을 봄 — 왼쪽은 CSS 가 뒤집습니다) */
+/* 옆모습 (오른쪽을 봄 — 왼쪽은 CSS 가 g.kflip 을 뒤집습니다) */
 function kidSide(R){
   return `<g class="tv tv-s">
     ${kArmS(R,'ka2',true)}
-    ${kLegS('kl2',true)}
+    ${kLegS(R,'kl2',true)}
     ${kBag(R,'s','back')}
-    ${kLegS('kl1')}
-    <path d="M41.5 84 H60 L62 101 Q55.6 104 50.2 102.6 Q44.4 104 40.5 101 Z" fill="${KID_PANTS}" ${KST}/>
-    <path d="M55 85 H60 L62 101 Q58.6 102.6 55.6 102.8 Z" fill="rgba(0,0,0,.13)"/><path d="M41.6 87 H59.9" stroke="${KID_PANTS_D}" stroke-width="1.4"/>
-    <path d="M41 60 Q50 56.5 59 60 L61.5 87 Q50 90 39.5 87 Z" fill="${R.sf}" ${KST}/>
+    ${kLegS(R,'kl1')}
+    <path d="M38.5 93.5 H61.5 L63 106 Q56 108.6 50 107 Q44 108.6 37 106 Z" fill="${KID_PANTS}" ${KST}/>
+    <path d="M55 94 H61.5 L63 106 Q59.6 107.6 55.6 107.6 Z" fill="rgba(0,0,0,.18)"/><path d="M38.6 96.6 H61.4" stroke="${KID_PANTS_D}" stroke-width="1.6"/>
+    <path d="M39.5 71 Q50 67.5 60.5 71 L62.5 95.5 Q50 98.6 37.5 95.5 Z" fill="${R.sf}" ${KST}/>
     ${kShirtDeco(R, true)}
-    <path d="M54 58 Q58.6 58.8 59 60 L61.5 87 Q58 88.3 55 88.6 Q57 73 54 58 Z" fill="rgba(0,0,0,.15)"/>
-    <path d="M43 63 Q45 61.5 47 61.3 L46 80 Q43.6 79 43 76 Z" fill="rgba(255,255,255,.16)"/>
+    <path d="M55 69.4 Q59.6 70 60.5 71 L62.5 95.5 Q59 96.8 56 97 Q57.6 82 55 69.4 Z" fill="rgba(0,0,0,.15)"/>
     ${kBag(R,'s','front')}
-    <rect x="45" y="53.5" width="8" height="6.5" fill="${KID_SKIN_D}"/>
-    <ellipse cx="49" cy="38" rx="17" ry="18.5" fill="${KID_SKIN}" ${KST}/>
-    <path d="M64.6 37.6 Q69.4 41 65 44.4" fill="${KID_SKIN}" ${KST}/>
-    <path d="M58 52 Q63 49 65.6 45" stroke="${KID_SKIN_D}" stroke-width="1.2" fill="none" opacity=".7"/>
-    <path d="M32.4 40 Q30.5 18.5 50 18 Q66.5 18.5 66 31 Q60 27.5 54.6 29.4 Q51.4 31.6 50.6 36.4 Q49.4 41 50.6 45 Q44.6 44.4 41 47 Q35.4 47.4 32.4 40 Z" fill="${KID_HAIR}" ${KST}/>
-    <path d="M36 28 Q41 22 48 21 M35 35 Q38 30 44 28.4 M38 42 Q41 37 46 36" stroke="${KID_HAIR_L}" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-    <circle cx="46" cy="40.4" r="4" fill="${KID_SKIN}" ${KST}/><path d="M45 39 Q47 40.4 45.6 42.2" stroke="${KID_SKIN_D}" stroke-width="1.1" fill="none"/>
-    <path d="M57 33.3 Q60 31.8 62.6 33.4" stroke="${KID_HAIR}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-    <ellipse cx="60" cy="39.6" rx="2.2" ry="3.2" fill="#2B2018"/><circle cx="60.8" cy="38.4" r=".95" fill="#fff"/>
-    <ellipse cx="59.6" cy="45.6" rx="2.6" ry="1.7" fill="#F29A8A" opacity=".45"/>
-    <path d="M59.6 48.6 Q62.6 51.4 64.6 48.4" fill="#B5483A" stroke="#7A2E24" stroke-width="1.1" stroke-linejoin="round"/>
+    <path d="${K_FACE_S}" fill="${R.skin}" ${KST}/>
+    <path d="M40 69 Q51 73.6 64 70 Q54 70.4 46 66 Z" fill="${R.skinD}" opacity=".6"/>
+    ${kHairSide(R)}
+    <circle cx="45" cy="50" r="4.8" fill="${R.skin}" ${KST2}/><path d="M44 48 Q46.2 50 44.4 52.2" stroke="${R.skinD}" stroke-width="1.3" fill="none"/>
+    <path d="M61.4 41.6 Q65 39.6 68.6 41.2" stroke="${R.hair}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    ${kEye(R, 65.4, true)}
+    ${R.bl ? `<ellipse cx="64" cy="57" rx="3.4" ry="2.1" fill="#FF8A8A" opacity=".55"/>` : ''}
+    <path d="M66.6 60.2 Q70.6 64.8 74.2 60.6 Q70.6 61.8 66.6 60.2 Z" fill="#C2453A" stroke="#7A2A22" stroke-width="1.4" stroke-linejoin="round"/>
+    ${kGlassesS(R)}
     ${kHat(R,'s')}
     ${kArmS(R,'ka1')}
   </g>`;
 }
-/* 옷장·코스튬 그림 — 앞모습 한 장 */
-function kidSvg(look){
-  const R = kidRes(look);
-  return `<svg viewBox="12 4 76 134" xmlns="http://www.w3.org/2000/svg" aria-label="나">${R.defs}
-    <ellipse cx="50" cy="132" rx="16" ry="4" fill="rgba(0,0,0,.2)"/>${kidFront(R)}</svg>`;
+/* 옷장·코스튬·꾸미기 그림 — 앞모습 한 장 (av 를 주면 그 모습으로) */
+function kidSvg(look, av){
+  const R = kidRes(look, av);
+  return `<svg viewBox="10 0 80 137" xmlns="http://www.w3.org/2000/svg" aria-label="나">${R.defs}
+    <ellipse cx="50" cy="132" rx="17" ry="4" fill="rgba(0,0,0,.2)"/>${kidFront(R)}</svg>`;
 }
-/* 지도용 — 세 방향을 다 넣어 두고 #player 의 f-d/f-u/f-l/f-r 로 하나만 보입니다 */
+/* 꾸미기 고르기 단추 그림 — 얼굴만 크게 */
+function avThumb(look, av){
+  const R = kidRes(look, av);
+  return `<svg viewBox="15 -1 70 76" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${R.defs}${kidHeadF(R)}</svg>`;
+}
+/* 지도용 — 세 방향을 다 넣어 두고 #player 의 f-d/f-u/f-l/f-r 로 하나만 보입니다.
+   g.kflip(왼쪽 보기 뒤집기) > g.kb(통통 튀기·숨쉬기) > 세 방향 */
 function trainerSvg(look){
   const R = kidRes(look);
   return `<svg class="kid" viewBox="0 0 100 140" xmlns="http://www.w3.org/2000/svg" aria-label="나">${R.defs}
-    <ellipse class="ksh" cx="50" cy="132" rx="15" ry="4.2" fill="rgba(0,0,0,.26)"/>
-    ${kidFront(R)}${kidBack(R)}${kidSide(R)}</svg>`;
+    <ellipse class="ksh" cx="50" cy="132" rx="16" ry="4.4" fill="rgba(0,0,0,.26)"/>
+    <g class="kflip"><g class="kb">${kidFront(R)}${kidBack(R)}${kidSide(R)}</g></g></svg>`;
 }
 
 /* =========================================================
@@ -4041,7 +4324,7 @@ function worldFx(r){
 const STEP_MS = 190;          /* 한 칸 걷는 시간 — 누르고 있을 때의 걸음 간격과 같습니다 */
 const STEP_MIN = 120;         /* 아주 빨리 연타해도 그림이 따라올 수 있는 최소 간격 */
 const HOLD_FIRST = 250;       /* 누르고 이만큼 지나면 계속 걷기 시작 (짧게 톡 누르면 한 칸) */
-const KID = {dir:'d', st:0, walk:false, wt:0};
+const KID = {dir:'d', st:0, walk:false, wt:0, land:false, lt:0};
 const FOL = {reg:-1, x:0, y:0, dir:'d', st:0, walk:false, wt:0};
 const HOLD = {dir:null, src:null, pid:null, t:0, t0:0, last:0, buf:null, bt:0, until:0, clickBlock:0, keys:[]};
 let FLD_LASTREG = -1;
@@ -4051,11 +4334,26 @@ function worldTf(){
 }
 function kidCls(){
   const t = tileAt(S.reg, S.px, S.py);
-  return `f-${KID.dir} st${KID.st}${KID.walk ? ' walk' : ''}${t === ENC_TILE ? ' ing' : ''}`;
+  return `f-${KID.dir} st${KID.st}${KID.walk ? ' walk' : (KID.land ? ' land' : '')}${t === ENC_TILE ? ' ing' : ''}`;
 }
 function folCls(){
   const t = tileAt(S.reg, FOL.x, FOL.y);
-  return `f-${FOL.dir} st${FOL.st}${FOL.walk ? ' walk' : ''}${t === ENC_TILE ? ' ing' : ''}`;
+  return `f-${FOL.dir} st${FOL.st}${FOL.walk ? ' walk' : ''}${t === ENC_TILE ? ' ing' : ''} z${folSize(pActive())}`;
+}
+/* ★ 28차: 따라오는 친구 크기 — 칸의 1.5 / 1.65 / 1.8 배 (CSS #fol.zS/zM/zL).
+   포켓몬별 표 없이 있는 데이터로 대충 셋으로 나눕니다:
+   전설(rare)·메가(base)·체력 23 이상 → 큰 친구 / 체력 13 이하 → 작은 친구 / 나머지 → 보통 */
+function folSize(m){
+  if(!m) return 'M';
+  if(m.rare || m.base || m.hp >= 23) return 'L';
+  if(m.hp <= 13) return 'S';
+  return 'M';
+}
+/* 친구 앞뒤 겹침 — 한 줄 아래(화면 앞쪽)에 있을 땐 원래 친구가 앞이지만,
+   하준이 바로 아래 칸이면 커진 친구가 하준이를 가리지 않게 하준이 바로 뒤 순서로 둡니다 */
+function folZ(){
+  if(FOL.x === S.px && FOL.y === S.py + 1) return 3*S.py + 11;
+  return 3*FOL.y + 11;
 }
 /* 친구 자리 맞추기 — 지역이 바뀌었거나 너무 멀어졌으면(집·불러오기 등) 하준이 옆 빈칸으로 */
 function folSync(){
@@ -4073,7 +4371,11 @@ function folSync(){
 function kidStep(dir, ox, oy){
   KID.dir = dir; KID.st ^= 1; KID.walk = true;
   clearTimeout(KID.wt);
-  KID.wt = setTimeout(()=>{ KID.walk = false; kidClsApply(); }, STEP_MS + 90);
+  KID.land = false; clearTimeout(KID.lt);
+  KID.wt = setTimeout(()=>{
+    KID.walk = false; KID.land = true; kidClsApply();       /* 28차: 멈출 때 살짝 찌그러졌다 펴지기 */
+    KID.lt = setTimeout(()=>{ KID.land = false; kidClsApply(); }, 300);
+  }, STEP_MS + 90);
   if(FOL.reg === S.reg && Math.abs(FOL.x - ox) + Math.abs(FOL.y - oy) <= 1){
     const dx = ox - FOL.x, dy = oy - FOL.y;
     if(dx || dy){
@@ -4101,7 +4403,7 @@ function kidClsApply(){
 /* 따라오는 친구 html */
 function folHtml(){
   if(S.partner == null || !MONS[S.partner]) return '';
-  return `<div id="fol" class="${folCls()}" style="transform:translate(${FOL.x*100}%, ${FOL.y*100}%);z-index:${3*FOL.y + 11}" aria-hidden="true">
+  return `<div id="fol" class="${folCls()}" style="transform:translate(${FOL.x*100}%, ${FOL.y*100}%);z-index:${folZ()}" aria-hidden="true">
     <i class="fsh"></i><div class="fimg">${artBoxA(pActive(), 0, '', S.partner)}</div>${feetFx()}</div>`;
 }
 /* 풀숲에 서 있으면 발 앞에 풀이 겹치고, 얕은 물이면 물결 고리 */
@@ -5063,6 +5365,7 @@ function bgmAllowed(){ return BGM.unlocked && S.voice && bgmOn() && !document.hi
 function bgmWant(){
   const sc = S.screen;
   if(sc === 'title' || sc === 'pick' || sc === 'set') return 'title';
+  if(sc === 'avatar' && S.avEd && S.avEd.from === 'new') return 'title';   /* 28차: 새로 시작할 때 꾸미기 */
   if(sc === 'ko' || (sc === 'quiz' && S.quiz && S.quiz.mode === 'revive')) return 'ko';
   if(S.rk && (sc === 'battle' || sc === 'rkpick' || sc === 'quiz')) return 'rocket';
   if(sc === 'rkpick') return 'rocket';
@@ -5337,7 +5640,10 @@ const S = {
   /* 21차 A4 · 22-B: 글자(음절)마다 숙련도 {lv:0~4, ok, miss, s, t} · 자모 숙련도 {lv:0~4, ok, miss, t} — 저장합니다 */
   wrm:{}, wrj:{},
   /* 21차 B: 도장 · 코스튬 — 저장합니다. stampOpen·cosBox·closet·boxAuto 는 창 상태라 저장하지 않습니다 */
-  stamp:0, cos:null, stampOpen:false, cosBox:null, closet:null, boxAuto:false
+  stamp:0, cos:null, stampOpen:false, cosBox:null, closet:null, boxAuto:false,
+  /* 28차: 내 트레이너 꾸미기 {h 머리 모양, hc 머리색, sk 피부, ey 눈, gl 안경, bl 볼, hat 기본 모자} — 저장합니다.
+     avEd 는 꾸미기 화면 상태 {cat 고르는 항목, from 'new'|'closet'} 라 저장하지 않습니다 */
+  av:null, avEd:null
 };
 const RK_MIN_DEX  = 8;    /* 도감 8마리부터 로켓단이 나타납니다 */
 const RK_TEAM_MAX = 3;    /* 팀은 세 마리까지 */
@@ -5369,6 +5675,8 @@ function save(){
              wrj:S.wrj,
              /* 21차 B: 도장 · 코스튬 */
              stamp:S.stamp, cos:S.cos,
+             /* 28차: 내 트레이너 꾸미기 (QR 로도 같이 옮겨집니다) */
+             av:saneAv(S.av),
              /* 27-B: 엄마·아빠 리포트 — 날짜별 요약 (최근 30일만, 끝의 빈 값은 잘라서 작게) */
              rep:repPack(S.rep)};
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(d)); }catch(e){ memoryStore = d; }
@@ -5429,6 +5737,8 @@ function load(){
   S.stamp = saneStamp(d.stamp);
   S.cos = saneCos(d.cos, S.stamp);
   S.stampOpen = false; S.cosBox = null; S.closet = null;
+  /* 28차: 꾸미기 — 예전 저장(값 없음)은 기본 모습 */
+  S.av = saneAv(d.av); S.avEd = null;
   /* 27-B: 리포트 — 이상한 값 · 30일 지난 날은 조용히 버립니다 */
   S.rep = saneRep(d.rep);
   /* 6차: 쓰러짐(ko)은 S.mons 안에 같이 저장됩니다.
@@ -5465,6 +5775,8 @@ function wipe(){
   /* 21차 B: 도장과 얻은 옷은 새로 시작해도 남깁니다 (도장은 절대 줄지 않음). 포켓몬별 장식만 비웁니다 */
   if(S.cos) S.cos.mon = {};
   S.stampOpen = false; S.cosBox = null; S.closet = null;
+  /* 28차: 꾸민 모습도 남깁니다 (새로 시작할 때 꾸미기 화면에서 다시 고칠 수 있어요) */
+  S.av = saneAv(S.av); S.avEd = null;
 }
 
 /* =========================================================
@@ -6229,7 +6541,9 @@ function render(){
     /* 18차: 어른 설정 — adultGate 를 지나야만 여기로 옵니다 */
     set:    ['⚙️ 어른 설정', viewSet],
     /* 21차 B: 옷장 */
-    closet: ['👕 옷장', viewCloset]
+    closet: ['👕 옷장', viewCloset],
+    /* 28차: 내 트레이너 꾸미기 */
+    avatar: ['🧒 나를 꾸며요', viewAvatar]
   }[S.screen];
   topTitle.textContent = V[0];
   const fkeep = fieldKeep();            /* 23차: 걷던 그림·카메라가 다시 그려도 이어서 움직이게 */
@@ -6321,7 +6635,7 @@ function viewField(){
     <button class="btn bagbtn" data-act="bag" aria-label="가방">🎒<span class="cnt">${bag}</span></button>
   </div>
   <div id="map" class="r-${reg.key} t23${terr ? ' tok' : ''}${enter ? ' enter' : ''}${HOLD.dir ? ' hold' : ''}" style="--ph:${ph.toFixed(2)}s;--stp:${STEP_MS}ms">
-    <div id="world" data-r="${S.reg}" style="transform:${worldTf()}"><div class="terrph"></div>${tiles}${drops}${folHtml()}<div id="player" class="${kidCls()}" style="transform:translate(${S.px*100}%, ${S.py*100}%);z-index:${3*S.py + 12}">${trainerSvg()}${feetFx()}</div>${worldFx(S.reg)}</div>
+    <div id="world" data-r="${S.reg}" style="transform:${worldTf()}"><div class="terrph"></div>${tiles}${drops}${folHtml()}<div id="player" class="${kidCls()}" style="transform:translate(${S.px*100}%, ${S.py*100}%);z-index:${3*S.py + 12}">${trainerSvg()}<i class="kdust" aria-hidden="true"><b></b><b></b></i>${feetFx()}</div>${worldFx(S.reg)}</div>
     ${/* 17차: ✏️ 글씨 쓰기 — 지도 위에 얹어서 지역줄·지도 크기를 하나도 건드리지 않습니다.
          배틀·포획과 완전히 따로 도는 길이라 언제 눌러도 손해가 없습니다 */''}
     <button class="btn wrfab" data-act="write" aria-label="글씨 쓰기">✏️<span class="wt">글씨</span>${goalPill()}</button>
@@ -6375,7 +6689,7 @@ function placePlayer(){
   const f = document.getElementById('fol');
   if(f){
     f.style.transform = `translate(${FOL.x*100}%, ${FOL.y*100}%)`;
-    f.style.zIndex = String(3*FOL.y + 11);
+    f.style.zIndex = String(folZ());
     f.className = folCls();
   }
   const w = document.getElementById('world');
@@ -7565,8 +7879,10 @@ function renderModal(){
 
 function newGame(){
   wipe();
-  S.screen = 'pick'; SFX.open(); render();
-  say('같이 갈 친구를 골라 봐!');
+  /* 28차: 친구를 고르기 전에 한 번 — 나를 꾸며요 (건너뛰어도 돼요) */
+  S.avEd = {cat:'h', from:'new'};
+  S.screen = 'avatar'; SFX.open(); render();
+  say('먼저 나를 꾸며 볼까? 머리랑 얼굴을 골라 봐!');
 }
 function choose(i){
   const m = MONS[i];
@@ -15302,7 +15618,8 @@ function viewCloset(){
   const mi = C.mi;
   let stage;
   if(isKid){
-    stage = `<div class="clkid">${kidSvg()}</div>`;
+    stage = `<div class="clkid">${kidSvg()}</div>
+      <button class="btn btn-yellow claved" data-act="avedit" aria-label="얼굴·머리 꾸미기"><span class="e">😊</span><span class="t">얼굴·머리<br>꾸미기</span></button>`;
   }else if(mi != null && MONS[mi]){
     const many = closetMons().length > 1;
     stage = `${many ? `<button class="btn btn-white clarr" data-act="clmon:-1" aria-label="앞 친구">◀</button>` : ''}
@@ -15330,9 +15647,78 @@ function viewCloset(){
   </div>`;
 }
 
+/* ---------- ★ 28차: 나를 꾸며요 (내 트레이너 만들기) ----------
+   큰 그림 단추만으로 고릅니다: 위 줄 = 무엇을 바꿀지(머리 모양·머리색·피부·눈·안경·볼·모자·🎲섞기),
+   아래 = 고를 것(얼굴 그림). 누르는 즉시 위 큰 그림이 바뀝니다.
+   머리 모양·머리색을 고를 때는 모자를 잠깐 벗겨서 보여 줍니다 (모자에 가려 안 바뀌는 것처럼 보이지 않게) */
+function avEdOf(){
+  if(!S.avEd) S.avEd = {cat:'h', from:'closet'};
+  if(!AV_CATS.some(c => c.k === S.avEd.cat)) S.avEd.cat = 'h';
+  return S.avEd;
+}
+function avPreview(A, cat){
+  const hairCat = cat === 'h' || cat === 'hc';
+  const look = Object.assign({}, kidLook());
+  if(hairCat || cat === 'hat') look.cap = null;
+  return {look, av: hairCat ? Object.assign({}, A, {hat:'off'}) : A};
+}
+function viewAvatar(){
+  const E = avEdOf(), A = saneAv(S.av);
+  const cat = AV_CATS.find(c => c.k === E.cat);
+  const P = avPreview(A, cat.k);
+  const cats = AV_CATS.map(c => {
+    const on = c.k === cat.k;
+    return `<button class="avcat${on ? ' on' : ''}" data-act="avcat:${c.k}" aria-label="${c.n}" aria-pressed="${on}"><span class="e">${c.e}</span><span class="t">${c.n}</span></button>`;
+  }).join('') + `<button class="avcat avrnd" data-act="avrnd" aria-label="아무거나 섞기"><span class="e">🎲</span><span class="t">섞기</span></button>`;
+  const opts = cat.opts.map(o => {
+    const on = A[cat.k] === o.k;
+    const t = Object.assign({}, P.av); t[cat.k] = o.k;
+    return `<button class="avopt${on ? ' on' : ''}" data-act="avset:${cat.k}:${o.k}" aria-label="${o.n}" aria-pressed="${on}">
+      <span class="ic">${avThumb(P.look, t)}</span>${on ? '<span class="ck">✅</span>' : ''}</button>`;
+  }).join('');
+  return `
+  <div class="avstage"><div class="avkid">${kidSvg(P.look, P.av)}</div></div>
+  <div class="avcats">${cats}</div>
+  <div class="avopts">${opts}</div>
+  <div class="avrow${E.from === 'new' ? '' : ' one'}">
+    ${E.from === 'new' ? `<button class="btn btn-white" data-act="avskip">건너뛰기</button>` : ''}
+    <button class="btn btn-green" data-act="avdone">✅ 다 됐어!</button>
+  </div>`;
+}
+function avDone(){
+  save();
+  const E = S.avEd; S.avEd = null;
+  if(E && E.from === 'new'){ S.screen = 'pick'; SFX.open(); render(); say('같이 갈 친구를 골라 봐!'); return; }
+  S.closet = {tab:'kid', mi:(S.closet && S.closet.mi != null) ? S.closet.mi : S.partner};
+  S.screen = 'closet'; SFX.good(); render(); say('멋지다!');
+}
+
 /* ---------- 버튼 ---------- */
 function cosAct(cmd, arg){
   switch(cmd){
+    case 'avedit':
+      S.avEd = {cat:'h', from:'closet'}; S.screen = 'avatar'; SFX.open(); render();
+      say('머리랑 얼굴을 골라 봐!');
+      return true;
+    case 'avcat': {
+      const c = AV_CATS.find(x => x.k === arg);
+      if(c){ avEdOf().cat = c.k; SFX.open(); render(); say(c.n); }
+      return true;
+    }
+    case 'avset': {
+      const p = String(arg || '').indexOf(':');
+      const k = p < 0 ? '' : arg.slice(0, p), v = p < 0 ? '' : arg.slice(p + 1);
+      const c = AV_CATS.find(x => x.k === k), o = c && c.opts.find(x => x.k === v);
+      if(o){ const A = saneAv(S.av); A[k] = v; S.av = A; save(); SFX.item(); render(); say(o.n); }
+      return true;
+    }
+    case 'avrnd': {
+      const A = {};
+      AV_CATS.forEach(c => { A[c.k] = c.opts[Math.floor(Math.random() * c.opts.length)].k; });
+      S.av = saneAv(A); save(); SFX.good(); render(); say('짠! 이건 어때?');
+      return true;
+    }
+    case 'avdone': case 'avskip': avDone(); return true;
     case 'stamps':
       S.stampOpen = true; S.cosBox = null; S.detail = null; S.travel = false; S.bag = false;
       SFX.open(); renderModal();
