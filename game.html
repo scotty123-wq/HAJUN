@@ -2373,6 +2373,76 @@ body.tab .wrhead .ch.chsnd{font-size:36px;min-width:76px;min-height:52px;}
 @media (orientation:landscape){
   body.tab .wrmode{display:grid;grid-template-columns:1fr 1fr;}
 }
+/* ---------- 30차 ①: ⛶ 전체 화면 버튼 (시작 화면 왼쪽, 태블릿 버튼 아래) ---------- */
+.fsctog{
+  position:absolute;left:5px;top:56px;min-height:44px;padding:2px 10px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font);font-weight:900;font-size:13px;color:var(--ink);letter-spacing:-.04em;
+  background:#fff;border:3px solid var(--edge);border-radius:14px;box-shadow:0 3px 0 var(--edge);cursor:pointer;
+}
+.fsctog:active{transform:translateY(2px);box-shadow:none;}
+/* ---------- 30차: ✨ 변신소 ---------- */
+#map .mffab{
+  position:absolute;right:8px;top:124px;z-index:6;
+  width:50px;min-height:50px;padding:0;gap:0;flex-direction:column;
+  font-size:22px;line-height:1;border-radius:16px;border-width:3px;
+  background:#EEE2FF;box-shadow:0 4px 0 var(--edge);
+}
+#map .mffab .wt{font-size:10px;font-weight:900;letter-spacing:-.05em;margin-top:2px;}
+#map .mffab.ready{background:var(--sun);animation:mfGlow 1.1s ease-in-out infinite alternate;}
+@keyframes mfGlow{from{filter:drop-shadow(0 0 0 #FFE45C);transform:scale(1);}to{filter:drop-shadow(0 0 7px #FFE45C);transform:scale(1.07);}}
+@media (max-height:780px){
+  #map .mffab{width:46px;min-height:46px;font-size:19px;right:6px;top:110px;}
+  #map .mffab .wt{font-size:9px;}
+}
+.dexrow{display:flex;gap:8px;}
+.dexrow .btn{flex:1 1 0;min-width:0;font-size:clamp(15px,4.8vw,24px);padding:8px 6px;white-space:nowrap;}
+.dexrow .mfdex{flex:0 0 38%;}
+.dexrow .mfdex.ready{animation:mfGlow 1.1s ease-in-out infinite alternate;}
+.mfhead{display:flex;align-items:center;gap:8px;padding:6px 10px;
+  background:linear-gradient(90deg,#F1E4FF,#FFF4D2);border:4px solid var(--edge);border-radius:18px;box-shadow:var(--shadow);}
+.mfst{display:flex;align-items:center;gap:2px;font-size:22px;font-weight:900;white-space:nowrap;}
+.mfst b{font-size:28px;color:#7A3FCF;}
+.mftx{font-weight:800;font-size:14px;line-height:1.25;word-break:keep-all;min-width:0;}
+.mfgrid{
+  flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px;
+  align-content:start;padding:9px;background:var(--cream);border:4px solid var(--edge);
+  border-radius:20px;box-shadow:var(--shadow);-webkit-overflow-scrolling:touch;
+}
+.mfcard{
+  background:#fff;border:3px solid var(--edge);border-radius:15px;padding:4px 3px 5px;text-align:center;cursor:pointer;
+  box-shadow:0 3px 0 var(--edge);display:flex;flex-direction:column;align-items:center;min-width:0;
+  transition:transform .08s, box-shadow .08s;
+}
+.mfcard:active{transform:translateY(3px);box-shadow:none;}
+.mfcard .artbox{width:100%;aspect-ratio:1;}
+.mfcard .nm{font-weight:900;font-size:12px;letter-spacing:-.04em;line-height:1.15;word-break:keep-all;}
+.mfcard .mfc{font-weight:900;font-size:11.5px;line-height:1.2;margin-top:3px;padding:2px 3px;border-radius:9px;
+  width:100%;box-sizing:border-box;word-break:keep-all;}
+.mfcard.go{background:#FFF7D6;}
+.mfcard.go .mfc{background:var(--sun);border:2px solid var(--edge);font-size:13px;animation:mfGlow 1.1s ease-in-out infinite alternate;}
+.mfcard.need .mfc{color:var(--ink-soft);}
+.mfbar{display:block;height:8px;border-radius:5px;background:#E8E0F4;overflow:hidden;margin:0 1px 2px;border:1.5px solid var(--edge);}
+.mfbar i{display:block;height:100%;background:#B98AF0;}
+.mfcard.own{background:#EAF7E4;}
+.mfcard.own .mfc{color:var(--grass-mid);}
+.mfcard.lock{background:#EDEDE6;}
+.mfcard.lock .artbox{filter:brightness(0);opacity:.22;}
+.mfcard.lock .nm{color:#A9AFA4;}
+.mfcard.lock .mfc{color:var(--ink-soft);font-size:11px;}
+.mfrow{display:flex;gap:8px;}
+.mfrow .btn{flex:1 1 0;min-width:0;min-height:60px;font-size:clamp(14px,4.4vw,20px);padding:8px 6px;white-space:nowrap;}
+@media (max-height:700px){
+  .mfrow .btn{min-height:52px;}
+  .mftx{font-size:12.5px;}
+  .mfst b{font-size:24px;}
+}
+/* 쓰기 화면 — 방금 받은 변신 별 */
+.wrpaper .mfpop{position:absolute;left:50%;top:16%;z-index:7;pointer-events:none;transform:translateX(-50%);
+  font-weight:900;font-size:30px;color:#7A3FCF;-webkit-text-stroke:5px #fff;paint-order:stroke;
+  animation:mfPop 1.6s ease-out forwards;}
+@keyframes mfPop{0%{opacity:0;transform:translate(-50%,10px) scale(.6);}20%{opacity:1;transform:translate(-50%,0) scale(1.15);}
+  70%{opacity:1;transform:translate(-50%,-14px) scale(1);}100%{opacity:0;transform:translate(-50%,-30px) scale(1);}}
 </style>
 
 <div id="app">
@@ -5652,7 +5722,9 @@ const S = {
   stamp:0, cos:null, stampOpen:false, cosBox:null, closet:null, boxAuto:false,
   /* 28차: 내 트레이너 꾸미기 {h 머리 모양, hc 머리색, sk 피부, ey 눈, gl 안경, bl 볼, hat 기본 모자} — 저장합니다.
      avEd 는 꾸미기 화면 상태 {cat 고르는 항목, from 'new'|'closet'} 라 저장하지 않습니다 */
-  av:null, avEd:null
+  av:null, avEd:null,
+  /* 30차: ✨ 변신 별 — mfs 지금 가진 개수 · mfsT 지금까지 받은 개수(줄지 않음). 저장합니다. mfing 은 변신 연출 중(저장 안 함) */
+  mfs:0, mfsT:0, mfing:false
 };
 const RK_MIN_DEX  = 8;    /* 도감 8마리부터 로켓단이 나타납니다 */
 const RK_TEAM_MAX = 3;    /* 팀은 세 마리까지 */
@@ -5686,6 +5758,8 @@ function save(){
              stamp:S.stamp, cos:S.cos,
              /* 28차: 내 트레이너 꾸미기 (QR 로도 같이 옮겨집니다) */
              av:saneAv(S.av),
+             /* 30차: ✨ 변신 별 (QR 로도 같이 옮겨집니다) */
+             mf:{n:S.mfs || 0, t:S.mfsT || 0},
              /* 27-B: 엄마·아빠 리포트 — 날짜별 요약 (최근 30일만, 끝의 빈 값은 잘라서 작게) */
              rep:repPack(S.rep)};
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(d)); }catch(e){ memoryStore = d; }
@@ -5748,6 +5822,8 @@ function load(){
   S.stampOpen = false; S.cosBox = null; S.closet = null;
   /* 28차: 꾸미기 — 예전 저장(값 없음)은 기본 모습 */
   S.av = saneAv(d.av); S.avEd = null;
+  /* 30차: ✨ 변신 별 — 예전 저장(값 없음)은 0 */
+  { const mf = saneMf(d.mf); S.mfs = mf.n; S.mfsT = mf.t; S.mfing = false; }
   /* 27-B: 리포트 — 이상한 값 · 30일 지난 날은 조용히 버립니다 */
   S.rep = saneRep(d.rep);
   /* 6차: 쓰러짐(ko)은 S.mons 안에 같이 저장됩니다.
@@ -5778,6 +5854,7 @@ function wipe(){
   S.qRecent = []; S.qHist = []; S.wRecent = [];
   S.learn = freshLearn();
   S.stars = 0; S.lastStars = 0; S.evoWas = null; S.evoing = false;
+  S.mfs = 0; S.mfsT = 0; S.mfing = false;   /* 30차 */
   S.swapping = false; S.reviveTarget = null; S.reviveGot = 0;
   S.rk = null; S.rkPick = null; S.rkEnd = null; S.rkStep = 0; S.rkWin = 0;
   S.wrm = {}; S.wrj = {};
@@ -6269,7 +6346,7 @@ function setOf(){
      cw  : 잡을 때마다 글자 쓰기. null 이면 "태블릿 모드를 따라감" (태블릿이면 켬)
    ========================================================= */
 const DEV_KEY = 'hajun-device';
-const DEV = {tab:false, cw:null, demo:0, mus:1, mv:1};   /* 24차: mus 음악 켜기(1)/끄기(0) · mv 음악 크기 0 작게 · 1 보통 · 2 크게 */   /* 21차 D: demo = 시범 속도 0 천천히 · 1 보통 · 2 빠르게 */
+const DEV = {tab:false, cw:null, demo:0, mus:1, mv:1, fs:0};   /* 30차: fs 전체 화면을 켜 두었나 (1 이면 화면을 다시 누를 때 살짝 다시 요청) */   /* 24차: mus 음악 켜기(1)/끄기(0) · mv 음악 크기 0 작게 · 1 보통 · 2 크게 */   /* 21차 D: demo = 시범 속도 0 천천히 · 1 보통 · 2 빠르게 */
 function devLoad(){
   try{
     const d = JSON.parse(localStorage.getItem(DEV_KEY) || 'null');
@@ -6279,10 +6356,11 @@ function devLoad(){
       DEV.demo = (d.demo === 1 || d.demo === 2) ? d.demo : 0;
       DEV.mus = d.mus === 0 ? 0 : 1;
       DEV.mv = (d.mv === 0 || d.mv === 2) ? d.mv : 1;
+      DEV.fs = d.fs === 1 ? 1 : 0;
     }
   }catch(e){}
 }
-function devSave(){ try{ localStorage.setItem(DEV_KEY, JSON.stringify({tab:DEV.tab, cw:DEV.cw, demo:DEV.demo, mus:DEV.mus, mv:DEV.mv})); }catch(e){} }
+function devSave(){ try{ localStorage.setItem(DEV_KEY, JSON.stringify({tab:DEV.tab, cw:DEV.cw, demo:DEV.demo, mus:DEV.mus, mv:DEV.mv, fs:DEV.fs})); }catch(e){} }
 function tabOn(){ return DEV.tab === true; }
 function cwOn(){ return DEV.cw == null ? tabOn() : DEV.cw === 1; }
 function devApply(){ try{ document.body.classList.toggle('tab', tabOn()); }catch(e){} tabFit(); }
@@ -6315,6 +6393,75 @@ window.addEventListener('orientationchange', ()=>{ setTimeout(tabFit, 60); setTi
 /* 돌렸는데 resize 가 늦게 오는 경우까지 — 태블릿 모드일 때만 가끔 크기를 다시 봅니다 (바뀐 게 없으면 바로 끝) */
 setInterval(()=>{ if(tabOn() || TZ !== 1) tabFit(); }, 700);
 devLoad();
+/* =========================================================
+   30차 ①: ⛶ 전체 화면 (태블릿 모드에서만)
+   갤럭시탭에서 브라우저 바로가기로 열면 삼성 인터넷 탭 안에서 돌아서, 하준이가 주소창·탭을 눌러 게임 밖으로 나갑니다.
+   Fullscreen API 로 브라우저 껍데기를 숨깁니다. 홈 화면 앱(standalone)으로 열렸거나 지원하지 않으면 버튼을 숨깁니다.
+   한 번 켜 두면(DEV.fs, 이 기기에만) 브라우저가 전체 화면을 풀었을 때(다른 앱 다녀오기 등) **다음에 화면을 누를 때**
+   살짝 다시 요청합니다 — 4초에 한 번까지, 연달아 3번 안 되면 그만(전체 화면이 다시 되면 다시 셉니다).
+   글씨 쓰는 중에는 요청하지 않습니다 (화면 크기가 바뀌면 획이 끊기니까요).
+   ========================================================= */
+let FSC_LAST = -1e9, FSC_FAIL = 0;
+function fscCan(){
+  try{
+    const d = document, e = d.documentElement;
+    if(!e || !(e.requestFullscreen || e.webkitRequestFullscreen)) return false;
+    const en = (d.fullscreenEnabled != null) ? d.fullscreenEnabled : d.webkitFullscreenEnabled;
+    return en !== false;
+  }catch(err){ return false; }
+}
+/* 홈 화면 앱으로 열렸나 (그러면 이미 브라우저 껍데기가 없습니다) */
+function fscApp(){
+  try{
+    if(typeof navigator !== 'undefined' && navigator.standalone === true) return true;
+    const mm = (typeof window !== 'undefined' && window.matchMedia) ? q => window.matchMedia(q).matches === true : null;
+    return !!(mm && mm('(display-mode: standalone)'));
+  }catch(err){ return false; }
+}
+function fscOn(){ try{ const d = document; return !!(d.fullscreenElement || d.webkitFullscreenElement); }catch(err){ return false; } }
+/* 전체 화면 버튼을 보여 줄까 — 태블릿 모드 + 지원 + 홈 화면 앱이 아님 */
+function fscShow(){ return tabOn() && fscCan() && !fscApp(); }
+function fscEnter(){
+  try{
+    const e = document.documentElement;
+    const r = e.requestFullscreen ? e.requestFullscreen({navigationUI:'hide'})
+            : (e.webkitRequestFullscreen ? e.webkitRequestFullscreen() : null);
+    if(r && typeof r.catch === 'function') r.catch(()=>{});
+    return true;
+  }catch(err){ return false; }
+}
+function fscExit(){
+  try{
+    const d = document;
+    const r = d.exitFullscreen ? d.exitFullscreen() : (d.webkitExitFullscreen ? d.webkitExitFullscreen() : null);
+    if(r && typeof r.catch === 'function') r.catch(()=>{});
+  }catch(err){}
+}
+/* 켜기 · 끄기 — 어른 설정과 시작 화면 버튼 (둘 다 아이·어른이 직접 누른 순간이라 브라우저가 허락합니다) */
+function fscSet(on){
+  DEV.fs = on ? 1 : 0; devSave(); FSC_FAIL = 0;
+  if(on){ if(!fscOn()) fscEnter(); }
+  else if(fscOn()) fscExit();
+}
+/* 켜 두었는데 풀려 있으면 — 다음 터치에서 살짝 다시 (조건은 위 설명) */
+function fscNudge(now){
+  if(DEV.fs !== 1 || !fscShow() || fscOn()) return false;
+  if(S.screen === 'write' || S.wrb) return false;
+  if(FSC_FAIL >= 3 || now - FSC_LAST < 4000) return false;
+  FSC_LAST = now; FSC_FAIL++;
+  return fscEnter();
+}
+function fscChanged(){
+  if(fscOn()) FSC_FAIL = 0;
+  TZ_KEY = ''; tabFit();                         /* 화면 높이가 바뀌었으니 태블릿 배율을 다시 셉니다 */
+  setTimeout(()=>{ TZ_KEY = ''; tabFit(); }, 350); /* 주소창이 늦게 사라지는 기기 대비 */
+  if(S.screen === 'title' || S.screen === 'set') render();
+}
+try{
+  document.addEventListener('fullscreenchange', fscChanged);
+  document.addEventListener('webkitfullscreenchange', fscChanged);
+  document.addEventListener('pointerup', ()=>{ fscNudge(typeof performance !== 'undefined' ? performance.now() : Date.now()); }, true);
+}catch(e){}
 
 function battleMul(){ return SET_BATTLE[setOf().battle] || SET_BATTLE[1]; }
 function wantAdj(){ return setOf().want; }
@@ -6552,7 +6699,9 @@ function render(){
     /* 21차 B: 옷장 */
     closet: ['👕 옷장', viewCloset],
     /* 28차: 내 트레이너 꾸미기 */
-    avatar: ['🧒 나를 꾸며요', viewAvatar]
+    avatar: ['🧒 나를 꾸며요', viewAvatar],
+    /* 30차: ✨ 변신소 */
+    morph:  ['✨ 변신소', viewMorph]
   }[S.screen];
   topTitle.textContent = V[0];
   const fkeep = fieldKeep();            /* 23차: 걷던 그림·카메라가 다시 그려도 이어서 움직이게 */
@@ -6581,6 +6730,8 @@ function viewTitle(){
     ${/* 21차 A1: 태블릿 모드 — 맞은편 구석. 켜졌는지 한눈에 보이게 노란색 + "켜짐" */''}
     <button class="tabtog${tabOn() ? ' on' : ''}" data-act="tabtog" aria-pressed="${tabOn()}"
       aria-label="태블릿 모드">✏️ 태블릿<b>${tabOn() ? '켜짐' : '꺼짐'}</b></button>
+    ${/* 30차 ①: ⛶ 전체 화면 — 태블릿 모드 · 지원하는 브라우저 · 아직 전체 화면이 아닐 때만 */''}
+    ${(fscShow() && !fscOn()) ? `<button class="fsctog" data-act="fsc" aria-label="전체 화면">⛶ 전체화면</button>` : ''}
   </div>
   ${has ? `
   <div class="start-row">
@@ -6650,6 +6801,8 @@ function viewField(){
     <button class="btn wrfab" data-act="write" aria-label="글씨 쓰기">✏️<span class="wt">글씨</span>${goalPill()}</button>
     ${/* 21차 B: 🎀 도장판 · 옷장 — 글씨 버튼 바로 아래. 상자가 있으면 🎁 로 흔들립니다 */''}
     <button class="btn stfab${boxesPending() ? ' gift' : ''}" data-act="stamps" aria-label="도장판">${boxesPending() ? '🎁' : '🎀'}<span class="wt">${boxesPending() ? '상자!' : `${(S.stamp || 0) % STAMP_BOARD}/${STAMP_BOARD}`}</span></button>
+    ${/* 30차: ✨ 변신소 — 도장 버튼 아래. 변신할 수 있으면 반짝 */''}
+    <button class="btn mffab${mfReady() ? ' ready' : ''}" data-act="morph" aria-label="변신소">✨<span class="wt">${S.mfs || 0}</span></button>
   </div>
   <div class="hint">${S.msg || reg.hint}</div>
   ${evoSlotHtml()}
@@ -7012,7 +7165,7 @@ function viewDex(){
   return `<div class="dex">${cards}</div>
   ${swap
     ? `<button class="btn btn-big btn-white" data-act="swapcancel">↩️ 다시 고를래</button>`
-    : `<button class="btn btn-big btn-green" data-act="back">🌿 계속 탐험하기</button>`}`;
+    : `<div class="dexrow"><button class="btn btn-big btn-yellow mfdex${mfReady() ? ' ready' : ''}" data-act="morph">✨ 변신소</button><button class="btn btn-big btn-green" data-act="back">🌿 계속 탐험하기</button></div>`}`;
 }
 
 /* =========================================================
@@ -7129,6 +7282,8 @@ function setWriteCard(){
       <div class="sethd">✏️ 태블릿 · 글씨 (이 기기에만 저장)</div>
       <div class="setlab">📱 태블릿 모드<small>S펜으로 크게 쓰기 · 손바닥은 무시 · 글자마다 ① 보며 쓰기 → ② 기억해 쓰기</small></div>
       ${segHtml('tab', [{v:1,t:'켜기'},{v:0,t:'끄기'}], tabOn() ? 1 : 0, 2)}
+      ${fscShow() ? `<div class="setlab">⛶ 전체 화면<small>주소창·탭을 숨겨서 게임 밖으로 잘 안 나가요 · 켜 두면 전체 화면이 풀렸을 때 화면을 다시 누르면 저절로 돌아와요 (지금: ${fscOn() ? '전체 화면' : '보통 화면'})</small></div>
+      ${segHtml('fs', [{v:1,t:'켜기'},{v:0,t:'끄기'}], DEV.fs === 1 ? 1 : 0, 2)}` : ''}
       <div class="setlab">⚪ 잡을 때마다 글자 쓰기<small>퀴즈를 맞히면 볼을 던지기 전에 포켓몬 이름의 한 글자를 씁니다. 다 쓰면 반드시 잡힙니다${DEV.cw == null ? ' (지금: 태블릿 모드를 따라감)' : ''}</small></div>
       ${segHtml('cw', [{v:1,t:'켜기'},{v:0,t:'끄기'}], cwOn() ? 1 : 0, 2)}
       <div class="setlab">👀 시범 속도<small>처음 쓰는 글자를 손이 먼저 그려 보일 때의 빠르기 · 👀 보여줘 도 같은 빠르기</small></div>
@@ -7995,8 +8150,10 @@ function startBattle(){
   if(partnerKo()){ S.screen = 'ko'; render(); return; }
   /* 7차: 지금 있는 지역에 사는 포켓몬만 나옵니다.
      "물 포켓몬 잡으러 물가 가자" 가 되도록 — 이게 지역을 나눈 이유입니다 */
-  const pool = (REGION_MONS[S.reg] && REGION_MONS[S.reg].length) ? REGION_MONS[S.reg]
-             : MONS.map((m,i)=>i);
+  /* 30차: 특별한 모습(거다이 · 알로라 …)은 변신소에서만 — 야생에서는 나오지 않습니다 */
+  let pool = ((REGION_MONS[S.reg] && REGION_MONS[S.reg].length) ? REGION_MONS[S.reg]
+             : MONS.map((m,i)=>i)).filter(wildOk);
+  if(!pool.length) pool = MONS.map((m,i)=>i).filter(wildOk);
   const weights = pool.map(i=>{
     const m = MONS[i];
     /* 7차: evos(갈래 진화) 도 '아직 더 클 수 있음' 으로 봅니다.
@@ -12353,7 +12510,7 @@ function doEvolve(pick){
 
 /* 보통 진화 연출 — 이름 읽기 → 실루엣 → 빛 → 새 모습.
    메가진화(showEvo, big)보다는 한 단계 덜 화려하게 둡니다 */
-function showEvoNice(from,to,done){
+function showEvoNice(from,to,done,word){
   const box = document.getElementById('evo');
   const SZ = 'width:min(58vw,240px);height:min(58vw,240px)';
   const paint = (m, cls, word)=>{
@@ -12366,7 +12523,7 @@ function showEvoNice(from,to,done){
   paint(from, 'glow', from.n);
   say(`${from.n}!`, {rate:0.8});
   /* 2) 실루엣이 되어 흔들립니다 — 무섭지 않게 짧게 */
-  setTimeout(()=>{ paint(from, 'sil fill', '진화!'); say('어라? 모습이 변한다!'); }, 900);
+  setTimeout(()=>{ paint(from, 'sil fill', word || '진화!'); say('어라? 모습이 변한다!'); }, 900);
   /* 3) 빛이 터지고 새 모습 + 새 이름 */
   setTimeout(()=>{
     flash();
@@ -13804,7 +13961,8 @@ function wrHeadHtml(w){
           : w.solo ? '✨ 혼자 한 번 더!'
           : w.kind === 'syl' ? `「${w.word}」 의 ${w.ch}`
           : '한글 낱자를 써 보자!';
-  const t2 = hide ? '받아쓰기' : (D ? `${D.i + 1} / ${D.cs.length} 글자` : `획 ${n}개`);
+  let t2 = hide ? '받아쓰기' : (D ? `${D.i + 1} / ${D.cs.length} 글자` : `획 ${n}개`);
+  if(w.chal && !w.bat) t2 += ` · ✨${S.mfs || 0}`;   /* 30차: 도전 탭 — 변신 별 */
   const ch = hide ? `<button class="ch chsnd" data-act="wrsay" aria-label="다시 듣기">🔊</button>`
                   : `<span class="ch">${w.ch}</span>`;
   return `<div class="wrhead${D ? ' wd' : ''}">
@@ -14203,7 +14361,7 @@ function wrWordAfter(w, my){
   wrHeadSync();
   if(!wrWordLast(w)){
     const nx = D.cs[D.i + 1];
-    w.tip = `좋아! 다음은 「${nx}」 ✏️`; wrDots();
+    w.tip = `좋아! 다음은 「${nx}」 ✏️${MF.last > 0 ? `  ✨+${MF.last}` : ''}`; wrDots();
     say(`좋아! 다음은 ${nx}!`, {rate:0.85});
     setTimeout(()=>{ if(my === WR.cheer && S.screen === 'write' && !S.wrb && wrState() === w && w.wd === D){ wrWordStep(w); render(); } }, 1400);
     return;
@@ -14211,7 +14369,7 @@ function wrWordAfter(w, my){
   /* 낱말 완성 — 읽어 주고 그림 / 포켓몬, 별 +1 보너스 */
   const bonus = gainStars(1);
   starNum.textContent = String(S.stars);
-  w.tip = `「${D.word}」 다 썼다! ⭐+${bonus}`;
+  w.tip = `「${D.word}」 다 썼다! ⭐+${bonus}${MF.last > 0 ? `  ✨+${MF.last}` : ''}`;
   wrWordBonus(w);
   const box = document.getElementById('wrcheer');
   if(box){
@@ -14577,6 +14735,7 @@ function wrDone(){
   const prize = wrPrize(w);
   w.tip = prize ? `⭐+${got}  ${prize.e} ${prize.n} 얻었다!` : `⭐+${got}  ${w.ch} 완성!`;
   if(soloOk && !prize) w.tip = `✨ 혼자 썼다!  ⭐+${got}`;
+  if(MF.pend > 0) w.tip += `  ✨+${MF.pend}`;   /* 30차: 변신 별 */
   SFX.good(); confetti(); setTimeout(()=>SFX.star(), 420);
   save();
   /* 27-B: 받아쓰기를 도움 없이 맞혔다 */
@@ -14584,6 +14743,7 @@ function wrDone(){
   const box = document.getElementById('wrcheer');
   if(box){ box.textContent = soloOk ? '혼자 썼다! ✨' : (dictOk ? '맞았어! 🎉' : '잘했어! 🎉'); box.classList.remove('go'); void box.offsetWidth; box.classList.add('go'); }
   if(w.dict) wrHeadSync();                       /* 받아쓰기 — 다 쓰면 글자를 보여 줍니다 */
+  mfFlash();                                     /* 30차: ✨+N */
   wrDots();
   const my = ++WR.cheer;
   if(w.wd){ wrWordAfter(w, my); return; }        /* 27-B: 낱말 쓰기 — 다음 글자 · 낱말 완성 */
@@ -15130,6 +15290,7 @@ function act(a){
   const arg = p < 0 ? null : a.slice(p+1);
   if(busy() && LOCKED_WHILE_BUSY.indexOf(cmd) >= 0) return;
   if(cosAct(cmd, arg)) return;            /* 21차 B: 도장판 · 선물 상자 · 옷장 */
+  if(mfAct(cmd, arg)) return;             /* 30차: ⛶ 전체 화면 · ✨ 변신소 */
   switch(cmd){
     case 'newgame':
       if(S.partner != null && !adultGate()) return;
@@ -15227,6 +15388,7 @@ function act(a){
       const w = wrState();
       /* 27-B: 받아쓰기 · 낱말 탭 */
       if(w.mode !== arg){ w.mode = (['ko','num','dict','word'].indexOf(arg) >= 0 ? arg : 'ko'); wrNewTarget(); }
+      if((w.mode === 'dict' || w.mode === 'word') && !w.dictEmpty) w.tip = MF_HINT;   /* 30차: 도전 탭 입구 — 큰 보상 안내 */
       SFX.open(); render();
       wrSayTarget(w);
       break;
@@ -15266,6 +15428,7 @@ function act(a){
       if(key === 'tab' && (v === 0 || v === 1)){ DEV.tab = v === 1; devSave(); devApply(); SFX.open(); render(); break; }
       if(key === 'cw'  && (v === 0 || v === 1)){ DEV.cw = v; devSave(); SFX.open(); render(); break; }
       if(key === 'demo' && (v === 0 || v === 1 || v === 2)){ DEV.demo = v; devSave(); SFX.open(); render(); break; }   /* 21차 D */
+      if(key === 'fs' && (v === 0 || v === 1)){ fscSet(v === 1); SFX.open(); render(); break; }   /* 30차 ① 전체 화면 */
       /* 24차: 🎵 배경음악 켜기·크기 (이 기기에만) */
       if(key === 'mus' && (v === 0 || v === 1)){ DEV.mus = v; devSave(); SFX.open(); render(); break; }
       if(key === 'mv'  && (v === 0 || v === 1 || v === 2)){ DEV.mv = v; devSave(); SFX.open(); render(); break; }
@@ -15597,6 +15760,168 @@ function repSolo(info, now){
 function repWord(now){ repToday(now)[8]++; }
 WR_DONE_HOOKS.push(info=>{ repLetter(info); });
 WR_SOLO_HOOKS.push(info=>{ repSolo(info); });
+
+/* =========================================================
+   30차: ✨ 변신 별 · 변신소 — 백지 도전(받아쓰기 · 낱말)의 큰 보상
+   ---------------------------------------------------------
+   아빠: "받아쓰기·낱말은 난이도가 높으니 저기서만 코스튬(특별한 모습) 애를 선택할 수 있는 거지"
+   · 변신 별은 **WR_CHAL_HOOKS(29차 도전 탭 신호)에서만** 들어옵니다. 도장 · ⭐ 별과 따로입니다.
+       받아쓰기 한 글자 1개 (도움·틀림 없이 깨끗하면 2개)
+       낱말 — 글자 하나 쓸 때마다 1개, 낱말을 다 썼는데 모든 글자가 깨끗하면 +1 (= 글자 수 + 1)
+       틀려도 · 보여줘를 눌러도 끝까지 쓰면 최소 1개. 별이 저절로 줄어드는 일은 없습니다 (아이가 고른 변신에 쓸 때만)
+   · 변신소: 특별한 모습(MONS 에서 base 가 있는 62마리 — 거다이 · 알로라 · 갈라르 · 히스이 · 팔데아 · 코스튬 피카츄 ·
+     오리진 · 원시 · 검왕/방패왕 · 황혼/새벽 · 영물 · 로토무 5폼 · 블랙/화이트큐레무 · 지가르데 2폼 · 메가 5종)
+     기본 모습을 잡은 적이 있으면(도감) 변신 별로 바꿀 수 있습니다. 바꾸면 그 모습을 **잡은 것과 같게**(도감 · 같이 가기),
+     원래 포켓몬은 그대로 남습니다.
+   · 특별한 모습은 이제 변신소에서만 — 야생에서는 나오지 않습니다 (wildOk). 이미 잡은 특별한 모습은 그대로입니다.
+   · 메가진화(Lv.15 배틀 중 잠깐 변신 · m.mega)는 다른 시스템이라 그대로 둡니다.
+   값: 한 번 도전(받아쓰기 5글자쯤 · 낱말 두세 개)에 7~10개 → 보통 25개 · 전설 30개 = 3~4번 도전에 하나
+   ========================================================= */
+const MF_COST = 25, MF_COST_RARE = 30, MF_MAX = 9999;
+const MF_HINT = '✨ 혼자 쓰면 변신 별! 모으면 포켓몬이 변신해요';
+const MF = {pend:0, last:0, msg:''};
+/* 특별한 모습 번호들 (MONS 순서 그대로) */
+const MF_FORMS = [];
+MONS.forEach((m,i)=>{ if(m.base && IDX[m.base] != null && IDX[m.base] !== i) MF_FORMS.push(i); });
+function mfIs(i){ const m = MONS[i]; return !!(m && m.base && IDX[m.base] != null && IDX[m.base] !== i); }
+function mfBase(i){ return mfIs(i) ? IDX[MONS[i].base] : null; }
+function mfCost(i){ return (MONS[i] && MONS[i].rare === 2) ? MF_COST_RARE : MF_COST; }
+/* 야생에서 나와도 되나 — 특별한 모습은 변신소에서만 */
+function wildOk(i){ return !mfIs(i); }
+/* 'own' 이미 가짐 · 'go' 바꿀 수 있음(별 충분) · 'need' 기본 모습은 있는데 별이 모자람 · 'lock' 기본 모습을 아직 못 잡음 */
+function mfState(i){
+  if(S.mons[i] || S.dex.indexOf(i) >= 0) return 'own';
+  const b = mfBase(i);
+  if(b == null || S.dex.indexOf(b) < 0) return 'lock';
+  return (S.mfs || 0) >= mfCost(i) ? 'go' : 'need';
+}
+function mfReady(){ return MF_FORMS.some(i => mfState(i) === 'go'); }
+/* 별 받기 — 29차 도전 신호에서만 */
+function mfEarn(e){
+  if(!e || S.wrb) return 0;
+  let g = 0;
+  if(e.type === 'letter') g = e.mode === 'dict' ? (e.clean ? 2 : 1) : 1;
+  else if(e.type === 'word') g = e.clean ? 1 : 0;
+  if(g > 0){
+    S.mfs = Math.min(MF_MAX, (S.mfs || 0) + g);
+    S.mfsT = Math.min(999999, (S.mfsT || 0) + g);
+    MF.pend += g;
+  }
+  return g;
+}
+WR_CHAL_HOOKS.push(e=>{ mfEarn(e); });
+/* 쓰기 화면 — 방금 받은 변신 별을 살짝 띄웁니다 (글자 끝 · 낱말 끝) */
+function mfFlash(){
+  const g = MF.pend; MF.pend = 0; MF.last = g;
+  if(!(g > 0)) return 0;
+  try{
+    const p = document.querySelector('.wrpaper');
+    if(p && p.appendChild){
+      const el = document.createElement('div');
+      el.className = 'mfpop'; el.textContent = `✨+${g}`;
+      p.appendChild(el);
+      setTimeout(()=>{ try{ el.remove(); }catch(e){} }, 1700);
+    }
+  }catch(e){}
+  return g;
+}
+function saneMf(d){
+  const n = (d && typeof d.n === 'number' && isFinite(d.n) && d.n > 0) ? Math.min(MF_MAX, Math.floor(d.n)) : 0;
+  const t = (d && typeof d.t === 'number' && isFinite(d.t) && d.t > 0) ? Math.min(999999, Math.floor(d.t)) : 0;
+  return {n:n, t:Math.max(t, n)};
+}
+/* 변신소 카드 순서: 바꿀 수 있음 → 별 모으는 중 → 이미 가짐 → 아직 못 잡음 */
+function mfList(){
+  const R = {go:0, need:1, own:2, lock:3};
+  return MF_FORMS.map((i,k)=>({i:i, k:k, st:mfState(i)})).sort((a,b)=>(R[a.st] - R[b.st]) || (a.k - b.k));
+}
+function viewMorph(){
+  const n = S.mfs || 0;
+  const cards = mfList().map(o=>{
+    const i = o.i, m = MONS[i], bn = MONS[mfBase(i)].n, c = mfCost(i);
+    let lab;
+    if(o.st === 'own') lab = '✔ 변신했어요';
+    else if(o.st === 'go') lab = `✨${c} 변신!`;
+    else if(o.st === 'need') lab = `<span class="mfbar"><i style="width:${Math.round(Math.min(1, n / c) * 100)}%"></i></span>✨ ${n}/${c}`;
+    else lab = `${bn}${josa(bn,['을','를'])} 잡으면!`;
+    return `<div class="mfcard ${o.st}" data-act="mfgo:${i}" role="button" tabindex="0">
+      ${o.st === 'own' ? artBoxA(m,0,'',i) : artBox(m,0,'')}
+      <div class="nm">${o.st === 'lock' ? '? ? ?' : m.n}</div><div class="mfc">${lab}</div></div>`;
+  }).join('');
+  return `<div class="mfhead"><div class="mfst" aria-label="변신 별">✨<b>${n}</b></div>
+    <div class="mftx">${MF.msg || '받아쓰기·낱말을 혼자 쓰면 ✨ 변신 별! 모으면 포켓몬이 변신해요'}</div></div>
+  <div class="mfgrid">${cards}</div>
+  <div class="mfrow">
+    <button class="btn btn-yellow" data-act="mfwrite" aria-label="받아쓰기 하러 가기">✏️ 별 모으러 가기</button>
+    <button class="btn btn-green" data-act="back">🌿 돌아가기</button>
+  </div>`;
+}
+function openMorph(){
+  S.swapping = false; S.detail = null; S.stampOpen = false;
+  MF.msg = '';
+  S.screen = 'morph'; SFX.open(); render();
+  say(mfReady() ? '변신소야! 변신할 수 있는 친구가 있어! 눌러 봐!'
+                : '변신소야! 받아쓰기랑 낱말을 혼자 쓰면 변신 별을 받아. 모으면 포켓몬이 변신해!', {rate:0.9});
+}
+/* 변신! — 별을 쓰고 특별한 모습을 잡은 것과 같게. 원래 포켓몬은 그대로 */
+function mfGo(i){
+  if(S.mfing || !mfIs(i)) return false;
+  const st = mfState(i), b = mfBase(i), bm = MONS[b], fm = MONS[i], c = mfCost(i);
+  if(st === 'own'){ S.detail = i; SFX.open(); renderModal(); say(fm.n, {rate:0.8}); return false; }
+  if(st === 'lock'){
+    MF.msg = `${bm.n}${josa(bm.n,['을','를'])} 잡으면 변신할 수 있어요! 🔍`;
+    tone(420,0.1,'sine',0.05); render();
+    say(`${bm.n}${josa(bm.n,['을','를'])} 잡으면 변신할 수 있어!`, {rate:0.85});
+    return false;
+  }
+  if(st === 'need'){
+    const left = c - (S.mfs || 0);
+    MF.msg = `변신 별이 ${left}개 더 있으면 ${fm.n}${josaRo(fm.n)} 변신! ✏️`;
+    tone(420,0.1,'sine',0.05); render();
+    say(`변신 별을 ${left}개만 더 모으자! 받아쓰기나 낱말을 혼자 써 봐!`, {rate:0.85});
+    return false;
+  }
+  S.mfs = Math.max(0, (S.mfs || 0) - c);
+  S.mons[i] = {lv:Math.max(1, (S.mons[b] && S.mons[b].lv) | 0)};
+  if(S.dex.indexOf(i) < 0) S.dex.push(i);
+  S.mfing = true; MF.msg = '';
+  lock(4200);
+  save(); render();
+  SFX.evolve(); bgmJingle('evolve', 1.3);   /* 24차 축하곡 */
+  showEvoNice(bm, fm, ()=>{
+    S.mfing = false;
+    MF.msg = `${fm.n}${josaRo(fm.n)} 변신했다! 🎉 같이 가 볼까?`;
+    confetti(); flash();
+    say(`${bm.n}${josa(bm.n,['이','가'])} ${fm.n}${josaRo(fm.n)} 변신했다!`, {rate:0.85});
+    /* 도감이 늘어 새 지역이 열리면 그 축하가 먼저 (닫으면 변신소 카드에서 바로 같이 가기) — 아니면 바로 "🤝 같이 가기" 창 */
+    const nu = newlyUnlocked();
+    if(nu != null) celebrateUnlock(nu);
+    else { S.detail = i; render(); }
+  }, '변신!');
+  return true;
+}
+/* 변신소에서 바로 도전하러 — 받아쓰기(연습한 글자가 있으면) 아니면 낱말 */
+function mfWrite(){
+  S.wrb = null; S.detail = null;
+  const w = wrState();
+  let dictOk = false; try{ dictOk = wrDictPool().length > 0; }catch(e){}
+  w.mode = dictOk ? 'dict' : 'word';
+  wrNewTarget();
+  w.tip = MF_HINT;
+  S.screen = 'write'; S.msg = '';
+  SFX.open(); render();
+  wrSayTarget(w);
+}
+/* 30차 액션 — ⛶ 전체 화면 · ✨ 변신소 */
+function mfAct(cmd, arg){
+  switch(cmd){
+    case 'fsc': fscSet(true); SFX.open(); setTimeout(()=>render(), 300); return true;
+    case 'morph': openMorph(); return true;
+    case 'mfgo': mfGo(+arg); return true;
+    case 'mfwrite': mfWrite(); return true;
+  }
+  return false;
+}
 
 /* 여러 날 합치기 — 리포트 화면용 */
 function repAgg(days){
