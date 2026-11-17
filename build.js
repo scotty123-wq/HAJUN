@@ -141,7 +141,7 @@ fs.writeFileSync(path.join(DIR,'manifest.webmanifest'), JSON.stringify({
   start_url: './',
   scope: './',
   display: 'standalone',
-  orientation: 'portrait',
+  orientation: 'any',   /* 21차: 태블릿은 가로로도 씁니다 (앱으로 설치하면 이 값이 화면 방향을 고정합니다) */
   background_color: '#24713C',
   theme_color: '#24713C',
   icons: [
